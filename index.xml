@@ -2,18 +2,18 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Welcome!</title>
-    <link>https://tomniesse.github.io/blog/</link>
+    <link>https://tomniesse.github.io/</link>
     <description>Recent content on Welcome!</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>&lt;a href=&#34;https://creativecommons.org/licenses/by-nc/4.0/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;CC BY-NC 4.0&lt;/a&gt;</copyright>
-    <lastBuildDate>Sun, 09 Apr 2023 13:28:55 +0200</lastBuildDate><atom:link href="https://tomniesse.github.io/blog/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sun, 09 Apr 2023 13:28:55 +0200</lastBuildDate><atom:link href="https://tomniesse.github.io/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Printing ABS using an Ender 3 (v1), without an enclosure</title>
-      <link>https://tomniesse.github.io/blog/posts/ender3-abs-printing/</link>
+      <link>https://tomniesse.github.io/posts/ender3-abs-printing/</link>
       <pubDate>Sun, 09 Apr 2023 13:28:55 +0200</pubDate>
       
-      <guid>https://tomniesse.github.io/blog/posts/ender3-abs-printing/</guid>
+      <guid>https://tomniesse.github.io/posts/ender3-abs-printing/</guid>
       <description>Introduction When looking for a guide on how to print ABS using a cheap printer, people usually say &amp;ldquo;it&amp;rsquo;s impossible&amp;rdquo;, &amp;ldquo;it requires a printer enclosure&amp;rdquo; or &amp;ldquo;you just have to remove the fans&amp;rdquo;.
 I disagree with all those statements. In this youtube video, someone put duct tape on their Ender 3 and was able to print ABS just fine.
 And if someone else can do it, it must be possible.</description>
@@ -21,10 +21,10 @@ And if someone else can do it, it must be possible.</description>
     
     <item>
       <title>Creating an embedded OS that runs a DOS game</title>
-      <link>https://tomniesse.github.io/blog/posts/buildroot-dune-dynasty/</link>
+      <link>https://tomniesse.github.io/posts/buildroot-dune-dynasty/</link>
       <pubDate>Tue, 21 Dec 2021 13:28:55 +0200</pubDate>
       
-      <guid>https://tomniesse.github.io/blog/posts/buildroot-dune-dynasty/</guid>
+      <guid>https://tomniesse.github.io/posts/buildroot-dune-dynasty/</guid>
       <description>Introduction This page explains how the game &amp;ldquo;Dune Dynasty II&amp;rdquo; can be ran on an embedded linux OS. The OS is created using buildroot.
 All required configurations and compile-commands are documented on this page.
 The below image shows the game (and embedded OS) running.
@@ -34,10 +34,10 @@ Previous work This post is based on another post in which a basic embedded OS is
     
     <item>
       <title>Creating an access point using buildroot</title>
-      <link>https://tomniesse.github.io/blog/posts/buildroot-ap/</link>
+      <link>https://tomniesse.github.io/posts/buildroot-ap/</link>
       <pubDate>Mon, 20 Dec 2021 13:28:55 +0200</pubDate>
       
-      <guid>https://tomniesse.github.io/blog/posts/buildroot-ap/</guid>
+      <guid>https://tomniesse.github.io/posts/buildroot-ap/</guid>
       <description>Introduction This page describes how a minimal router OS can be created using buildroot.
 All configurations and build commands are documented on this page.
 The resulting OS will boot, connect to the first LAN-network it can find and then start an access point.
@@ -47,38 +47,38 @@ Editing the minimal Buildroot OS Configuring the access point part of the target
     
     <item>
       <title>Introduction to docker(-compose)</title>
-      <link>https://tomniesse.github.io/blog/posts/docker/</link>
+      <link>https://tomniesse.github.io/posts/docker/</link>
       <pubDate>Sun, 05 Dec 2021 13:28:55 +0200</pubDate>
       
-      <guid>https://tomniesse.github.io/blog/posts/docker/</guid>
+      <guid>https://tomniesse.github.io/posts/docker/</guid>
       <description>What is Docker? Docker is software that allows other programs and OS&amp;rsquo;es to run inside a container. There are other virtualization programs that can do the same (VMWare, VirtualBox, QEMU, etc.), but Docker allows building a container using a script. This script is called a Dockerfile. In addition to this, the package docker-compose allows running multiple dockerfiles at once. This way, multiple containers can run simultaneously and work together to get a certain task done.</description>
     </item>
     
     <item>
       <title>Creating a minimal OS using buildroot (Raspberry Pi)</title>
-      <link>https://tomniesse.github.io/blog/posts/buildroot/</link>
+      <link>https://tomniesse.github.io/posts/buildroot/</link>
       <pubDate>Thu, 18 Nov 2021 13:28:55 +0200</pubDate>
       
-      <guid>https://tomniesse.github.io/blog/posts/buildroot/</guid>
+      <guid>https://tomniesse.github.io/posts/buildroot/</guid>
       <description>What is an embedded OS? An Embedded Operating System is an Operating System designed to run on specific hardware. For example, many smart TV&amp;rsquo;s these days are running an embedded OS. Because the OS is made for the specific hardware, it can be configured to start up in the blink of an eye.
 What is Buildroot? Buildroot, just like the yocto project, is a set of tools to help automate the build process of an embedded Linux based OS.</description>
     </item>
     
     <item>
       <title>C and SDL2 programming</title>
-      <link>https://tomniesse.github.io/blog/posts/c-sdl2-programming/</link>
+      <link>https://tomniesse.github.io/posts/c-sdl2-programming/</link>
       <pubDate>Thu, 04 Nov 2021 13:28:55 +0200</pubDate>
       
-      <guid>https://tomniesse.github.io/blog/posts/c-sdl2-programming/</guid>
+      <guid>https://tomniesse.github.io/posts/c-sdl2-programming/</guid>
       <description>Working with SDL2 and C This post will show snippets of code that can be used to make an SDL2 application. This post serves mostly as a personal reminder of how the basics of SDL2 work. Much more advanced things can be done using SDL2, especially if it&amp;rsquo;s combined with a language like C++. C++ has classes, which make it much easier to create more advanced programs (like a basic game).</description>
     </item>
     
     <item>
       <title>Programming a character device driver (PinePhone and Linux)</title>
-      <link>https://tomniesse.github.io/blog/posts/pinephone-linux-kernel-programming/</link>
+      <link>https://tomniesse.github.io/posts/pinephone-linux-kernel-programming/</link>
       <pubDate>Wed, 03 Nov 2021 13:28:55 +0200</pubDate>
       
-      <guid>https://tomniesse.github.io/blog/posts/pinephone-linux-kernel-programming/</guid>
+      <guid>https://tomniesse.github.io/posts/pinephone-linux-kernel-programming/</guid>
       <description>Introduction This page describes the process of writing a kernel module that can toggle an LED inside a PinePhone UBports edition.
 Using the user manual of the phone&amp;rsquo;s processor (Allwinner A64), a kernel module will be written that can control the RGB-LED of the phone.
 What is a kernel module? A kernel is a piece of software that handles all the communications between hardware and software. The linux kernel uses modules for this.</description>
@@ -86,10 +86,10 @@ What is a kernel module? A kernel is a piece of software that handles all the co
     
     <item>
       <title>About</title>
-      <link>https://tomniesse.github.io/blog/about/</link>
+      <link>https://tomniesse.github.io/about/</link>
       <pubDate>Wed, 09 Apr 2014 00:00:00 +0000</pubDate>
       
-      <guid>https://tomniesse.github.io/blog/about/</guid>
+      <guid>https://tomniesse.github.io/about/</guid>
       <description>Hugo is the world’s fastest framework for building websites. It is written in Go.
 It makes use of a variety of open source projects including:
  https://github.com/russross/blackfriday https://github.com/alecthomas/chroma https://github.com/muesli/smartcrop https://github.com/spf13/cobra https://github.com/spf13/viper  Learn more and contribute on GitHub.</description>

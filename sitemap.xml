@@ -2,44 +2,44 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
-    <loc>https://tomniesse.github.io/blog/posts/</loc>
+    <loc>https://tomniesse.github.io/posts/</loc>
     <lastmod>2023-04-09T13:28:55+02:00</lastmod>
   </url><url>
-    <loc>https://tomniesse.github.io/blog/posts/ender3-abs-printing/</loc>
+    <loc>https://tomniesse.github.io/posts/ender3-abs-printing/</loc>
     <lastmod>2023-04-09T13:28:55+02:00</lastmod>
   </url><url>
-    <loc>https://tomniesse.github.io/blog/tags/</loc>
+    <loc>https://tomniesse.github.io/tags/</loc>
     <lastmod>2023-04-09T13:28:55+02:00</lastmod>
   </url><url>
-    <loc>https://tomniesse.github.io/blog/tags/untagged/</loc>
+    <loc>https://tomniesse.github.io/tags/untagged/</loc>
     <lastmod>2023-04-09T13:28:55+02:00</lastmod>
   </url><url>
-    <loc>https://tomniesse.github.io/blog/</loc>
+    <loc>https://tomniesse.github.io/</loc>
     <lastmod>2023-04-09T13:28:55+02:00</lastmod>
   </url><url>
-    <loc>https://tomniesse.github.io/blog/posts/buildroot-dune-dynasty/</loc>
+    <loc>https://tomniesse.github.io/posts/buildroot-dune-dynasty/</loc>
     <lastmod>2021-12-21T13:28:55+02:00</lastmod>
   </url><url>
-    <loc>https://tomniesse.github.io/blog/posts/buildroot-ap/</loc>
+    <loc>https://tomniesse.github.io/posts/buildroot-ap/</loc>
     <lastmod>2021-12-20T13:28:55+02:00</lastmod>
   </url><url>
-    <loc>https://tomniesse.github.io/blog/posts/docker/</loc>
+    <loc>https://tomniesse.github.io/posts/docker/</loc>
     <lastmod>2021-12-05T13:28:55+02:00</lastmod>
   </url><url>
-    <loc>https://tomniesse.github.io/blog/posts/buildroot/</loc>
+    <loc>https://tomniesse.github.io/posts/buildroot/</loc>
     <lastmod>2021-11-18T13:28:55+02:00</lastmod>
   </url><url>
-    <loc>https://tomniesse.github.io/blog/posts/c-sdl2-programming/</loc>
+    <loc>https://tomniesse.github.io/posts/c-sdl2-programming/</loc>
     <lastmod>2021-11-04T13:28:55+02:00</lastmod>
   </url><url>
-    <loc>https://tomniesse.github.io/blog/posts/pinephone-linux-kernel-programming/</loc>
+    <loc>https://tomniesse.github.io/posts/pinephone-linux-kernel-programming/</loc>
     <lastmod>2021-11-03T13:28:55+02:00</lastmod>
   </url><url>
-    <loc>https://tomniesse.github.io/blog/about/</loc>
+    <loc>https://tomniesse.github.io/about/</loc>
     <lastmod>2014-04-09T00:00:00+00:00</lastmod>
   </url><url>
-    <loc>https://tomniesse.github.io/blog/blog/</loc>
+    <loc>https://tomniesse.github.io/blog/</loc>
   </url><url>
-    <loc>https://tomniesse.github.io/blog/series/</loc>
+    <loc>https://tomniesse.github.io/series/</loc>
   </url>
 </urlset>
