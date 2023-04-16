@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="author" content="">
+<meta name="description" content="What is Docker? Docker is software that allows other programs and OS&amp;rsquo;es to run inside a container. There are other virtualization programs that can do the same (VMWare, VirtualBox, QEMU, etc.), but Docker allows building a container using a script. This script is called a Dockerfile. In addition to this, the package docker-compose allows running multiple dockerfiles at once. This way, multiple containers can run simultaneously and work together to get a certain task done." />
+<meta name="keywords" content=", untagged" />
+<meta name="robots" content="noodp" />
+<meta name="theme-color" content="" />
+<link rel="canonical" href="https://tomniesse.github.io/blog/posts/docker/" />
+
+
+    <title>
+        
+            Introduction to docker(-compose) :: Welcome!  — The place where I write about hobby stuff
+        
+    </title>
+
+
+
+
+
+<link rel="stylesheet" href="/blog/main.5b3e37caf5f369f54ba730903dd9043b99e0b3792e27db9a87f21a3634934b96.css" integrity="sha256-Wz43yvXzafVLpzCQPdkEO5ngs3kuJ9uah/IaNjSTS5Y=">
+
+
+
+    <link rel="apple-touch-icon" sizes="180x180" href="/blog/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/blog/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/blog/favicon-16x16.png">
+    <link rel="manifest" href="/blog/site.webmanifest">
+    <link rel="mask-icon" href="/blog/safari-pinned-tab.svg" color="">
+    <link rel="shortcut icon" href="/blog/favicon.ico">
+    <meta name="msapplication-TileColor" content="">
+
+
+<meta itemprop="name" content="Introduction to docker(-compose)">
+<meta itemprop="description" content="What is Docker? Docker is software that allows other programs and OS&rsquo;es to run inside a container. There are other virtualization programs that can do the same (VMWare, VirtualBox, QEMU, etc.), but Docker allows building a container using a script. This script is called a Dockerfile. In addition to this, the package docker-compose allows running multiple dockerfiles at once. This way, multiple containers can run simultaneously and work together to get a certain task done."><meta itemprop="datePublished" content="2021-12-05T13:28:55+02:00" />
+<meta itemprop="dateModified" content="2021-12-05T13:28:55+02:00" />
+<meta itemprop="wordCount" content="1427"><meta itemprop="image" content="https://tomniesse.github.io/blog"/>
+<meta itemprop="keywords" content="untagged," />
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:image" content="https://tomniesse.github.io/blog"/>
+
+<meta name="twitter:title" content="Introduction to docker(-compose)"/>
+<meta name="twitter:description" content="What is Docker? Docker is software that allows other programs and OS&rsquo;es to run inside a container. There are other virtualization programs that can do the same (VMWare, VirtualBox, QEMU, etc.), but Docker allows building a container using a script. This script is called a Dockerfile. In addition to this, the package docker-compose allows running multiple dockerfiles at once. This way, multiple containers can run simultaneously and work together to get a certain task done."/>
+
+
+
+    <meta property="og:title" content="Introduction to docker(-compose)" />
+<meta property="og:description" content="What is Docker? Docker is software that allows other programs and OS&rsquo;es to run inside a container. There are other virtualization programs that can do the same (VMWare, VirtualBox, QEMU, etc.), but Docker allows building a container using a script. This script is called a Dockerfile. In addition to this, the package docker-compose allows running multiple dockerfiles at once. This way, multiple containers can run simultaneously and work together to get a certain task done." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://tomniesse.github.io/blog/posts/docker/" /><meta property="og:image" content="https://tomniesse.github.io/blog"/><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2021-12-05T13:28:55+02:00" />
+<meta property="article:modified_time" content="2021-12-05T13:28:55+02:00" /><meta property="og:site_name" content="Welcome!" />
+
+
+
+
+
+
+
+    <meta property="article:published_time" content="2021-12-05 13:28:55 &#43;0200 &#43;0200" />
+
+
+
+
+
+
+
+
+
+
+
+    </head>
+
+    
+        <body>
+    
+    
+        <div class="container">
+            <header class="header">
+    <span class="header__inner">
+        <a href="/blog" style="text-decoration: none;">
+    <div class="logo">
+        
+            <span class="logo__mark">></span>
+            <span class="logo__text ">
+                Tom&#39;s blogposts</span>
+            <span class="logo__cursor" style=
+                  "
+                   
+                   ">
+            </span>
+        
+    </div>
+</a>
+
+
+        <span class="header__right">
+            
+                <nav class="menu">
+    <ul class="menu__inner"><li><a href="/blog/posts">Blogposts</a></li>
+    </ul>
+</nav>
+
+                <span class="menu-trigger">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                        <path d="M0 0h24v24H0z" fill="none"/>
+                        <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/>
+                    </svg>
+                </span>
+            
+        </span>
+    </span>
+</header>
+
+
+            <div class="content">
+                
+  <main class="post">
+
+    <div class="post-info">
+      <p>
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-clock">
+          <circle cx="12" cy="12" r="10"></circle>
+          <polyline points="12 6 12 12 16 14"></polyline>
+        </svg>
+        7 minutes
+
+        
+      </p>
+    </div>
+
+    <article>
+      <h1 class="post-title">
+        <a href="https://tomniesse.github.io/blog/posts/docker/">Introduction to docker(-compose)</a>
+      </h1>
+
+      
+
+      
+
+      
+
+      <div class="post-content">
+        <h1 id="what-is-docker">What is Docker?</h1>
+<p>Docker is software that allows other programs and OS&rsquo;es to run inside a container. There are other virtualization programs that can do the same (VMWare, VirtualBox, QEMU, etc.), but Docker allows building a container using a script. This script is called a <code>Dockerfile</code>. In addition to this, the package <code>docker-compose</code> allows running multiple dockerfiles at once. This way, multiple containers can run simultaneously and work together to get a certain task done. So, Docker takes much of the pain away when configuring a system, since all system configurations are stored inside the Dockerfiles. This post is going to explain the basics of making a Dockerfile and how docker-compose can manage multiple containers.</p>
+<h1 id="creating-a-dockerfile">Creating a Dockerfile</h1>
+<p>A Dockerfile is a configuration script for any given container. The Dockerfile contains all the commands needed to configure an entire container (virtual machine). This chapter explains how a Dockerfile is made. All commands one would normally insert into a system are now stored in a Dockerfile.</p>
+<h2 id="the-syntax">The syntax</h2>
+<p>Dockerfiles have the following syntax (where everything including and between the <code>&lt;</code> and <code>&gt;</code> is to be replaced):</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-Dockerfile" data-lang="Dockerfile"><span style="color:#75715e"># this is a comment</span><span style="color:#960050;background-color:#1e0010">
+</span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">FROM</span><span style="color:#e6db74"> &lt;existing container&gt;      # use someone else&#39;s already existing container to get started more quickly</span><span style="color:#960050;background-color:#1e0010">
+</span><span style="color:#960050;background-color:#1e0010">
+</span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">RUN</span> &lt;command&gt;                  <span style="color:#75715e"># run a command inside the container (configure phase)</span><span style="color:#960050;background-color:#1e0010">
+</span><span style="color:#960050;background-color:#1e0010">
+</span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#75715e"># when the container starts, run the following command, where the two dashes (--) allow arguments from the host</span><span style="color:#960050;background-color:#1e0010">
+</span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">ENTRYPOINT</span> [<span style="color:#e6db74">&#34;&lt;/path/to/binary&gt;&#34;</span>, <span style="color:#960050;background-color:#1e0010">&lt;optional</span> <span style="color:#960050;background-color:#1e0010">argument</span> <span style="color:#ae81ff">1</span><span style="color:#960050;background-color:#1e0010">&gt;</span>, <span style="color:#960050;background-color:#1e0010">--</span>, <span style="color:#960050;background-color:#1e0010">&lt;optional</span> <span style="color:#960050;background-color:#1e0010">argument</span> <span style="color:#ae81ff">3</span><span style="color:#960050;background-color:#1e0010">&gt;</span>, <span style="color:#960050;background-color:#1e0010">...</span>]<span style="color:#960050;background-color:#1e0010">
+</span><span style="color:#960050;background-color:#1e0010">
+</span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#75715e"># when the container starts, run the following command (in case no arguments were given, this is the default)</span><span style="color:#960050;background-color:#1e0010">
+</span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">CMD</span> [<span style="color:#e6db74">&#34;&lt;/path/to/binary&gt;&#34;</span>, <span style="color:#960050;background-color:#1e0010">&lt;optional</span> <span style="color:#960050;background-color:#1e0010">argument</span> <span style="color:#ae81ff">1</span><span style="color:#960050;background-color:#1e0010">&gt;</span>, <span style="color:#960050;background-color:#1e0010">&lt;optional</span> <span style="color:#960050;background-color:#1e0010">argument</span> <span style="color:#ae81ff">2</span><span style="color:#960050;background-color:#1e0010">&gt;</span>]<span style="color:#960050;background-color:#1e0010">
+</span></code></pre></div><h2 id="a-real-world-example">A real world example</h2>
+<p>In real life, a Dockerfile contains many more calls to <code>RUN</code> before the container is configured. In the example below, a gitea server is created within a Dockerfile:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-Dockerfile" data-lang="Dockerfile"><span style="color:#75715e"># use alpine linux</span><span style="color:#960050;background-color:#1e0010">
+</span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">FROM</span><span style="color:#e6db74"> alpine:latest</span><span style="color:#960050;background-color:#1e0010">
+</span><span style="color:#960050;background-color:#1e0010">
+</span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#75715e"># install gitea</span><span style="color:#960050;background-color:#1e0010">
+</span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">RUN</span> apk update<span style="color:#960050;background-color:#1e0010">
+</span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">RUN</span> apk add gitea<span style="color:#960050;background-color:#1e0010">
+</span><span style="color:#960050;background-color:#1e0010">
+</span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#75715e"># run gitea</span><span style="color:#960050;background-color:#1e0010">
+</span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">CMD</span> /usr/bin/gitea<span style="color:#960050;background-color:#1e0010">
+</span><span style="color:#960050;background-color:#1e0010">
+</span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#75715e"># expose port 3000 to the host</span><span style="color:#960050;background-color:#1e0010">
+</span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">EXPOSE</span><span style="color:#e6db74"> 3000</span><span style="color:#960050;background-color:#1e0010">
+</span></code></pre></div><p>Before this Dockerfile is used to create a container, another file called <code>docker-compose.yml</code> is created to manage all containers.</p>
+<h1 id="creating-a-docker-compose-configuration">Creating a docker-compose configuration</h1>
+<h2 id="the-syntax-1">The syntax</h2>
+<p>A configuration for docker-compose is to be called <code>docker-compose.yml</code> and it has the following syntax:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yml" data-lang="yml"><span style="color:#f92672">version</span>: <span style="color:#e6db74">&#39;3&#39;</span>
+<span style="color:#f92672">services</span>:
+  <span style="color:#75715e"># a container which is built using a dockerfile</span>
+  <span style="color:#f92672">a_service</span>:
+    <span style="color:#f92672">build</span>: <span style="color:#ae81ff">&lt;directory where the Dockerfile is located&gt;</span>
+    <span style="color:#f92672">container_name</span>: <span style="color:#ae81ff">&lt;container name goes here&gt;</span>
+    <span style="color:#f92672">volumes</span>:
+      - <span style="color:#e6db74">&#34;&lt;path/to/host/dir&gt;:&lt;path/to/guest/dir&gt;&#34;</span>
+    <span style="color:#f92672">ports</span>:
+      - <span style="color:#e6db74">&#34;&lt;host port&gt;:&lt;guest port&gt;&#34;</span>
+  <span style="color:#75715e"># create another service; uses a pre-built image from Docker Hub</span>
+  <span style="color:#f92672">another_service</span>:
+    <span style="color:#f92672">image</span>: <span style="color:#ae81ff">&lt;image name from Docker Hub goes here&gt;</span>
+    <span style="color:#f92672">container_name</span>: <span style="color:#ae81ff">&lt;container name goes here&gt;</span>
+    <span style="color:#f92672">volumes</span>:
+      - <span style="color:#e6db74">&#34;&lt;path/to/host/dir&gt;:&lt;path/to/guest/dir&gt;&#34;</span>
+    <span style="color:#f92672">ports</span>:
+      - <span style="color:#e6db74">&#34;&lt;host port&gt;:&lt;guest port&gt;&#34;</span>
+    <span style="color:#f92672">environment</span>:
+      - <span style="color:#ae81ff">variable=value</span>
+</code></pre></div><h2 id="a-real-world-example-1">A real world example</h2>
+<p>First, the minimal configuration is created to create a gitea server:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yml" data-lang="yml"><span style="color:#f92672">version</span>: <span style="color:#e6db74">&#39;3&#39;</span>
+<span style="color:#f92672">services</span>:
+  <span style="color:#f92672">gitea</span>:
+    <span style="color:#f92672">build</span>: <span style="color:#ae81ff">./ </span> <span style="color:#75715e"># The Dockerfile is located in the same directory as this file</span>
+    <span style="color:#f92672">container_name</span>: <span style="color:#ae81ff">gitea</span>
+    <span style="color:#f92672">volumes</span>:
+      - <span style="color:#e6db74">&#34;$PWD/gitea_files/var/lib/gitea:/var/lib/gitea&#34;</span>
+      - <span style="color:#e6db74">&#34;$PWD/gitea_files/etc/gitea:/etc/gitea&#34;</span>
+    <span style="color:#f92672">ports</span>:
+      - <span style="color:#e6db74">&#34;3000:3000&#34;</span>
+</code></pre></div><p>The <code>version</code> entry is often set to <code>3</code> or <code>3.x</code>. If the given version is too old, docker-compose will start complaining. This <code>docker-compose.yml</code> file contains one service called <code>gitea</code>, with container name <code>gitea</code>.</p>
+<p>Volumes are a mapped directory from guest to host, where <code>/var/lib/gitea</code> and <code>/etc/gitea</code> are folders inside the container. These two folders are mapped to <code>$PWD/gitea_files/var/lib/gitea</code> and <code>$PWD/gitea_files/etc/gitea</code> respectively. After the container has run at least one time, the container files can be viewed from the host OS by entering the <code>gitea_files</code> folder.</p>
+<p>Normally, when no volumes are created, each container forgets what it was doing when it stops running. This is not very desireable. When there is a power outage for example, each container would have to be re-configured. When volumes are present in <code>docker-compose.yml</code>, Docker will automatically restore all files in the volumes based on the files from the host OS. This would mean that the gitea server will restore the files for <code>/var/lib/gitea</code> (where the git repositories are located) as well as <code>/etc/gitea</code> (where the configuration files are stored). All the other files in the container (like the binaries in <code>/usr/bin</code>) do not have to be restored, and thus do not need a volume.</p>
+<h1 id="starting-the-container">Starting the container</h1>
+<p>To start the docker container, the following command is executed:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#75715e"># build and start all containers</span>
+docker-compose up --build
+</code></pre></div><p>The gitea Docker container will now be built and run. The build process will only happen once. Next time the container is run, it will start without having to be built. The <code>--build</code> option can therefore be left out if a container is already built.</p>
+<h2 id="testing-the-container">Testing the container</h2>
+<p>If a browser is now opened and the url <code>http://localhost:3000</code> is visited, the gitea setup screen will appear. This means that the container is running as expected. An image of part of the setup screen is shown below:</p>
+<p><a href="images/gitea_setup.png"><img src="images/gitea_setup.png" alt="Gitea setup with default options"></a></p>
+<h2 id="adding-another-container">Adding another container</h2>
+<p>By default, gitea is set to use a <code>SQLite3</code> SQL server. This SQL server is very lightweight, but can only handle one connection at a time. This would mean that gitea would stop working if multiple users started using it. This is not very desireable.</p>
+<p>For this reason, another container will be created in the <code>docker-compose.yml</code>. This container will contain a complete MySQL server. The <code>docker-compose.yml</code> file will now look as follows:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yml" data-lang="yml"><span style="color:#f92672">version</span>: <span style="color:#e6db74">&#39;3&#39;</span>
+<span style="color:#f92672">services</span>:
+  <span style="color:#75715e"># build gitea using a Dockerfile</span>
+  <span style="color:#f92672">gitea</span>:
+    <span style="color:#f92672">build</span>: <span style="color:#ae81ff">./</span>
+    <span style="color:#f92672">container_name</span>: <span style="color:#ae81ff">gitea</span>
+    <span style="color:#f92672">volumes</span>:
+      - <span style="color:#e6db74">&#34;$PWD/gitea_files/var/lib/gitea:/var/lib/gitea&#34;</span>
+      - <span style="color:#e6db74">&#34;$PWD/gitea_files/etc/gitea:/etc/gitea&#34;</span>
+    <span style="color:#f92672">ports</span>:
+      - <span style="color:#e6db74">&#34;3000:3000&#34;</span>
+
+  <span style="color:#75715e"># add another container, containing a mysql image from docker hub</span>
+  <span style="color:#f92672">db</span>:
+    <span style="color:#f92672">image</span>: <span style="color:#ae81ff">mariadb</span>
+    <span style="color:#f92672">container_name</span>: <span style="color:#ae81ff">mariadb</span>
+    <span style="color:#f92672">volumes</span>:
+      - <span style="color:#e6db74">&#34;$PWD/mariadb_files/var/lib/mysql:/var/lib/mysql&#34;</span>
+    <span style="color:#f92672">environment</span>:
+      <span style="color:#f92672">MYSQL_ROOT_PASSWORD</span>: <span style="color:#ae81ff">example_root_password</span>
+      <span style="color:#f92672">MYSQL_USER</span>: <span style="color:#ae81ff">example_user</span>
+      <span style="color:#f92672">MYSQL_PASSWORD</span>: <span style="color:#ae81ff">example_password</span>
+      <span style="color:#f92672">MYSQL_DATABASE</span>: <span style="color:#ae81ff">example_database</span>
+</code></pre></div><p>A docker container containing a mariadb database server is now added to the list of containers. Another volume is created to make sure that all database related files are transferable to another computer at a later time.</p>
+<p>When the containers are now (re) started using the command</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#75715e"># build and start all containers</span>
+docker-compose up --build
+</code></pre></div><p>the gitea container as well as a mariadb server is started.</p>
+<h2 id="communication-between-containers">Communication between containers</h2>
+<p>The cool thing about Docker containers is that they can talk to each other in a very nice way. How this works can be seen when configuring gitea. Normally, the IP address and port have to be inserted. Because the mariadb server is also a Docker container, gitea can be configured to talk to <code>mariadb:3306</code>. Docker will then automatically translate the <code>mariadb</code> part to the IP address of the mariadb container. This way, the two containers can always talk to each other. The database configuration for gitea now looks as follows:</p>
+<p><a href="images/gitea_db_setup.png"><img src="images/gitea_db_setup.png" alt="Gitea database settings"></a></p>
+<p>Gitea will always know where the database is, since Docker will always provide the right IP address (also when the docker containers are restarted later). In addition to that, both the gitea and database container will always run together.</p>
+<p>Because the Dockerfile for the gitea server is so minimal, the option <code>Run as user</code> is changed from <code>gitea</code> to <code>root</code>, since the <code>gitea</code> user does not exist within the container (programs should run as a non-root user within a docker container if it&rsquo;s a production server!).</p>
+<p>After all configurations are saved, the gitea server is operational and can be used to store projects.</p>
+<h1 id="docker-images">Docker images</h1>
+<p>For most containers on Docker Hub, the needed docker-compose configuration is given. For some images however, only a command to start a container is given. An example of this is an unofficial <a href="https://hub.docker.com/r/creativitykills/nginx-php-server">nginx and php image</a>. At the time of writing, the description contains the following command to start the container:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">docker run -d -p 4488:80 --name<span style="color:#f92672">=</span>testapp -v $PWD:/var/www creativitykills/nginx-php-server
+</code></pre></div><p>The options can be &ldquo;converted&rdquo; into a service and added to <code>docker-compose.yml</code> as follows:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yml" data-lang="yml"><span style="color:#f92672">version</span>: <span style="color:#e6db74">&#39;3&#39;</span>
+<span style="color:#f92672">services</span>:
+  <span style="color:#f92672">nginx_php</span>:
+    <span style="color:#f92672">image</span>: <span style="color:#ae81ff">creativitykills/nginx-php-server</span>
+    <span style="color:#f92672">container_name</span>: <span style="color:#ae81ff">testapp</span>
+    <span style="color:#f92672">volumes</span>:
+      - <span style="color:#e6db74">&#34;$PWD:/var/www&#34;</span>
+    <span style="color:#f92672">ports</span>:
+      - <span style="color:#e6db74">&#34;4488:80&#34;</span>
+</code></pre></div><p>The docker image can now be managed by docker-compose and works exactly the same as it would without docker-compose.</p>
+<h1 id="more-options">More options</h1>
+<p>There are more options to Dockerfiles and docker-compose configurations. One example is setting up an <a href="https://hub.docker.com/r/erichough/nfs-server">nfs server container</a>, where the container has (to have) access to some parts of the host OS. For most of these images, the needed configurations/options are given.</p>
+<h1 id="migrating-to-another-computer">Migrating to another computer</h1>
+<p>Migrating to another computer is really simple: just copy the <code>Dockerfile</code>, <code>docker-compose.yml</code> and volume-directories to another computer. That&rsquo;s it! No need to configure a new OS. Just install Docker, copy the files, rebuild the container(s) and it&rsquo;s all done.</p>
+<h1 id="conclusion">Conclusion</h1>
+<p>Docker is not too difficult to learn and is a great way to containerize many applications. Once a simple docker container is created using a <code>Dockerfile</code> and a <code>docker-compose.yml</code> file, many more features can be added. If there are containers that need to talk to eachother, it&rsquo;s all possible! And migrating the whole setup to another computer is just copying files, instead of re-configuring an entire OS.</p>
+
+      </div>
+    </article>
+
+    <hr />
+
+    <div class="post-info">
+      
+    <p>
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-tag meta-icon"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7" y2="7"></line></svg>
+
+        <span class="tag"><a href="https://tomniesse.github.io/blog/tags/untagged/">untagged</a></span>
+        
+    </p>
+
+      
+
+      <p>
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+          <polyline points="14 2 14 8 20 8"></polyline>
+          <line x1="16" y1="13" x2="8" y2="13"></line>
+          <line x1="16" y1="17" x2="8" y2="17"></line>
+          <polyline points="10 9 9 9 8 9"></polyline>
+        </svg>
+        1427 Words
+      </p>
+
+      <p>
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-calendar">
+          <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+          <line x1="16" y1="2" x2="16" y2="6"></line>
+          <line x1="8" y1="2" x2="8" y2="6"></line>
+          <line x1="3" y1="10" x2="21" y2="10"></line>
+        </svg>
+        
+          2021-12-05 12:28
+        
+
+         
+          
+        
+      </p>
+    </div>
+      <hr />
+      <div class="sharing-buttons">
+        
+<a class="resp-sharing-button__link" href="https://facebook.com/sharer/sharer.php?u=https%3a%2f%2ftomniesse.github.io%2fblog%2fposts%2fdocker%2f" target="_blank" rel="noopener" aria-label="" title="Share on facebook">
+  <div class="resp-sharing-button resp-sharing-button--facebook resp-sharing-button--small"><div aria-hidden="true" class="resp-sharing-button__icon resp-sharing-button__icon--solid">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>
+    </div>
+  </div>
+</a>
+
+
+<a class="resp-sharing-button__link" href="https://twitter.com/intent/tweet/?url=https%3a%2f%2ftomniesse.github.io%2fblog%2fposts%2fdocker%2f" target="_blank" rel="noopener" aria-label="" title="Share on twitter">
+  <div class="resp-sharing-button resp-sharing-button--twitter resp-sharing-button--small">
+      <div aria-hidden="true" class="resp-sharing-button__icon resp-sharing-button__icon--solid">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"></path></svg>
+    </div>
+  </div>
+</a>
+
+
+<a class="resp-sharing-button__link" href="https://www.tumblr.com/widgets/share/tool?posttype=link&amp;title=Introduction%20to%20docker%28-compose%29&amp;caption=Introduction%20to%20docker%28-compose%29&amp;canonicalUrl=https%3a%2f%2ftomniesse.github.io%2fblog%2fposts%2fdocker%2f" target="_blank" rel="noopener" aria-label="" title="Share on tumblr">
+  <div class="resp-sharing-button resp-sharing-button--tumblr resp-sharing-button--small">
+    <div aria-hidden="true" class="resp-sharing-button__icon resp-sharing-button__icon--solid">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" stroke="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.563 24c-5.093 0-7.031-3.756-7.031-6.411V9.747H5.116V6.648c3.63-1.313 4.512-4.596 4.71-6.469C9.84.051 9.941 0 9.999 0h3.517v6.114h4.801v3.633h-4.82v7.47c.016 1.001.375 2.371 2.207 2.371h.09c.631-.02 1.486-.205 1.936-.419l1.156 3.425c-.436.636-2.4 1.374-4.156 1.404h-.178l.011.002z"/></svg>
+    </div>
+  </div>
+</a>
+
+
+<a class="resp-sharing-button__link" href="mailto:?subject=Introduction%20to%20docker%28-compose%29&amp;body=https%3a%2f%2ftomniesse.github.io%2fblog%2fposts%2fdocker%2f" target="_self" rel="noopener" aria-label="" title="Share via email">
+  <div class="resp-sharing-button resp-sharing-button--email resp-sharing-button--small"><div aria-hidden="true" class="resp-sharing-button__icon resp-sharing-button__icon--solid">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+    </div>
+  </div>
+</a>
+
+
+<a class="resp-sharing-button__link" href="https://pinterest.com/pin/create/button/?url=https%3a%2f%2ftomniesse.github.io%2fblog%2fposts%2fdocker%2f&amp;media=https%3a%2f%2ftomniesse.github.io%2fblog%2fposts%2fdocker%2f;description=Introduction%20to%20docker%28-compose%29" target="_blank" rel="noopener" aria-label="" title="Share on pinterest">
+  <div class="resp-sharing-button resp-sharing-button--pinterest resp-sharing-button--small"><div aria-hidden="true" class="resp-sharing-button__icon resp-sharing-button__icon--solid">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12.017 0C5.396 0 .029 5.367.029 11.987c0 5.079 3.158 9.417 7.618 11.162-.105-.949-.199-2.403.041-3.439.219-.937 1.406-5.957 1.406-5.957s-.359-.72-.359-1.781c0-1.663.967-2.911 2.168-2.911 1.024 0 1.518.769 1.518 1.688 0 1.029-.653 2.567-.992 3.992-.285 1.193.6 2.165 1.775 2.165 2.128 0 3.768-2.245 3.768-5.487 0-2.861-2.063-4.869-5.008-4.869-3.41 0-5.409 2.562-5.409 5.199 0 1.033.394 2.143.889 2.741.099.12.112.225.085.345-.09.375-.293 1.199-.334 1.363-.053.225-.172.271-.401.165-1.495-.69-2.433-2.878-2.433-4.646 0-3.776 2.748-7.252 7.92-7.252 4.158 0 7.392 2.967 7.392 6.923 0 4.135-2.607 7.462-6.233 7.462-1.214 0-2.354-.629-2.758-1.379l-.749 2.848c-.269 1.045-1.004 2.352-1.498 3.146 1.123.345 2.306.535 3.55.535 6.607 0 11.985-5.365 11.985-11.987C23.97 5.39 18.592.026 11.985.026L12.017 0z"/></svg>
+    </div>
+  </div>
+</a>
+
+
+<a class="resp-sharing-button__link" href="https://www.linkedin.com/shareArticle?mini=true&amp;url=https%3a%2f%2ftomniesse.github.io%2fblog%2fposts%2fdocker%2f&amp;title=Introduction%20to%20docker%28-compose%29&amp;summary=Introduction%20to%20docker%28-compose%29&amp;source=https%3a%2f%2ftomniesse.github.io%2fblog%2fposts%2fdocker%2f" target="_blank" rel="noopener" aria-label="" title="Share on linkedin">
+  <div class="resp-sharing-button resp-sharing-button--linkedin resp-sharing-button--small"><div aria-hidden="true" class="resp-sharing-button__icon resp-sharing-button__icon--solid">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg>
+    </div>
+  </div>
+</a>
+
+
+<a class="resp-sharing-button__link" href="https://reddit.com/submit/?url=https%3a%2f%2ftomniesse.github.io%2fblog%2fposts%2fdocker%2f&amp;resubmit=true&amp;title=Introduction%20to%20docker%28-compose%29" target="_blank" rel="noopener" aria-label="" title="Share on reddit">
+  <div class="resp-sharing-button resp-sharing-button--reddit resp-sharing-button--small"><div aria-hidden="true" class="resp-sharing-button__icon resp-sharing-button__icon--solid">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0zm5.01 4.744c.688 0 1.25.561 1.25 1.249a1.25 1.25 0 0 1-2.498.056l-2.597-.547-.8 3.747c1.824.07 3.48.632 4.674 1.488.308-.309.73-.491 1.207-.491.968 0 1.754.786 1.754 1.754 0 .716-.435 1.333-1.01 1.614a3.111 3.111 0 0 1 .042.52c0 2.694-3.13 4.87-7.004 4.87-3.874 0-7.004-2.176-7.004-4.87 0-.183.015-.366.043-.534A1.748 1.748 0 0 1 4.028 12c0-.968.786-1.754 1.754-1.754.463 0 .898.196 1.207.49 1.207-.883 2.878-1.43 4.744-1.487l.885-4.182a.342.342 0 0 1 .14-.197.35.35 0 0 1 .238-.042l2.906.617a1.214 1.214 0 0 1 1.108-.701zM9.25 12C8.561 12 8 12.562 8 13.25c0 .687.561 1.248 1.25 1.248.687 0 1.248-.561 1.248-1.249 0-.688-.561-1.249-1.249-1.249zm5.5 0c-.687 0-1.248.561-1.248 1.25 0 .687.561 1.248 1.249 1.248.688 0 1.249-.561 1.249-1.249 0-.687-.562-1.249-1.25-1.249zm-5.466 3.99a.327.327 0 0 0-.231.094.33.33 0 0 0 0 .463c.842.842 2.484.913 2.961.913.477 0 2.105-.056 2.961-.913a.361.361 0 0 0 .029-.463.33.33 0 0 0-.464 0c-.547.533-1.684.73-2.512.73-.828 0-1.979-.196-2.512-.73a.326.326 0 0 0-.232-.095z"/></svg>
+    </div>
+  </div>
+</a>
+
+
+<a class="resp-sharing-button__link" href="https://www.xing.com/app/user?op=share;url=https%3a%2f%2ftomniesse.github.io%2fblog%2fposts%2fdocker%2f;title=Introduction%20to%20docker%28-compose%29" target="_blank" rel="noopener" aria-label="" title="Share on xing">
+  <div class="resp-sharing-button resp-sharing-button--xing resp-sharing-button--small"><div aria-hidden="true" class="resp-sharing-button__icon resp-sharing-button__icon--solid">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M18.188 0c-.517 0-.741.325-.927.66 0 0-7.455 13.224-7.702 13.657.015.024 4.919 9.023 4.919 9.023.17.308.436.66.967.66h3.454c.211 0 .375-.078.463-.22.089-.151.089-.346-.009-.536l-4.879-8.916c-.004-.006-.004-.016 0-.022L22.139.756c.095-.191.097-.387.006-.535C22.056.078 21.894 0 21.686 0h-3.498zM3.648 4.74c-.211 0-.385.074-.473.216-.09.149-.078.339.02.531l2.34 4.05c.004.01.004.016 0 .021L1.86 16.051c-.099.188-.093.381 0 .529.085.142.239.234.45.234h3.461c.518 0 .766-.348.945-.667l3.734-6.609-2.378-4.155c-.172-.315-.434-.659-.962-.659H3.648v.016z"/></svg>
+    </div>
+  </div>
+</a>
+
+
+<a class="resp-sharing-button__link" href="whatsapp://send?text=Introduction%20to%20docker%28-compose%29%20https%3a%2f%2ftomniesse.github.io%2fblog%2fposts%2fdocker%2f" target="_blank" rel="noopener" aria-label="" title="Share on whatsapp">
+  <div class="resp-sharing-button resp-sharing-button--whatsapp resp-sharing-button--small"><div aria-hidden="true" class="resp-sharing-button__icon resp-sharing-button__icon--solid">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" stroke="none" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+    </div>
+  </div>
+</a>
+
+
+<a class="resp-sharing-button__link" href="https://news.ycombinator.com/submitlink?u=https%3a%2f%2ftomniesse.github.io%2fblog%2fposts%2fdocker%2f&amp;t=Introduction%20to%20docker%28-compose%29" target="_blank" rel="noopener" aria-label="" title="Share on hacker news">
+  <div class="resp-sharing-button resp-sharing-button--hackernews resp-sharing-button--small"><div aria-hidden="true" class="resp-sharing-button__icon resp-sharing-button__icon--solid">
+			<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M0 24V0h24v24H0zM6.951 5.896l4.112 7.708v5.064h1.583v-4.972l4.148-7.799h-1.749l-2.457 4.875c-.372.745-.688 1.434-.688 1.434s-.297-.708-.651-1.434L8.831 5.896h-1.88z"/></svg>
+    </div>
+  </div>
+</a>
+
+
+<a class="resp-sharing-button__link" href="https://telegram.me/share/url?text=Introduction%20to%20docker%28-compose%29&amp;url=https%3a%2f%2ftomniesse.github.io%2fblog%2fposts%2fdocker%2f" target="_blank" rel="noopener" aria-label="" title="Share on telegram">
+  <div class="resp-sharing-button resp-sharing-button--telegram resp-sharing-button--small"><div aria-hidden="true" class="resp-sharing-button__icon resp-sharing-button__icon--solid">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+    </div>
+  </div>
+</a>
+
+      </div>
+
+    
+    <div class="pagination">
+        
+        <div class="pagination__title">
+            <span class="pagination__title-h">Read other posts</span>
+            <hr />
+        </div>
+        
+
+        <div class="pagination__buttons">
+            
+            <span class="button previous">
+                <a href="https://tomniesse.github.io/blog/posts/buildroot-ap/">
+                    <span class="button__icon">←</span>
+                    <span class="button__text">Creating an access point using buildroot</span>
+                </a>
+            </span>
+            
+
+            
+            <span class="button next">
+                <a href="https://tomniesse.github.io/blog/posts/buildroot/">
+                    <span class="button__text">Creating a minimal OS using buildroot (Raspberry Pi)</span>
+                    <span class="button__icon">→</span>
+                </a>
+            </span>
+            
+        </div>
+    </div>
+
+
+    
+
+    
+
+  </main>
+
+            </div>
+
+            
+                <footer class="footer">
+    
+    
+</footer>
+
+            
+        </div>
+
+        
+
+
+
+<script type="text/javascript" src="/blog/bundle.min.644292943ae47eef02fcd64b11757aeb8caeeaebf473a823b62099edccac808e8d82689359f285e5d95994e5ad5ae3b9c1ccc281eb1828e67d0ba6630f95b832.js" integrity="sha512-ZEKSlDrkfu8C/NZLEXV664yu6uv0c6gjtiCZ7cysgI6NgmiTWfKF5dlZlOWtWuO5wczCgesYKOZ9C6ZjD5W4Mg=="></script>
+
+
+
+    </body>
+</html>

@@ -1,0 +1,918 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="author" content="">
+<meta name="description" content="Introduction This page explains how the game &amp;ldquo;Dune Dynasty II&amp;rdquo; can be ran on an embedded linux OS. The OS is created using buildroot.
+All required configurations and compile-commands are documented on this page.
+The below image shows the game (and embedded OS) running.
+
+Previous work This post is based on another post in which a basic embedded OS is created. However, the toolchain used uClibc as C library, which will not work here." />
+<meta name="keywords" content=", untagged" />
+<meta name="robots" content="noodp" />
+<meta name="theme-color" content="" />
+<link rel="canonical" href="https://tomniesse.github.io/blog/posts/buildroot-dune-dynasty/" />
+
+
+    <title>
+        
+            Creating an embedded OS that runs a DOS game :: Welcome!  — The place where I write about hobby stuff
+        
+    </title>
+
+
+
+
+
+<link rel="stylesheet" href="/blog/main.5b3e37caf5f369f54ba730903dd9043b99e0b3792e27db9a87f21a3634934b96.css" integrity="sha256-Wz43yvXzafVLpzCQPdkEO5ngs3kuJ9uah/IaNjSTS5Y=">
+
+
+
+    <link rel="apple-touch-icon" sizes="180x180" href="/blog/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/blog/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/blog/favicon-16x16.png">
+    <link rel="manifest" href="/blog/site.webmanifest">
+    <link rel="mask-icon" href="/blog/safari-pinned-tab.svg" color="">
+    <link rel="shortcut icon" href="/blog/favicon.ico">
+    <meta name="msapplication-TileColor" content="">
+
+
+<meta itemprop="name" content="Creating an embedded OS that runs a DOS game">
+<meta itemprop="description" content="Introduction This page explains how the game &ldquo;Dune Dynasty II&rdquo; can be ran on an embedded linux OS. The OS is created using buildroot.
+All required configurations and compile-commands are documented on this page.
+The below image shows the game (and embedded OS) running.
+
+Previous work This post is based on another post in which a basic embedded OS is created. However, the toolchain used uClibc as C library, which will not work here."><meta itemprop="datePublished" content="2021-12-21T13:28:55+02:00" />
+<meta itemprop="dateModified" content="2021-12-21T13:28:55+02:00" />
+<meta itemprop="wordCount" content="3094"><meta itemprop="image" content="https://tomniesse.github.io/blog"/>
+<meta itemprop="keywords" content="untagged," />
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:image" content="https://tomniesse.github.io/blog"/>
+
+<meta name="twitter:title" content="Creating an embedded OS that runs a DOS game"/>
+<meta name="twitter:description" content="Introduction This page explains how the game &ldquo;Dune Dynasty II&rdquo; can be ran on an embedded linux OS. The OS is created using buildroot.
+All required configurations and compile-commands are documented on this page.
+The below image shows the game (and embedded OS) running.
+
+Previous work This post is based on another post in which a basic embedded OS is created. However, the toolchain used uClibc as C library, which will not work here."/>
+
+
+
+    <meta property="og:title" content="Creating an embedded OS that runs a DOS game" />
+<meta property="og:description" content="Introduction This page explains how the game &ldquo;Dune Dynasty II&rdquo; can be ran on an embedded linux OS. The OS is created using buildroot.
+All required configurations and compile-commands are documented on this page.
+The below image shows the game (and embedded OS) running.
+
+Previous work This post is based on another post in which a basic embedded OS is created. However, the toolchain used uClibc as C library, which will not work here." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://tomniesse.github.io/blog/posts/buildroot-dune-dynasty/" /><meta property="og:image" content="https://tomniesse.github.io/blog"/><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2021-12-21T13:28:55+02:00" />
+<meta property="article:modified_time" content="2021-12-21T13:28:55+02:00" /><meta property="og:site_name" content="Welcome!" />
+
+
+
+
+
+
+
+    <meta property="article:published_time" content="2021-12-21 13:28:55 &#43;0200 &#43;0200" />
+
+
+
+
+
+
+
+
+
+
+
+    </head>
+
+    
+        <body>
+    
+    
+        <div class="container">
+            <header class="header">
+    <span class="header__inner">
+        <a href="/blog" style="text-decoration: none;">
+    <div class="logo">
+        
+            <span class="logo__mark">></span>
+            <span class="logo__text ">
+                Tom&#39;s blogposts</span>
+            <span class="logo__cursor" style=
+                  "
+                   
+                   ">
+            </span>
+        
+    </div>
+</a>
+
+
+        <span class="header__right">
+            
+                <nav class="menu">
+    <ul class="menu__inner"><li><a href="/blog/posts">Blogposts</a></li>
+    </ul>
+</nav>
+
+                <span class="menu-trigger">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                        <path d="M0 0h24v24H0z" fill="none"/>
+                        <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/>
+                    </svg>
+                </span>
+            
+        </span>
+    </span>
+</header>
+
+
+            <div class="content">
+                
+  <main class="post">
+
+    <div class="post-info">
+      <p>
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-clock">
+          <circle cx="12" cy="12" r="10"></circle>
+          <polyline points="12 6 12 12 16 14"></polyline>
+        </svg>
+        15 minutes
+
+        
+      </p>
+    </div>
+
+    <article>
+      <h1 class="post-title">
+        <a href="https://tomniesse.github.io/blog/posts/buildroot-dune-dynasty/">Creating an embedded OS that runs a DOS game</a>
+      </h1>
+
+      
+
+      
+
+      
+
+      <div class="post-content">
+        <h1 id="introduction">Introduction</h1>
+<p>This page explains how the game &ldquo;Dune Dynasty II&rdquo; can be ran on an embedded linux OS. The OS is created using <a href="https://buildroot.org">buildroot</a>.<br>
+All required configurations and compile-commands are documented on this page.</p>
+<p>The below image shows the game (and embedded OS) running.</p>
+<p><a href="images/game.jpg"><img src="images/game.jpg" alt="Buildroot OS running Dune Dynasty II"></a></p>
+<h1 id="previous-work">Previous work</h1>
+<p>This post is based on <a href="/blog/posts/buildroot">another post</a> in which a basic embedded OS is created. However, the toolchain used uClibc as C library, which will not work here. This is why a new toolchain and Buildroot OS will be created. It is assumed that the previous post was followed and that all the tools and source code are already downloaded.</p>
+<p>The previous post showed how to make a basic OS (using crosstool-NG, U-boot and Buildroot), which did very little of value. It just started a shell and that was it.<br>
+Not very interesting.</p>
+<p>In this post, the goals are as follows:</p>
+<ul>
+<li>Make a buildroot OS containing Allegro5 and Dune Dynasty</li>
+<li>Compile the kernel without using Buildroot</li>
+<li>Make the OS start as fast as possible</li>
+</ul>
+<h1 id="creating-a-new-toolchain">Creating a new toolchain</h1>
+<p>For this OS, a new toolchain using glibc will be used. This is because uClibc creates lots of segfaults (probably while resolving libraries).</p>
+<h2 id="creating-a-new-toolchain-configuration">Creating a new toolchain configuration</h2>
+<p>First, a new toolchain configuration is created inside the crosstool-NG folder:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">./ct-ng distclean
+./ct-ng aarch64-rpi4-linux-gnu
+</code></pre></div><h2 id="making-a-few-changes-to-the-toolchain-configuration">Making a few changes to the toolchain configuration</h2>
+<p>Then, the toolchain options are changed using:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">./ct-ng menuconfig
+</code></pre></div><p>The following options were changed:</p>
+<ul>
+<li>Under <code>C compiler</code>, the option <code>Version of gcc</code> is set to the second to latest option (<code>10.3.0</code> at time of writing)</li>
+<li>Under <code>Operating System</code>, the option <code>Version of linux</code> is set to <code>5.10.79</code> (this is the version of linux that will be compiled later in this post)</li>
+<li>Under <code>Debug facilities</code>, the option <code>gdb</code> is disabled.</li>
+</ul>
+<h2 id="building-the-new-toolchain">Building the new toolchain</h2>
+<p><em>If <code>~/x-tools/</code> already contains a toolchain with the same name; move, rename or delete that toolchain. If it is not dealt with, the wrong linux headers might still be present and the target OS will fail to run. crosstool-NG will not build a shiny new toolchain automatically.</em></p>
+<p>To then build the new toolchain, execute the build command:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">./ct-ng build -j<span style="color:#e6db74">`</span>nproc<span style="color:#e6db74">`</span>
+</code></pre></div><h1 id="creating-a-new-buildroot-os">Creating a new Buildroot OS</h1>
+<p>The previous post describes how to make a Buildroot OS using uClibc. Because this does not apply here anymore, a completely new Buildroot OS will be created.</p>
+<h2 id="creating-a-new-configuration">Creating a new configuration</h2>
+<p>Within Buildroot, using <code>make menuconfig</code>, the following options are changed to create a new OS:</p>
+<ul>
+<li>Under <code>Build options</code>, the option <code>Enable compiler cache</code> is enabled</li>
+<li>Under <code>Build options</code>, the option <code>RELR0 protection</code> is set to <code>Partial</code></li>
+<li>Under <code>Build options</code>, the option <code>Stack Smashing Protection</code> is set to <code>None</code></li>
+<li>Under <code>Bootloaders</code>, all the options are disabled (the bootloader will be compiled manually)</li>
+<li>Under <code>Kernel</code>, the option <code>Linux Kernel</code> is disabled (the kernel will be compiled manually)</li>
+<li>Under <code>Filesystem images</code>, the option <code>ext2/3/4 root filesystem</code> is disabled</li>
+<li>Under <code>Filesystem images</code>, the option <code>tar the root filesystem</code> is enabled, along with the <code>Compression method</code> set to <code>gzip</code></li>
+<li>Under <code>Toolchain</code>, the option <code>Toolchain type</code> is set to <code>External toolchain</code> (this post uses a toolchain built by crosstool-NG)</li>
+<li>Under <code>Toolchain</code>, the option <code>Toolchain</code> is set to <code>Custom toolchain</code></li>
+<li>Under <code>Toolchain</code>, the option <code>Toolchain origin</code> is set to <code>Pre-installed toolchain</code></li>
+<li>Under <code>Toolchain</code>, the option <code>Toolchain path</code> is set to <code>/home/&lt;YOUR_USERNAME_GOES_HERE&gt;/x-tools/aarch64-rpi4-linux-gnu</code> (the path has to be absolute and may not contain <code>~/</code> or <code>/home/$USER/</code>!).</li>
+<li>Under <code>Toolchain</code>, the option <code>Toolchain prefix</code> is set to <code>aarch64-rpi4-linux-gnu</code></li>
+<li>Under <code>Toolchain</code>, the option <code>External toolchain C library</code> is set to <code>glibc/eglibc</code></li>
+<li>Under <code>Toolchain</code>, the option <code>External toolchain gcc version</code> is set to <code>10.x</code> (matching the version from the toolchain)</li>
+<li>Under <code>Toolchain</code>, the option <code>External toolchain kernel headers series</code> is set to <code>5.10.x</code> (matching the version from the toolchain)</li>
+<li>Under <code>Toolchain</code>, the option <code>Toolchain has locale support?</code> is enabled</li>
+<li>Under <code>Toolchain</code>, the option <code>Toolchain has threads support?</code> is enabled, along with the two extra options for threads support</li>
+<li>Under <code>Toolchain</code>, the option <code>Toolchain has SSP support?</code> is enabled</li>
+<li>Under <code>Toolchain</code>, the option <code>Toolchain has RPC support</code> is <strong>disabled</strong></li>
+<li>Under <code>Toolchain</code>, the option <code>Toolchain has C++ support?</code> is enabled</li>
+<li>Under <code>System configuration</code>, the option <code>System hostname</code> is set to <code>gaming</code></li>
+<li>Under <code>System configuration</code>, the option <code>System banner</code> is set to <code>Welcome to gaming!</code></li>
+<li>Under <code>System configuration</code>, the option <code>Root password</code> is set to <code>root</code> (the root login will be bypassed later, so this value does not matter too much)</li>
+<li>Under <code>System configuration</code>, the option <code>/dev management</code> is set to <code>Dynamic using devtmpfs + mdev</code> (to load drivers automatically when the target device boots)</li>
+<li>Under <code>System configuration</code>, the option <code>Enable Native Language Support (NLS)</code> is enabled</li>
+</ul>
+<p>The following additional options are changed to install all required dependencies for <code>X.org</code> and <code>Allegro5</code>:</p>
+<ul>
+<li>Under <code>Target packages</code> -&gt; <code>Hardware handling</code> -&gt; <code>Firmware</code>, the option <code>rpi 4 (default)</code> is <strong>disabled</strong> (all the extra firmware is not needed)</li>
+<li>Under <code>Target packages</code> -&gt; <code>Hardware handling</code> -&gt; <code>Firmware</code>, the option <code>rpi 4 (cut-down)</code> is enabled</li>
+<li>Under <code>Target packages</code> -&gt; <code>Graphic libraries and applications (graphic/text)</code>, the option <code>ratpoison</code> is enabled (Dune Dynasty refuses to run without a WM and ratpoison places windows in the middle of the screen by default)</li>
+<li>Under <code>Target packages</code> -&gt; <code>Graphic libraries and applications (graphic/text)</code>, the option <code>X.org X Window System</code> is enabled, along with the following options:
+<ul>
+<li><code>X11R7 Servers</code> -&gt; <code>xorg-server</code></li>
+<li><code>X11R7 Servers</code> -&gt; <code>Xvfb server</code></li>
+<li><code>X11R7 Applications</code> -&gt; <code>xinit</code></li>
+<li><code>X11R7 Applications</code> -&gt; <code>xinput</code></li>
+<li><code>X11R7 Applications</code> -&gt; <code>xrandr</code></li>
+<li><code>X11R7 Drivers</code> -&gt; <code>xf86-input-keyboard</code></li>
+<li><code>X11R7 Drivers</code> -&gt; <code>xf86-input-mouse</code></li>
+<li><code>X11R7 Drivers</code> -&gt; <code>xf86-video-fbdev</code></li>
+<li><code>X11R7 Drivers</code> -&gt; <code>xf86-video-fbturbo</code></li>
+</ul>
+</li>
+<li>Under <code>Target packages</code> -&gt; <code>Graphic libraries and applications (graphic/text)</code>, the option <code>mesa3d</code> is enabled, along with the following options:
+<ul>
+<li><code>Gallium v3d driver</code></li>
+<li><code>Gallium vc4 driver</code></li>
+<li><code>DRI nouveau driver</code> (Enable DRI support by enabling at least one driver, or Dune Dynasty will give a black screen with the following error log: <code>bo.1: permission denied</code>)</li>
+<li><code>OSMesa (Gallium) library</code></li>
+<li><code>OpenGL GLX</code></li>
+<li><code>OpenGL EGL</code></li>
+<li><code>OpenGL ES</code></li>
+</ul>
+</li>
+<li>Under <code>Target packages</code> -&gt; <code>Graphic libraries and applications (graphic/text)</code>, the option <code>sdl2</code> is enabled, along with the following extra options:
+<ul>
+<li><code>X11 video driver</code></li>
+<li><code>KMS/DRM video driver</code></li>
+<li><code>OpenGL (GLX)</code></li>
+<li><code>OpenGL ES</code></li>
+<li><code>sdl2_gfx</code></li>
+<li><code>sdl2_ttf</code></li>
+<li><code>sdl2_image</code></li>
+<li><code>sdl2_mixer</code></li>
+</ul>
+</li>
+<li>Under <code>Target packages</code> -&gt; <code>Graphic libraries and applications (graphic/text)</code>, the option <code>xterm</code> is enabled (for debugging)</li>
+<li>Under <code>Target packages</code> -&gt; <code>Audio and video applications</code>, the option <code>fluidsynth</code> is enabled, along with the following extra options:
+<ul>
+<li>alsa</li>
+<li>jack2</li>
+<li>sdl2</li>
+</ul>
+</li>
+<li>Under <code>Target packages</code> -&gt; <code>Libraries</code> -&gt; <code>Graphics</code>, the option <code>libglew</code> is enabled</li>
+<li>Under <code>Target packages</code> -&gt; <code>Libraries</code> -&gt; <code>Graphics</code>, the option <code>libglfw</code> is enabled</li>
+<li>Under <code>Target packages</code> -&gt; <code>Libraries</code> -&gt; <code>Graphics</code>, the option <code>libglu</code> is enabled</li>
+<li>Under <code>Target packages</code> -&gt; <code>Libraries</code> -&gt; <code>Graphics</code>, the option <code>libgtk3</code> is enabled, along with the option <code>X11 GDK backend</code> (the rest is <strong>disabled</strong>)</li>
+<li>Under <code>Target packages</code> -&gt; <code>Libraries</code> -&gt; <code>Filesystem</code>, the option <code>physfs</code> is enabled</li>
+<li>Under <code>Target packages</code> -&gt; <code>Libraries</code> -&gt; <code>Audio/Sound</code>, the option <code>opusfile</code> is enabled</li>
+<li>Under <code>Target packages</code> -&gt; <code>Libraries</code> -&gt; <code>Audio/Sound</code>, the option <code>libmad</code> is enabled</li>
+<li>Under <code>Target packages</code> -&gt; <code>Libraries</code> -&gt; <code>Audio/Sound</code>, the option <code>alsa-lib</code> is enabled, as well as all the extra options it provides</li>
+<li>Under <code>Target packages</code> -&gt; <code>Libraries</code> -&gt; <code>Multimedia</code>, the option <code>libtheora</code> is enabled</li>
+</ul>
+<p>The target OS should now have all required dependencies enabled.</p>
+<h2 id="automatic-post-build-system-changes">Automatic post-build system changes</h2>
+<p>There are a few changes made to the system after it&rsquo;s built. These changes are as follows:</p>
+<ul>
+<li>Make sure <code>mdev</code> loads device firmware</li>
+<li>Bypass the login prompt</li>
+<li>Make sure X.org starts correctly when <code>xinit</code> is executed inside the target OS</li>
+<li>Make sure Dune Dynasty is started when the WM starts</li>
+<li>Disable automatic network setup</li>
+</ul>
+<p>To make sure these changes are always present in the target OS, the following will be appended to <code>/path/to/buildroot-&lt;VERSION_GOES_HERE&gt;/board/raspberrypi/post-build.sh</code>:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#75715e"># Make sure device firmware is being loaded during boot</span>
+cp package/busybox/S10mdev <span style="color:#e6db74">${</span>TARGET_DIR<span style="color:#e6db74">}</span>/etc/init.d/S10mdev
+chmod <span style="color:#ae81ff">755</span> <span style="color:#e6db74">${</span>TARGET_DIR<span style="color:#e6db74">}</span>/etc/init.d/S10mdev
+chmod +x <span style="color:#e6db74">${</span>TARGET_DIR<span style="color:#e6db74">}</span>/etc/init.d/S10mdev
+cp package/busybox/mdev.conf <span style="color:#e6db74">${</span>TARGET_DIR<span style="color:#e6db74">}</span>/etc/mdev.conf
+
+<span style="color:#75715e"># Skip login by changing /etc/inittab</span>
+sed -i s<span style="color:#e6db74">&#39;|console::respawn:/sbin/getty -L  console 0 vt100 # GENERIC_SERIAL|# login bypass|g&#39;</span> <span style="color:#e6db74">${</span>TARGET_DIR<span style="color:#e6db74">}</span>/etc/inittab
+sed -i <span style="color:#e6db74">&#39;s|tty1::respawn:/sbin/getty -L  tty1 0 vt100 # HDMI console|::respawn:-/bin/sh -c &#34;xinit&#34;|g&#39;</span> <span style="color:#e6db74">${</span>TARGET_DIR<span style="color:#e6db74">}</span>/etc/inittab
+
+<span style="color:#75715e"># Make sure X.org works</span>
+sed -i <span style="color:#e6db74">&#39;s| Driver|#Driver|g&#39;</span> <span style="color:#e6db74">${</span>TARGET_DIR<span style="color:#e6db74">}</span>/etc/X11/xorg.conf
+
+<span style="color:#75715e"># Configure ratpoison WM</span>
+echo <span style="color:#e6db74">&#34;startup_message off&#34;</span> &gt; <span style="color:#e6db74">${</span>TARGET_DIR<span style="color:#e6db74">}</span>/.ratpoisonrc
+echo <span style="color:#e6db74">&#34;exec /usr/local/bin/dunedynasty&#34;</span> &gt;&gt; <span style="color:#e6db74">${</span>TARGET_DIR<span style="color:#e6db74">}</span>/.ratpoisonrc
+
+<span style="color:#75715e"># Configure xinit</span>
+echo <span style="color:#e6db74">&#39;export LD_LIBRARY_PATH=&#34;/lib:/usr/lib:/usr/local/lib&#34;&#39;</span> &gt; <span style="color:#e6db74">${</span>TARGET_DIR<span style="color:#e6db74">}</span>/.xinitrc
+echo <span style="color:#e6db74">&#34;ratpoison&#34;</span> &gt;&gt; <span style="color:#e6db74">${</span>TARGET_DIR<span style="color:#e6db74">}</span>/.xinitrc
+
+<span style="color:#75715e"># Delete X.org and networking init files</span>
+rm <span style="color:#e6db74">${</span>TARGET_DIR<span style="color:#e6db74">}</span>/etc/init.d/S40xorg
+rm <span style="color:#e6db74">${</span>TARGET_DIR<span style="color:#e6db74">}</span>/etc/init.d/S40network
+</code></pre></div><h2 id="automatically-build-and-install-allegro5-and-dune-dynasty-to-target-os">Automatically build and install Allegro5 and Dune Dynasty to target OS</h2>
+<p>The <code>post-build.sh</code> file will also be used to automatically install Allegro5 and Dune Dynasty to the target OS.</p>
+<p>There are two directories within Buildroot that are required when building and installing Allegro5 and Dune Dynasty:</p>
+<ul>
+<li><code>target</code>: buildroot-&lt;VERSION_GOES_HERE&gt;/output/target (<code>post-build.sh</code> refers to this as <code>${TARGET_DIR}</code>)</li>
+<li><code>sysroot</code>: buildroot-&lt;VERSION_GOES_HERE&gt;/output/host/aarch64-buildroot-linux-gnu/sysroot (or, <code>${TARGET_DIR}/../host/aarch64-buildroot-linux-gnu/sysroot</code>)</li>
+</ul>
+<p>Compiling can only be done against the <code>sysroot</code> directory, while the target OS is stored in the <code>target</code> directory. For this reason, Allegro5 must be installed to both directories to compile and run Dune Dynasty correctly.</p>
+<h3 id="creating-a-toolchain-for-both-allegro5-and-dune-dynasty">Creating a toolchain for both Allegro5 and Dune Dynasty</h3>
+<p>A file called <code>Toolchain-raspberrypi4_64.cmake</code> is created inside the <code>/path/to/buildroot-&lt;VERSION_GOES_HERE&gt;/board/raspberrypi</code>, with the following contents:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#75715e">#############</span>
+<span style="color:#75715e"># Set target OS</span>
+<span style="color:#75715e">#############</span>
+
+set<span style="color:#f92672">(</span>CMAKE_SYSTEM_NAME Linux<span style="color:#f92672">)</span>
+
+<span style="color:#75715e">######################################################</span>
+<span style="color:#75715e"># Force CMake to use the toolchain built by crosstool-NG</span>
+<span style="color:#75715e"># (both 64 bit and 32 bit cross-compiling toolchains can</span>
+<span style="color:#75715e"># be used here)</span>
+<span style="color:#75715e">######################################################</span>
+
+set<span style="color:#f92672">(</span>CMAKE_TOOLCHAIN_FILE /home/&lt;YOUR_USERNAME_GOES_HERE&gt;/x-tools/aarch64-rpi4-linux-gnu/bin/aarch64-rpi4-linux-gnu<span style="color:#f92672">)</span>
+set<span style="color:#f92672">(</span>CMAKE_C_COMPILER <span style="color:#e6db74">${</span>CMAKE_TOOLCHAIN_FILE<span style="color:#e6db74">}</span>-gcc<span style="color:#f92672">)</span>
+set<span style="color:#f92672">(</span>CMAKE_CXX_COMPILER <span style="color:#e6db74">${</span>CMAKE_TOOLCHAIN_FILE<span style="color:#e6db74">}</span>-g++<span style="color:#f92672">)</span>
+set<span style="color:#f92672">(</span>CMAKE_LINKER <span style="color:#e6db74">${</span>CMAKE_TOOLCHAIN_FILE<span style="color:#e6db74">}</span>-ld<span style="color:#f92672">)</span>
+
+set<span style="color:#f92672">(</span>MAKE_C_LINK_EXECUTABLE <span style="color:#e6db74">${</span>CMAKE_LINKER<span style="color:#e6db74">}</span><span style="color:#f92672">)</span>
+set<span style="color:#f92672">(</span>MAKE_CXX_LINK_EXECUTABLE <span style="color:#e6db74">${</span>CMAKE_LINKER<span style="color:#e6db74">}</span><span style="color:#f92672">)</span>
+
+<span style="color:#75715e">#########################################################</span>
+<span style="color:#75715e"># Tell CMake to do all compiling against the target sysroot</span>
+<span style="color:#75715e">#########################################################</span>
+
+set<span style="color:#f92672">(</span>CMAKE_SYSROOT /path/to/buildroot-&lt;VERSION_GOES_HERE&gt;/output/host/aarch64-buildroot-linux-gnu/sysroot<span style="color:#f92672">)</span>
+set<span style="color:#f92672">(</span>CMAKE_SYSROOT_COMPILE <span style="color:#e6db74">${</span>CMAKE_SYSROOT<span style="color:#e6db74">}</span>/<span style="color:#f92672">)</span>
+set<span style="color:#f92672">(</span>CMAKE_SYSROOT_LINK <span style="color:#e6db74">${</span>CMAKE_SYSROOT<span style="color:#e6db74">}</span>/<span style="color:#f92672">)</span>
+set<span style="color:#f92672">(</span>CMAKE_SYSTEM_PREFIX_PATH <span style="color:#e6db74">${</span>CMAKE_SYSROOT<span style="color:#e6db74">}</span>/<span style="color:#f92672">)</span>
+set<span style="color:#f92672">(</span>CMAKE_INSTALL_PREFIX <span style="color:#e6db74">${</span>CMAKE_SYSROOT<span style="color:#e6db74">}</span><span style="color:#f92672">)</span>
+
+<span style="color:#75715e">#######################################################</span>
+<span style="color:#75715e"># Make sure CMake does not link against host OS libraries</span>
+<span style="color:#75715e">#######################################################</span>
+
+set<span style="color:#f92672">(</span>CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER<span style="color:#f92672">)</span>
+set<span style="color:#f92672">(</span>CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY<span style="color:#f92672">)</span>
+set<span style="color:#f92672">(</span>CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY<span style="color:#f92672">)</span>
+set<span style="color:#f92672">(</span>CMAKE_FINE_ROOT_PATH_MODE_PACKAGE ONLY<span style="color:#f92672">)</span>
+
+<span style="color:#75715e">###############################################</span>
+<span style="color:#75715e"># Make sure Allegro5 is found (using pkg-config).</span>
+<span style="color:#75715e"># Only Dune Dynasty needs this. When building</span>
+<span style="color:#75715e"># Allegro5, this part is ignored by CMake.</span>
+<span style="color:#75715e">###############################################</span>
+
+set<span style="color:#f92672">(</span>ENV<span style="color:#f92672">{</span>PKG_CONFIG_DIR<span style="color:#f92672">}</span> <span style="color:#e6db74">&#34;&#34;</span><span style="color:#f92672">)</span>
+set<span style="color:#f92672">(</span>ENV<span style="color:#f92672">{</span>PKG_CONFIG_LIBDIR<span style="color:#f92672">}</span> <span style="color:#e6db74">${</span>CMAKE_SYSROOT<span style="color:#e6db74">}</span>/usr/lib/pkgconfig:<span style="color:#e6db74">${</span>CMAKE_SYSROOT<span style="color:#e6db74">}</span>/usr/share/pkgconfig:<span style="color:#e6db74">${</span>CMAKE_SYSROOT<span style="color:#e6db74">}</span>/usr/local/lib/pkgconfig/<span style="color:#f92672">)</span>
+set<span style="color:#f92672">(</span>ENV<span style="color:#f92672">{</span>PKG_CONFIG_PATH<span style="color:#f92672">}</span> <span style="color:#e6db74">${</span>PKG_CONFIG_LIBDIR<span style="color:#e6db74">}</span><span style="color:#f92672">)</span>
+set<span style="color:#f92672">(</span>ENV<span style="color:#f92672">{</span>PKG_CONFIG_SYSROOT_DIR<span style="color:#f92672">}</span> <span style="color:#e6db74">${</span>CMAKE_SYSROOT<span style="color:#e6db74">}</span><span style="color:#f92672">)</span>
+</code></pre></div><p>This toolchain file is used by Allegro5 and Dune Dynasty to cross-compile and link to the target Buildroot OS.</p>
+<h3 id="automate-the-installation-of-allegro5-and-dune-dynasty">Automate the installation of Allegro5 and Dune Dynasty</h3>
+<p>To make sure Allegro5 and Dune Dynasty are added to the target OS after Buildroot is done creating it, the following is appended to <code>/path/to/buildroot-&lt;VERSION_GOES_HERE&gt;/board/raspberrypi/post-build.sh</code>:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#75715e"># Add Allegro5 and Dune Dynasty to the target rootfs</span>
+
+<span style="color:#75715e"># Create a temporary download directory</span>
+rm -rf tmp
+mkdir tmp
+cd tmp
+
+<span style="color:#75715e"># Install Allegro5 to target OS and development sysroot</span>
+wget https://github.com/liballeg/allegro5/releases/download/5.2.7.0/allegro-5.2.7.0.tar.gz
+tar -xvf allegro-5.2.7.0.tar.gz
+rm -rf allegro-5.2.7.0.tar.gz
+cp ../board/raspberrypi/Toolchain-raspberrypi4_64.cmake allegro-5.2.7.0/cmake/
+cd allegro-5.2.7.0/
+mkdir build
+cd build
+rm -rf CMakeFiles CMakeCache.txt addons cmake_install.cmake demos docs examples include lib Makefile tests
+cmake -DCMAKE_TOOLCHAIN_FILE<span style="color:#f92672">=</span>cmake/Toolchain-raspberrypi4_64.cmake -DSHARED<span style="color:#f92672">=</span>on -DCMAKE_LINKER_FLAGS<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;-static-libgcc -static-libstdc++&#34;</span> ..
+make -j<span style="color:#e6db74">`</span>nproc<span style="color:#e6db74">`</span>
+DESTDIR<span style="color:#f92672">=</span><span style="color:#e6db74">${</span>TARGET_DIR<span style="color:#e6db74">}</span>/../host/aarch64-buildroot-linux-gnu/sysroot make install <span style="color:#75715e"># install to target sysroot to compile dune dynasty against</span>
+DESTDIR<span style="color:#f92672">=</span><span style="color:#e6db74">${</span>TARGET_DIR<span style="color:#e6db74">}</span> make install <span style="color:#75715e"># install to target system</span>
+
+cd ../../
+
+<span style="color:#75715e"># Install Dune Dynasty to target OS</span>
+rm -rf dunedynasty-1.5.7/
+wget https://versaweb.dl.sourceforge.net/project/dunedynasty/dunedynasty-1.5/dunedynasty-1.5.7.tar.gz
+tar -xvf dunedynasty-1.5.7.tar.gz
+rm -rf dunedynasty-1.5.7.tar.gz
+cp ../board/raspberrypi/Toolchain-raspberrypi4_64.cmake dunedynasty-1.5.7/cmake/
+cd dunedynasty-1.5.7/
+mkdir build
+cd build
+cmake -DCMAKE_TOOLCHAIN_FILE<span style="color:#f92672">=</span>cmake/Toolchain-raspberrypi4_64.cmake ..
+make -j<span style="color:#e6db74">`</span>nproc<span style="color:#e6db74">`</span>
+DESTDIR<span style="color:#f92672">=</span><span style="color:#e6db74">${</span>TARGET_DIR<span style="color:#e6db74">}</span> make install <span style="color:#75715e"># install to target system</span>
+
+cd ../../../
+</code></pre></div><h2 id="creating-a-new-buildroot-os-1">Creating a new Buildroot OS</h2>
+<p>To then create a new OS, the make command is executed within Buildroot:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">make clean
+make
+</code></pre></div><p>After Buildroot is done, a file called <code>rootfs.tar.gz</code> is created inside the <code>/path/to/buildroot-&lt;VERSION_GOES_HERE&gt;/output/images</code> directory. This is the entire OS, minus the kernel.</p>
+<h1 id="compiling-the-linux-kernel">Compiling the linux kernel</h1>
+<p>While Buildroot is doing it&rsquo;s thing, a linux kernel can be compiled. There exists a <a href="https://github.com/raspberrypi/linux">github repository</a> containing a complete kernel source for the Raspberry Pi. This source will be used to create a kernel.</p>
+<h2 id="downloading-the-source">Downloading the source</h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">git clone https://github.com/raspberrypi/linux
+git checkout rpi-5.10.y <span style="color:#75715e"># version 5.10.y matches the one from the toolchain</span>
+git checkout d261fd9f97da8b6b3ed1fa613cc3fd6abb41f0be <span style="color:#75715e"># known working commit for the paranoid (optional)</span>
+cd linux
+</code></pre></div><h2 id="configuring-the-source">Configuring the source</h2>
+<p>To see all available default configurations:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">ls arch/arm64/configs/
+</code></pre></div><p>To pick the one for the Raspberry Pi 4:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">ARCH<span style="color:#f92672">=</span>arm64 CROSS_COMPILE<span style="color:#f92672">=</span>~/x-tools/aarch64-rpi4-linux-gnu/bin/aarch64-rpi4-linux-gnu- make bcm2711_defconfig
+</code></pre></div><h2 id="compiling">Compiling</h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">ARCH<span style="color:#f92672">=</span>arm64 CROSS_COMPILE<span style="color:#f92672">=</span>~/x-tools/aarch64-rpi4-linux-gnu/bin/aarch64-rpi4-linux-gnu- make clean
+ARCH<span style="color:#f92672">=</span>arm64 CROSS_COMPILE<span style="color:#f92672">=</span>~/x-tools/aarch64-rpi4-linux-gnu/bin/aarch64-rpi4-linux-gnu- make -j<span style="color:#e6db74">`</span>nproc<span style="color:#e6db74">`</span>
+ARCH<span style="color:#f92672">=</span>arm64 CROSS_COMPILE<span style="color:#f92672">=</span>~/x-tools/aarch64-rpi4-linux-gnu/bin/aarch64-rpi4-linux-gnu- make modules -j<span style="color:#e6db74">`</span>nproc<span style="color:#e6db74">`</span>
+</code></pre></div><p>After the compiling process is done, there should be a file called <code>Image</code> inside the <code>/path/to/linux/arch/arm64/boot</code> directory.</p>
+<h1 id="creating-a-system-image">Creating a system image</h1>
+<p>Buildroot is done, Linux is compiled. Everything can now be put inside of a system image. This process will be automated using a file called <code>build_image.sh</code>.</p>
+<h2 id="creating-raspberry-pi-4-boot-configuration-configtxt">Creating Raspberry Pi 4 boot configuration (config.txt)</h2>
+<p>Before <code>build_image.sh</code> can do it&rsquo;s thing, a file called <code>config.txt</code> will be created in the root directory of the project. The file will have the following contents:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-ini" data-lang="ini"><span style="color:#75715e"># Enable 64 bit mode</span>
+<span style="color:#a6e22e">arm_64bit</span><span style="color:#f92672">=</span><span style="color:#e6db74">1</span>
+
+<span style="color:#75715e"># Make the raspberry Pi 4 start the linux binary called &#34;Image&#34;</span>
+<span style="color:#a6e22e">kernel</span><span style="color:#f92672">=</span><span style="color:#e6db74">Image</span>
+
+<span style="color:#75715e"># Disable bluetooth</span>
+<span style="color:#a6e22e">dtoverlay</span><span style="color:#f92672">=</span><span style="color:#e6db74">disable-bt</span>
+
+<span style="color:#75715e"># Run cut-down files</span>
+<span style="color:#a6e22e">start_file</span><span style="color:#f92672">=</span><span style="color:#e6db74">start4cd.elf</span>
+<span style="color:#a6e22e">fixup_file</span><span style="color:#f92672">=</span><span style="color:#e6db74">fixup4cd.dat</span>
+
+<span style="color:#75715e"># Go fast</span>
+<span style="color:#a6e22e">arm_boost</span><span style="color:#f92672">=</span><span style="color:#e6db74">1</span>
+<span style="color:#a6e22e">initial_turbo</span><span style="color:#f92672">=</span><span style="color:#e6db74">20</span>
+<span style="color:#a6e22e">boot_delay</span><span style="color:#f92672">=</span><span style="color:#e6db74">0</span>
+<span style="color:#a6e22e">boot_delay_ms</span><span style="color:#f92672">=</span><span style="color:#e6db74">0</span>
+<span style="color:#a6e22e">force_eeprom_read</span><span style="color:#f92672">=</span><span style="color:#e6db74">0</span>
+<span style="color:#a6e22e">start_cd</span><span style="color:#f92672">=</span><span style="color:#e6db74">1</span>
+<span style="color:#a6e22e">start_x</span><span style="color:#f92672">=</span><span style="color:#e6db74">0</span>
+<span style="color:#a6e22e">enable_uart</span><span style="color:#f92672">=</span><span style="color:#e6db74">0</span>
+
+<span style="color:#75715e"># Disable rainbow splash screen</span>
+<span style="color:#a6e22e">disable_splash</span><span style="color:#f92672">=</span><span style="color:#e6db74">1</span>
+
+<span style="color:#75715e"># Enable DRM VC4 V3D driver overlay</span>
+<span style="color:#a6e22e">dtoverlay</span><span style="color:#f92672">=</span><span style="color:#e6db74">vc4-fkms-v3d-pi4</span>
+<span style="color:#a6e22e">max_framebuffers</span><span style="color:#f92672">=</span><span style="color:#e6db74">2</span>
+<span style="color:#a6e22e">gpu_mem</span><span style="color:#f92672">=</span><span style="color:#e6db74">128</span>
+
+<span style="color:#75715e"># Enable audio</span>
+<span style="color:#a6e22e">dtparam</span><span style="color:#f92672">=</span><span style="color:#e6db74">audio=on</span>
+</code></pre></div><h2 id="creating-raspberry-pi-4-boot-configuration-cmdlinetxt">Creating Raspberry Pi 4 boot configuration (cmdline.txt)</h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">rng_core.default_quality<span style="color:#f92672">=</span><span style="color:#ae81ff">100</span> dwc_otg.lpm_enable<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span> console<span style="color:#f92672">=</span>tty1 root<span style="color:#f92672">=</span>/dev/mmcblk0p2 rootfstype<span style="color:#f92672">=</span>ext4 rootwait quiet
+</code></pre></div><h2 id="creating-the-build-script">Creating the build script</h2>
+<p>The file <code>build_image.sh</code> is created inside the root directory of the project, and has the following contents:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#75715e">#########################################</span>
+<span style="color:#75715e"># Create a system image called &#34;system.img&#34;</span>
+<span style="color:#75715e">#########################################</span>
+
+rm -rf system.img
+sudo dd <span style="color:#66d9ef">if</span><span style="color:#f92672">=</span>/dev/zero of<span style="color:#f92672">=</span>system.img bs<span style="color:#f92672">=</span>1MiB count<span style="color:#f92672">=</span><span style="color:#ae81ff">300</span> status<span style="color:#f92672">=</span>progress
+sudo sync
+
+echo <span style="color:#e6db74">&#34;mklabel msdos&#34;</span> | sudo parted system.img
+echo <span style="color:#e6db74">&#34;mkpart primary fat16 2048s 30MiB&#34;</span> | sudo parted system.img
+echo <span style="color:#e6db74">&#34;mkpart primary ext4 30MiB 100%&#34;</span> | sudo parted system.img
+echo <span style="color:#e6db74">&#34;set 1 boot on&#34;</span> | sudo parted system.img
+<span style="color:#75715e"># echo &#34;print&#34; | sudo parted system.img</span>
+<span style="color:#75715e"># sleep 10</span>
+sudo chmod <span style="color:#ae81ff">777</span> system.img
+
+<span style="color:#75715e">###########################################</span>
+<span style="color:#75715e"># Mount the system image, as if it&#39;s a device</span>
+<span style="color:#75715e">###########################################</span>
+
+SYSTEM_IMAGE<span style="color:#f92672">=</span><span style="color:#e6db74">`</span>sudo losetup -Pf system.img --show<span style="color:#e6db74">`</span>
+
+<span style="color:#75715e">##########################</span>
+<span style="color:#75715e"># Partition the system image</span>
+<span style="color:#75715e">##########################</span>
+
+sudo mkfs.vfat -n BOOT <span style="color:#e6db74">`</span>echo <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">${</span>SYSTEM_IMAGE<span style="color:#e6db74">}</span><span style="color:#e6db74">p1&#34;</span><span style="color:#e6db74">`</span>   <span style="color:#75715e"># Create a fat16 partition for boot files</span>
+sudo mkfs.ext4 -L ROOTFS <span style="color:#e6db74">`</span>echo <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">${</span>SYSTEM_IMAGE<span style="color:#e6db74">}</span><span style="color:#e6db74">p2&#34;</span><span style="color:#e6db74">`</span> <span style="color:#75715e"># Create an ext4 partition for rootfs files</span>
+
+<span style="color:#75715e">########################</span>
+<span style="color:#75715e"># Mount the new partitions</span>
+<span style="color:#75715e">########################</span>
+
+sudo rm -rf ./target_mnt
+mkdir ./target_mnt
+sudo mount <span style="color:#e6db74">`</span>echo <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">${</span>SYSTEM_IMAGE<span style="color:#e6db74">}</span><span style="color:#e6db74">p2&#34;</span><span style="color:#e6db74">`</span> ./target_mnt
+sudo mkdir ./target_mnt/boot
+sudo mount <span style="color:#e6db74">`</span>echo <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">${</span>SYSTEM_IMAGE<span style="color:#e6db74">}</span><span style="color:#e6db74">p1&#34;</span><span style="color:#e6db74">`</span> ./target_mnt/boot
+
+<span style="color:#75715e">###############</span>
+<span style="color:#75715e"># Copy boot files</span>
+<span style="color:#75715e">###############</span>
+
+<span style="color:#75715e"># Raspberry Pi 4 boot configuration</span>
+sudo cp ./config.txt ./target_mnt/boot/
+sudo cp ./cmdline.txt ./target_mnt/boot/
+
+<span style="color:#75715e"># firmware</span>
+sudo cp ./buildroot-2021.11/output/images/rpi-firmware/bcm2711-rpi-4-b.dtb ./target_mnt/boot/
+sudo cp ./buildroot-2021.11/output/images/rpi-firmware/start4cd.elf ./target_mnt/boot/
+sudo cp ./buildroot-2021.11/output/images/rpi-firmware/fixup4cd.dat ./target_mnt/boot/
+sudo cp ./buildroot-2021.11/output/images/rpi-firmware/overlays ./target_mnt/boot -r
+
+<span style="color:#75715e"># kernel</span>
+sudo cp ./linux/arch/arm64/boot/Image ./target_mnt/boot/
+
+sleep <span style="color:#ae81ff">3</span>
+
+<span style="color:#75715e">#################</span>
+<span style="color:#75715e"># Copy rootfs files</span>
+<span style="color:#75715e">#################</span>
+
+<span style="color:#75715e"># buildroot&#39;s rootfs</span>
+cd target_mnt/
+sudo tar -xvf ../buildroot-2021.11/output/images/rootfs.tar.gz .
+cd ..
+
+sleep <span style="color:#ae81ff">3</span>
+
+<span style="color:#75715e"># kernel</span>
+cd linux
+sudo INSTALL_MOD_PATH<span style="color:#f92672">=</span>../target_mnt/ ARCH<span style="color:#f92672">=</span>arm64 CROSS_COMPILE<span style="color:#f92672">=</span>/home/tom/x-tools/aarch64-rpi4-linux-gnu/bin/aarch64-rpi4-linux-gnu- make modules_install
+cd ..
+
+sleep <span style="color:#ae81ff">3</span>
+
+<span style="color:#75715e"># game files</span>
+sudo cp ./data ./target_mnt -r
+
+<span style="color:#75715e">########################</span>
+<span style="color:#75715e"># Unmount the system image</span>
+<span style="color:#75715e">########################</span>
+
+sudo sync
+sudo umount ./target_mnt/boot -l
+sudo umount ./target_mnt -l
+sudo losetup -D
+sudo rm -rf ./target_mnt
+</code></pre></div><p>The system should now be ready to run Dune Dynasty. Flash the system.img file to any Raspberry Pi 4&rsquo;s SD card and see the OS in action!</p>
+<h1 id="debugging">Debugging</h1>
+<p>If the system does not boot into ratpoison automatically, the game can be started manually, using the following commands:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#75715e"># start X.org (will start one xterm window for now)</span>
+xinit
+<span style="color:#75715e"># start twm window manager</span>
+exec twm &amp;
+<span style="color:#75715e"># load some kernel modules related to hardware acceleration (still in testing phase)</span>
+modprobe v3d
+modprobe vc4
+<span style="color:#75715e"># make sure the Dune Dynasty binary can find the Allegro5 library files</span>
+export LD_LIBRARY_PATH<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;/lib:/usr/lib:/usr/local/lib&#34;</span>
+<span style="color:#75715e"># start Dune Dynasty</span>
+/usr/local/bin/dunedynasty
+</code></pre></div><h1 id="extras">Extra&rsquo;s</h1>
+<h2 id="building-allegro5-manually-optional">Building Allegro5 manually (optional)</h2>
+<p>To compile Dune Dynasty, the <a href="https://github.com/liballeg/allegro5">Allegro5 game programming library</a> is needed.</p>
+<p>Buildroot must be done building before Allegro5 is built; Allegro5 cannot compile against an incomplete OS.</p>
+<h3 id="downloading-the-source-files">Downloading the source files</h3>
+<p>To download and extract the Allegro5 library source file, the following commands are executed:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">wget https://github.com/liballeg/allegro5/releases/download/5.2.7.0/allegro-5.2.7.0.tar.gz
+tar -xvf allegro-5.2.7.0.tar.gz
+rm -rf allegro-5.2.7.0.tar.gz
+cd allegro-5.2.7.0/
+</code></pre></div><h3 id="configuring-cmake">Configuring CMake</h3>
+<p>In the folder <code>allegro-5.2.7.0/cmake</code> are a bunch of files related to CMake. Within the list of files there is a file called <a href="https://github.com/liballeg/allegro5/blob/master/cmake/Toolchain-raspberrypi.cmake">Toolchain-raspberrypi.cmake</a>. This file contains configuration that tells CMake how to build the library for the first Raspberry Pi. The first Raspberry Pi is 32 bit and the toolchain does <em>not</em> have multilib support enabled. Therefor, a new toolchain must be created.</p>
+<p>A custom file called <code>Toolchain-raspberrypi4_64.cmake</code> will be created and placed inside the <code>allegro-5.2.7.0/cmake</code> directory. The file will contain the following contents:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#75715e">#############</span>
+<span style="color:#75715e"># Set target OS</span>
+<span style="color:#75715e">#############</span>
+
+set<span style="color:#f92672">(</span>CMAKE_SYSTEM_NAME Linux<span style="color:#f92672">)</span>
+
+<span style="color:#75715e">######################################################</span>
+<span style="color:#75715e"># Force CMake to use the toolchain built by crosstool-NG</span>
+<span style="color:#75715e"># (both 64 bit and 32 bit cross-compiling toolchains can</span>
+<span style="color:#75715e"># be used here)</span>
+<span style="color:#75715e">######################################################</span>
+
+set<span style="color:#f92672">(</span>CMAKE_TOOLCHAIN_FILE /home/&lt;YOUR_USERNAME_GOES_HERE&gt;/x-tools/aarch64-rpi4-linux-gnu/bin/aarch64-rpi4-linux-gnu<span style="color:#f92672">)</span>
+set<span style="color:#f92672">(</span>CMAKE_C_COMPILER <span style="color:#e6db74">${</span>CMAKE_TOOLCHAIN_FILE<span style="color:#e6db74">}</span>-gcc<span style="color:#f92672">)</span>
+set<span style="color:#f92672">(</span>CMAKE_CXX_COMPILER <span style="color:#e6db74">${</span>CMAKE_TOOLCHAIN_FILE<span style="color:#e6db74">}</span>-g++<span style="color:#f92672">)</span>
+set<span style="color:#f92672">(</span>CMAKE_LINKER <span style="color:#e6db74">${</span>CMAKE_TOOLCHAIN_FILE<span style="color:#e6db74">}</span>-ld<span style="color:#f92672">)</span>
+
+set<span style="color:#f92672">(</span>MAKE_C_LINK_EXECUTABLE <span style="color:#e6db74">${</span>CMAKE_LINKER<span style="color:#e6db74">}</span><span style="color:#f92672">)</span>
+set<span style="color:#f92672">(</span>MAKE_CXX_LINK_EXECUTABLE <span style="color:#e6db74">${</span>CMAKE_LINKER<span style="color:#e6db74">}</span><span style="color:#f92672">)</span>
+
+<span style="color:#75715e">#########################################################</span>
+<span style="color:#75715e"># Tell CMake to do all compiling against the target sysroot</span>
+<span style="color:#75715e">#########################################################</span>
+
+set<span style="color:#f92672">(</span>CMAKE_SYSROOT /path/to/buildroot-&lt;VERSION_GOES_HERE&gt;/output/host/aarch64-rpi4-linux-gnu/sysroot<span style="color:#f92672">)</span>
+set<span style="color:#f92672">(</span>CMAKE_SYSROOT_COMPILE <span style="color:#e6db74">${</span>CMAKE_SYSROOT<span style="color:#e6db74">}</span>/<span style="color:#f92672">)</span>
+set<span style="color:#f92672">(</span>CMAKE_SYSROOT_LINK <span style="color:#e6db74">${</span>CMAKE_SYSROOT<span style="color:#e6db74">}</span>/<span style="color:#f92672">)</span>
+set<span style="color:#f92672">(</span>CMAKE_SYSTEM_PREFIX_PATH <span style="color:#e6db74">${</span>CMAKE_SYSROOT<span style="color:#e6db74">}</span>/<span style="color:#f92672">)</span>
+set<span style="color:#f92672">(</span>CMAKE_INSTALL_PREFIX <span style="color:#e6db74">${</span>CMAKE_SYSROOT<span style="color:#e6db74">}</span><span style="color:#f92672">)</span>
+
+<span style="color:#75715e">#######################################################</span>
+<span style="color:#75715e"># Make sure CMake does not link against host OS libraries</span>
+<span style="color:#75715e">#######################################################</span>
+
+set<span style="color:#f92672">(</span>CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER<span style="color:#f92672">)</span>
+set<span style="color:#f92672">(</span>CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY<span style="color:#f92672">)</span>
+set<span style="color:#f92672">(</span>CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY<span style="color:#f92672">)</span>
+set<span style="color:#f92672">(</span>CMAKE_FINE_ROOT_PATH_MODE_PACKAGE ONLY<span style="color:#f92672">)</span>
+</code></pre></div><p>When the following commands are then executed, the Allegro library will be built:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#75715e"># create a build directory and go into it, to separate source code from binaries</span>
+mkdir build/
+cd build/
+
+<span style="color:#75715e"># delete old build files (in case the previous build failed)</span>
+rm -rf CMakeFiles CMakeCache.txt addons cmake_install.cmake demos docs examples include lib Makefile tests
+
+<span style="color:#75715e"># configure CMake</span>
+cmake -DCMAKE_TOOLCHAIN_FILE<span style="color:#f92672">=</span>cmake/Toolchain-raspberrypi4_64.cmake -DSHARED<span style="color:#f92672">=</span>on -DCMAKE_LINKER_FLAGS<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;-static-libgcc -static-libstdc++&#34;</span> ..
+
+<span style="color:#75715e"># build Allegro5</span>
+make -j<span style="color:#e6db74">`</span>nproc<span style="color:#e6db74">`</span>
+</code></pre></div><h3 id="manually-installing-allegro5-to-the-target-buildroot-os">Manually installing Allegro5 to the target Buildroot OS</h3>
+<p>After Allegro5 is done compiling, it can be installed to the target OS using the environment variable <code>DESTDIR</code>:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#75715e"># dune dynasty will compile against this sysroot, it cannot compile against target</span>
+DESTDIR<span style="color:#f92672">=</span>path/to/buildroot-&lt;VERSION_GOES_HERE&gt;/output/host/&lt;COMPILING_TOOLCHAIN_GOES_HERE&gt;/sysroot make install
+<span style="color:#75715e"># install to target OS as well</span>
+DESTDIR<span style="color:#f92672">=</span>path/to/buildroot-&lt;VERSION_GOES_HERE&gt;/output/target/ make install
+</code></pre></div><h2 id="manually-compiling-dune-dynasty-against-the-target-buildroot-os">Manually compiling Dune Dynasty against the target Buildroot OS</h2>
+<p>It it assumed that Allegro5 was installed to the target Buildroot OS. If it&rsquo;s not, this has to be done before continuing.</p>
+<p>First, download and extract the game:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">wget https://versaweb.dl.sourceforge.net/project/dunedynasty/dunedynasty-1.5/dunedynasty-1.5.7.tar.gz
+tar -xvf dunedynasty-1.5.7.tar.gz
+rm -rf dunedynasty-1.5.7.tar.gz
+</code></pre></div><p>Then, create a toolchain file in the <code>dunedynasty-1.5.7/cmake</code> directory, called <code>Toolchain-raspberrypi4_64.cmake</code>. The toolchain is almost the same as the one from Allegro5, but with some extra configuration at the bottom:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#75715e">#############</span>
+<span style="color:#75715e"># Set target OS</span>
+<span style="color:#75715e">#############</span>
+set<span style="color:#f92672">(</span>CMAKE_SYSTEM_NAME Linux<span style="color:#f92672">)</span>
+
+<span style="color:#75715e">######################################################</span>
+<span style="color:#75715e"># Force CMake to use the toolchain built by crosstool-NG</span>
+<span style="color:#75715e"># (both 64 bit and 32 bit cross-compiling toolchains can</span>
+<span style="color:#75715e"># be used here)</span>
+<span style="color:#75715e">######################################################</span>
+
+set<span style="color:#f92672">(</span>CMAKE_TOOLCHAIN_FILE /home/&lt;YOUR_USERNAME_GOES_HERE&gt;/x-tools/aarch64-rpi4-linux-gnu/bin/aarch64-rpi4-linux-gnu<span style="color:#f92672">)</span>
+set<span style="color:#f92672">(</span>CMAKE_C_COMPILER <span style="color:#e6db74">${</span>CMAKE_TOOLCHAIN_FILE<span style="color:#e6db74">}</span>-gcc<span style="color:#f92672">)</span>
+set<span style="color:#f92672">(</span>CMAKE_CXX_COMPILER <span style="color:#e6db74">${</span>CMAKE_TOOLCHAIN_FILE<span style="color:#e6db74">}</span>-g++<span style="color:#f92672">)</span>
+set<span style="color:#f92672">(</span>CMAKE_LINKER <span style="color:#e6db74">${</span>CMAKE_TOOLCHAIN_FILE<span style="color:#e6db74">}</span>-ld<span style="color:#f92672">)</span>
+
+set<span style="color:#f92672">(</span>MAKE_C_LINK_EXECUTABLE <span style="color:#e6db74">${</span>CMAKE_LINKER<span style="color:#e6db74">}</span><span style="color:#f92672">)</span>
+set<span style="color:#f92672">(</span>MAKE_CXX_LINK_EXECUTABLE <span style="color:#e6db74">${</span>CMAKE_LINKER<span style="color:#e6db74">}</span><span style="color:#f92672">)</span>
+
+<span style="color:#75715e">#########################################################</span>
+<span style="color:#75715e"># Tell CMake to do all compiling against the target sysroot</span>
+<span style="color:#75715e">#########################################################</span>
+
+set<span style="color:#f92672">(</span>CMAKE_SYSROOT /path/to/buildroot-&lt;VERSION_GOES_HERE&gt;/output/host/&lt;COMPILING_TOOLCHAIN_GOES_HERE&gt;/sysroot<span style="color:#f92672">)</span>
+set<span style="color:#f92672">(</span>CMAKE_SYSROOT_COMPILE <span style="color:#e6db74">${</span>CMAKE_SYSROOT<span style="color:#e6db74">}</span>/<span style="color:#f92672">)</span>
+set<span style="color:#f92672">(</span>CMAKE_SYSROOT_LINK <span style="color:#e6db74">${</span>CMAKE_SYSROOT<span style="color:#e6db74">}</span>/<span style="color:#f92672">)</span>
+set<span style="color:#f92672">(</span>CMAKE_SYSTEM_PREFIX_PATH <span style="color:#e6db74">${</span>CMAKE_SYSROOT<span style="color:#e6db74">}</span>/<span style="color:#f92672">)</span>
+set<span style="color:#f92672">(</span>CMAKE_INSTALL_PREFIX <span style="color:#e6db74">${</span>CMAKE_SYSROOT<span style="color:#e6db74">}</span><span style="color:#f92672">)</span>
+
+<span style="color:#75715e">#######################################################</span>
+<span style="color:#75715e"># Make sure CMake does not link against host OS libraries</span>
+<span style="color:#75715e">#######################################################</span>
+
+set<span style="color:#f92672">(</span>CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER<span style="color:#f92672">)</span>
+set<span style="color:#f92672">(</span>CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY<span style="color:#f92672">)</span>
+set<span style="color:#f92672">(</span>CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY<span style="color:#f92672">)</span>
+set<span style="color:#f92672">(</span>CMAKE_FINE_ROOT_PATH_MODE_PACKAGE ONLY<span style="color:#f92672">)</span>
+
+<span style="color:#75715e">##############################################</span>
+<span style="color:#75715e"># Make sure Allegro5 is found (using pkg-config)</span>
+<span style="color:#75715e">##############################################</span>
+
+set<span style="color:#f92672">(</span>ENV<span style="color:#f92672">{</span>PKG_CONFIG_DIR<span style="color:#f92672">}</span> <span style="color:#e6db74">&#34;&#34;</span><span style="color:#f92672">)</span>
+set<span style="color:#f92672">(</span>ENV<span style="color:#f92672">{</span>PKG_CONFIG_LIBDIR<span style="color:#f92672">}</span> <span style="color:#e6db74">${</span>CMAKE_SYSROOT<span style="color:#e6db74">}</span>/usr/lib/pkgconfig:<span style="color:#e6db74">${</span>CMAKE_SYSROOT<span style="color:#e6db74">}</span>/usr/share/pkgconfig:<span style="color:#e6db74">${</span>CMAKE_SYSROOT<span style="color:#e6db74">}</span>/usr/local/lib/pkgconfig/<span style="color:#f92672">)</span>
+set<span style="color:#f92672">(</span>ENV<span style="color:#f92672">{</span>PKG_CONFIG_PATH<span style="color:#f92672">}</span> <span style="color:#e6db74">${</span>PKG_CONFIG_LIBDIR<span style="color:#e6db74">}</span><span style="color:#f92672">)</span>
+set<span style="color:#f92672">(</span>ENV<span style="color:#f92672">{</span>PKG_CONFIG_SYSROOT_DIR<span style="color:#f92672">}</span> <span style="color:#e6db74">${</span>CMAKE_SYSROOT<span style="color:#e6db74">}</span><span style="color:#f92672">)</span>
+</code></pre></div><p>To then compile the game, create a directory called <code>build</code>, go into it and compile everything:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#75715e"># go inside a build directory to separate binaries from source code</span>
+mkdir build/
+cd build/
+
+<span style="color:#75715e"># configure CMake</span>
+cmake -DCMAKE_TOOLCHAIN_FILE<span style="color:#f92672">=</span>../cmake/Toolchain-raspberrypi4_64.cmake ..
+
+<span style="color:#75715e"># build the game</span>
+make -j<span style="color:#e6db74">`</span>nproc<span style="color:#e6db74">`</span>
+</code></pre></div><h3 id="installing-the-game-to-the-target-sysroot">Installing the game to the target sysroot</h3>
+<p>Installing the binaries to the target sysroot is exactly the same process as installing Allegro5:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">sudo DESTDIR<span style="color:#f92672">=</span>path/to/buildroot-&lt;VERSION_GOES_HERE&gt;/output/target/ make install <span style="color:#75715e"># install to target OS</span>
+</code></pre></div>
+      </div>
+    </article>
+
+    <hr />
+
+    <div class="post-info">
+      
+    <p>
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-tag meta-icon"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7" y2="7"></line></svg>
+
+        <span class="tag"><a href="https://tomniesse.github.io/blog/tags/untagged/">untagged</a></span>
+        
+    </p>
+
+      
+
+      <p>
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+          <polyline points="14 2 14 8 20 8"></polyline>
+          <line x1="16" y1="13" x2="8" y2="13"></line>
+          <line x1="16" y1="17" x2="8" y2="17"></line>
+          <polyline points="10 9 9 9 8 9"></polyline>
+        </svg>
+        3094 Words
+      </p>
+
+      <p>
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-calendar">
+          <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+          <line x1="16" y1="2" x2="16" y2="6"></line>
+          <line x1="8" y1="2" x2="8" y2="6"></line>
+          <line x1="3" y1="10" x2="21" y2="10"></line>
+        </svg>
+        
+          2021-12-21 12:28
+        
+
+         
+          
+        
+      </p>
+    </div>
+      <hr />
+      <div class="sharing-buttons">
+        
+<a class="resp-sharing-button__link" href="https://facebook.com/sharer/sharer.php?u=https%3a%2f%2ftomniesse.github.io%2fblog%2fposts%2fbuildroot-dune-dynasty%2f" target="_blank" rel="noopener" aria-label="" title="Share on facebook">
+  <div class="resp-sharing-button resp-sharing-button--facebook resp-sharing-button--small"><div aria-hidden="true" class="resp-sharing-button__icon resp-sharing-button__icon--solid">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>
+    </div>
+  </div>
+</a>
+
+
+<a class="resp-sharing-button__link" href="https://twitter.com/intent/tweet/?url=https%3a%2f%2ftomniesse.github.io%2fblog%2fposts%2fbuildroot-dune-dynasty%2f" target="_blank" rel="noopener" aria-label="" title="Share on twitter">
+  <div class="resp-sharing-button resp-sharing-button--twitter resp-sharing-button--small">
+      <div aria-hidden="true" class="resp-sharing-button__icon resp-sharing-button__icon--solid">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"></path></svg>
+    </div>
+  </div>
+</a>
+
+
+<a class="resp-sharing-button__link" href="https://www.tumblr.com/widgets/share/tool?posttype=link&amp;title=Creating%20an%20embedded%20OS%20that%20runs%20a%20DOS%20game&amp;caption=Creating%20an%20embedded%20OS%20that%20runs%20a%20DOS%20game&amp;canonicalUrl=https%3a%2f%2ftomniesse.github.io%2fblog%2fposts%2fbuildroot-dune-dynasty%2f" target="_blank" rel="noopener" aria-label="" title="Share on tumblr">
+  <div class="resp-sharing-button resp-sharing-button--tumblr resp-sharing-button--small">
+    <div aria-hidden="true" class="resp-sharing-button__icon resp-sharing-button__icon--solid">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" stroke="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.563 24c-5.093 0-7.031-3.756-7.031-6.411V9.747H5.116V6.648c3.63-1.313 4.512-4.596 4.71-6.469C9.84.051 9.941 0 9.999 0h3.517v6.114h4.801v3.633h-4.82v7.47c.016 1.001.375 2.371 2.207 2.371h.09c.631-.02 1.486-.205 1.936-.419l1.156 3.425c-.436.636-2.4 1.374-4.156 1.404h-.178l.011.002z"/></svg>
+    </div>
+  </div>
+</a>
+
+
+<a class="resp-sharing-button__link" href="mailto:?subject=Creating%20an%20embedded%20OS%20that%20runs%20a%20DOS%20game&amp;body=https%3a%2f%2ftomniesse.github.io%2fblog%2fposts%2fbuildroot-dune-dynasty%2f" target="_self" rel="noopener" aria-label="" title="Share via email">
+  <div class="resp-sharing-button resp-sharing-button--email resp-sharing-button--small"><div aria-hidden="true" class="resp-sharing-button__icon resp-sharing-button__icon--solid">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+    </div>
+  </div>
+</a>
+
+
+<a class="resp-sharing-button__link" href="https://pinterest.com/pin/create/button/?url=https%3a%2f%2ftomniesse.github.io%2fblog%2fposts%2fbuildroot-dune-dynasty%2f&amp;media=https%3a%2f%2ftomniesse.github.io%2fblog%2fposts%2fbuildroot-dune-dynasty%2f;description=Creating%20an%20embedded%20OS%20that%20runs%20a%20DOS%20game" target="_blank" rel="noopener" aria-label="" title="Share on pinterest">
+  <div class="resp-sharing-button resp-sharing-button--pinterest resp-sharing-button--small"><div aria-hidden="true" class="resp-sharing-button__icon resp-sharing-button__icon--solid">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12.017 0C5.396 0 .029 5.367.029 11.987c0 5.079 3.158 9.417 7.618 11.162-.105-.949-.199-2.403.041-3.439.219-.937 1.406-5.957 1.406-5.957s-.359-.72-.359-1.781c0-1.663.967-2.911 2.168-2.911 1.024 0 1.518.769 1.518 1.688 0 1.029-.653 2.567-.992 3.992-.285 1.193.6 2.165 1.775 2.165 2.128 0 3.768-2.245 3.768-5.487 0-2.861-2.063-4.869-5.008-4.869-3.41 0-5.409 2.562-5.409 5.199 0 1.033.394 2.143.889 2.741.099.12.112.225.085.345-.09.375-.293 1.199-.334 1.363-.053.225-.172.271-.401.165-1.495-.69-2.433-2.878-2.433-4.646 0-3.776 2.748-7.252 7.92-7.252 4.158 0 7.392 2.967 7.392 6.923 0 4.135-2.607 7.462-6.233 7.462-1.214 0-2.354-.629-2.758-1.379l-.749 2.848c-.269 1.045-1.004 2.352-1.498 3.146 1.123.345 2.306.535 3.55.535 6.607 0 11.985-5.365 11.985-11.987C23.97 5.39 18.592.026 11.985.026L12.017 0z"/></svg>
+    </div>
+  </div>
+</a>
+
+
+<a class="resp-sharing-button__link" href="https://www.linkedin.com/shareArticle?mini=true&amp;url=https%3a%2f%2ftomniesse.github.io%2fblog%2fposts%2fbuildroot-dune-dynasty%2f&amp;title=Creating%20an%20embedded%20OS%20that%20runs%20a%20DOS%20game&amp;summary=Creating%20an%20embedded%20OS%20that%20runs%20a%20DOS%20game&amp;source=https%3a%2f%2ftomniesse.github.io%2fblog%2fposts%2fbuildroot-dune-dynasty%2f" target="_blank" rel="noopener" aria-label="" title="Share on linkedin">
+  <div class="resp-sharing-button resp-sharing-button--linkedin resp-sharing-button--small"><div aria-hidden="true" class="resp-sharing-button__icon resp-sharing-button__icon--solid">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg>
+    </div>
+  </div>
+</a>
+
+
+<a class="resp-sharing-button__link" href="https://reddit.com/submit/?url=https%3a%2f%2ftomniesse.github.io%2fblog%2fposts%2fbuildroot-dune-dynasty%2f&amp;resubmit=true&amp;title=Creating%20an%20embedded%20OS%20that%20runs%20a%20DOS%20game" target="_blank" rel="noopener" aria-label="" title="Share on reddit">
+  <div class="resp-sharing-button resp-sharing-button--reddit resp-sharing-button--small"><div aria-hidden="true" class="resp-sharing-button__icon resp-sharing-button__icon--solid">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0zm5.01 4.744c.688 0 1.25.561 1.25 1.249a1.25 1.25 0 0 1-2.498.056l-2.597-.547-.8 3.747c1.824.07 3.48.632 4.674 1.488.308-.309.73-.491 1.207-.491.968 0 1.754.786 1.754 1.754 0 .716-.435 1.333-1.01 1.614a3.111 3.111 0 0 1 .042.52c0 2.694-3.13 4.87-7.004 4.87-3.874 0-7.004-2.176-7.004-4.87 0-.183.015-.366.043-.534A1.748 1.748 0 0 1 4.028 12c0-.968.786-1.754 1.754-1.754.463 0 .898.196 1.207.49 1.207-.883 2.878-1.43 4.744-1.487l.885-4.182a.342.342 0 0 1 .14-.197.35.35 0 0 1 .238-.042l2.906.617a1.214 1.214 0 0 1 1.108-.701zM9.25 12C8.561 12 8 12.562 8 13.25c0 .687.561 1.248 1.25 1.248.687 0 1.248-.561 1.248-1.249 0-.688-.561-1.249-1.249-1.249zm5.5 0c-.687 0-1.248.561-1.248 1.25 0 .687.561 1.248 1.249 1.248.688 0 1.249-.561 1.249-1.249 0-.687-.562-1.249-1.25-1.249zm-5.466 3.99a.327.327 0 0 0-.231.094.33.33 0 0 0 0 .463c.842.842 2.484.913 2.961.913.477 0 2.105-.056 2.961-.913a.361.361 0 0 0 .029-.463.33.33 0 0 0-.464 0c-.547.533-1.684.73-2.512.73-.828 0-1.979-.196-2.512-.73a.326.326 0 0 0-.232-.095z"/></svg>
+    </div>
+  </div>
+</a>
+
+
+<a class="resp-sharing-button__link" href="https://www.xing.com/app/user?op=share;url=https%3a%2f%2ftomniesse.github.io%2fblog%2fposts%2fbuildroot-dune-dynasty%2f;title=Creating%20an%20embedded%20OS%20that%20runs%20a%20DOS%20game" target="_blank" rel="noopener" aria-label="" title="Share on xing">
+  <div class="resp-sharing-button resp-sharing-button--xing resp-sharing-button--small"><div aria-hidden="true" class="resp-sharing-button__icon resp-sharing-button__icon--solid">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M18.188 0c-.517 0-.741.325-.927.66 0 0-7.455 13.224-7.702 13.657.015.024 4.919 9.023 4.919 9.023.17.308.436.66.967.66h3.454c.211 0 .375-.078.463-.22.089-.151.089-.346-.009-.536l-4.879-8.916c-.004-.006-.004-.016 0-.022L22.139.756c.095-.191.097-.387.006-.535C22.056.078 21.894 0 21.686 0h-3.498zM3.648 4.74c-.211 0-.385.074-.473.216-.09.149-.078.339.02.531l2.34 4.05c.004.01.004.016 0 .021L1.86 16.051c-.099.188-.093.381 0 .529.085.142.239.234.45.234h3.461c.518 0 .766-.348.945-.667l3.734-6.609-2.378-4.155c-.172-.315-.434-.659-.962-.659H3.648v.016z"/></svg>
+    </div>
+  </div>
+</a>
+
+
+<a class="resp-sharing-button__link" href="whatsapp://send?text=Creating%20an%20embedded%20OS%20that%20runs%20a%20DOS%20game%20https%3a%2f%2ftomniesse.github.io%2fblog%2fposts%2fbuildroot-dune-dynasty%2f" target="_blank" rel="noopener" aria-label="" title="Share on whatsapp">
+  <div class="resp-sharing-button resp-sharing-button--whatsapp resp-sharing-button--small"><div aria-hidden="true" class="resp-sharing-button__icon resp-sharing-button__icon--solid">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" stroke="none" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+    </div>
+  </div>
+</a>
+
+
+<a class="resp-sharing-button__link" href="https://news.ycombinator.com/submitlink?u=https%3a%2f%2ftomniesse.github.io%2fblog%2fposts%2fbuildroot-dune-dynasty%2f&amp;t=Creating%20an%20embedded%20OS%20that%20runs%20a%20DOS%20game" target="_blank" rel="noopener" aria-label="" title="Share on hacker news">
+  <div class="resp-sharing-button resp-sharing-button--hackernews resp-sharing-button--small"><div aria-hidden="true" class="resp-sharing-button__icon resp-sharing-button__icon--solid">
+			<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M0 24V0h24v24H0zM6.951 5.896l4.112 7.708v5.064h1.583v-4.972l4.148-7.799h-1.749l-2.457 4.875c-.372.745-.688 1.434-.688 1.434s-.297-.708-.651-1.434L8.831 5.896h-1.88z"/></svg>
+    </div>
+  </div>
+</a>
+
+
+<a class="resp-sharing-button__link" href="https://telegram.me/share/url?text=Creating%20an%20embedded%20OS%20that%20runs%20a%20DOS%20game&amp;url=https%3a%2f%2ftomniesse.github.io%2fblog%2fposts%2fbuildroot-dune-dynasty%2f" target="_blank" rel="noopener" aria-label="" title="Share on telegram">
+  <div class="resp-sharing-button resp-sharing-button--telegram resp-sharing-button--small"><div aria-hidden="true" class="resp-sharing-button__icon resp-sharing-button__icon--solid">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+    </div>
+  </div>
+</a>
+
+      </div>
+
+    
+    <div class="pagination">
+        
+        <div class="pagination__title">
+            <span class="pagination__title-h">Read other posts</span>
+            <hr />
+        </div>
+        
+
+        <div class="pagination__buttons">
+            
+            <span class="button previous">
+                <a href="https://tomniesse.github.io/blog/posts/ender3-abs-printing/">
+                    <span class="button__icon">←</span>
+                    <span class="button__text">Printing ABS using an Ender 3 (v1), without an enclosure</span>
+                </a>
+            </span>
+            
+
+            
+            <span class="button next">
+                <a href="https://tomniesse.github.io/blog/posts/buildroot-ap/">
+                    <span class="button__text">Creating an access point using buildroot</span>
+                    <span class="button__icon">→</span>
+                </a>
+            </span>
+            
+        </div>
+    </div>
+
+
+    
+
+    
+
+  </main>
+
+            </div>
+
+            
+                <footer class="footer">
+    
+    
+</footer>
+
+            
+        </div>
+
+        
+
+
+
+<script type="text/javascript" src="/blog/bundle.min.644292943ae47eef02fcd64b11757aeb8caeeaebf473a823b62099edccac808e8d82689359f285e5d95994e5ad5ae3b9c1ccc281eb1828e67d0ba6630f95b832.js" integrity="sha512-ZEKSlDrkfu8C/NZLEXV664yu6uv0c6gjtiCZ7cysgI6NgmiTWfKF5dlZlOWtWuO5wczCgesYKOZ9C6ZjD5W4Mg=="></script>
+
+
+
+    </body>
+</html>

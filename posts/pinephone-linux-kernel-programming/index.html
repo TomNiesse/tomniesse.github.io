@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="author" content="">
+<meta name="description" content="Introduction This page describes the process of writing a kernel module that can toggle an LED inside a PinePhone UBports edition.
+Using the user manual of the phone&amp;rsquo;s processor (Allwinner A64), a kernel module will be written that can control the RGB-LED of the phone.
+What is a kernel module? A kernel is a piece of software that handles all the communications between hardware and software. The linux kernel uses modules for this." />
+<meta name="keywords" content=", untagged" />
+<meta name="robots" content="noodp" />
+<meta name="theme-color" content="" />
+<link rel="canonical" href="https://tomniesse.github.io/blog/posts/pinephone-linux-kernel-programming/" />
+
+
+    <title>
+        
+            Programming a character device driver (PinePhone and Linux) :: Welcome!  — The place where I write about hobby stuff
+        
+    </title>
+
+
+
+
+
+<link rel="stylesheet" href="/blog/main.5b3e37caf5f369f54ba730903dd9043b99e0b3792e27db9a87f21a3634934b96.css" integrity="sha256-Wz43yvXzafVLpzCQPdkEO5ngs3kuJ9uah/IaNjSTS5Y=">
+
+
+
+    <link rel="apple-touch-icon" sizes="180x180" href="/blog/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/blog/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/blog/favicon-16x16.png">
+    <link rel="manifest" href="/blog/site.webmanifest">
+    <link rel="mask-icon" href="/blog/safari-pinned-tab.svg" color="">
+    <link rel="shortcut icon" href="/blog/favicon.ico">
+    <meta name="msapplication-TileColor" content="">
+
+
+<meta itemprop="name" content="Programming a character device driver (PinePhone and Linux)">
+<meta itemprop="description" content="Introduction This page describes the process of writing a kernel module that can toggle an LED inside a PinePhone UBports edition.
+Using the user manual of the phone&rsquo;s processor (Allwinner A64), a kernel module will be written that can control the RGB-LED of the phone.
+What is a kernel module? A kernel is a piece of software that handles all the communications between hardware and software. The linux kernel uses modules for this."><meta itemprop="datePublished" content="2021-11-03T13:28:55+02:00" />
+<meta itemprop="dateModified" content="2021-11-03T13:28:55+02:00" />
+<meta itemprop="wordCount" content="2217"><meta itemprop="image" content="https://tomniesse.github.io/blog"/>
+<meta itemprop="keywords" content="untagged," />
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:image" content="https://tomniesse.github.io/blog"/>
+
+<meta name="twitter:title" content="Programming a character device driver (PinePhone and Linux)"/>
+<meta name="twitter:description" content="Introduction This page describes the process of writing a kernel module that can toggle an LED inside a PinePhone UBports edition.
+Using the user manual of the phone&rsquo;s processor (Allwinner A64), a kernel module will be written that can control the RGB-LED of the phone.
+What is a kernel module? A kernel is a piece of software that handles all the communications between hardware and software. The linux kernel uses modules for this."/>
+
+
+
+    <meta property="og:title" content="Programming a character device driver (PinePhone and Linux)" />
+<meta property="og:description" content="Introduction This page describes the process of writing a kernel module that can toggle an LED inside a PinePhone UBports edition.
+Using the user manual of the phone&rsquo;s processor (Allwinner A64), a kernel module will be written that can control the RGB-LED of the phone.
+What is a kernel module? A kernel is a piece of software that handles all the communications between hardware and software. The linux kernel uses modules for this." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://tomniesse.github.io/blog/posts/pinephone-linux-kernel-programming/" /><meta property="og:image" content="https://tomniesse.github.io/blog"/><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2021-11-03T13:28:55+02:00" />
+<meta property="article:modified_time" content="2021-11-03T13:28:55+02:00" /><meta property="og:site_name" content="Welcome!" />
+
+
+
+
+
+
+
+    <meta property="article:published_time" content="2021-11-03 13:28:55 &#43;0200 &#43;0200" />
+
+
+
+
+
+
+
+
+
+
+
+    </head>
+
+    
+        <body>
+    
+    
+        <div class="container">
+            <header class="header">
+    <span class="header__inner">
+        <a href="/blog" style="text-decoration: none;">
+    <div class="logo">
+        
+            <span class="logo__mark">></span>
+            <span class="logo__text ">
+                Tom&#39;s blogposts</span>
+            <span class="logo__cursor" style=
+                  "
+                   
+                   ">
+            </span>
+        
+    </div>
+</a>
+
+
+        <span class="header__right">
+            
+                <nav class="menu">
+    <ul class="menu__inner"><li><a href="/blog/posts">Blogposts</a></li>
+    </ul>
+</nav>
+
+                <span class="menu-trigger">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                        <path d="M0 0h24v24H0z" fill="none"/>
+                        <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/>
+                    </svg>
+                </span>
+            
+        </span>
+    </span>
+</header>
+
+
+            <div class="content">
+                
+  <main class="post">
+
+    <div class="post-info">
+      <p>
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-clock">
+          <circle cx="12" cy="12" r="10"></circle>
+          <polyline points="12 6 12 12 16 14"></polyline>
+        </svg>
+        11 minutes
+
+        
+      </p>
+    </div>
+
+    <article>
+      <h1 class="post-title">
+        <a href="https://tomniesse.github.io/blog/posts/pinephone-linux-kernel-programming/">Programming a character device driver (PinePhone and Linux)</a>
+      </h1>
+
+      
+
+      
+
+      
+
+      <div class="post-content">
+        <h1 id="introduction">Introduction</h1>
+<p>This page describes the process of writing a kernel module that can toggle an LED inside a PinePhone UBports edition.<br>
+Using the user manual of the phone&rsquo;s processor (Allwinner A64), a kernel module will be written that can control the RGB-LED of the phone.</p>
+<h1 id="what-is-a-kernel-module">What is a kernel module?</h1>
+<p>A kernel is a piece of software that handles all the communications between hardware and software. The linux kernel uses modules for this. Only the kernel and it&rsquo;s modules are allowed to read/write to/from hardware.</p>
+<h1 id="the-goal">The goal</h1>
+<p>The goal of this little project is to create a linux module that turns the built-in RGB-LED of the PinePhone UBports edition on or off. The same approach can be used to control GPIO ports on other embedded systems, like Raspberry Pi&rsquo;s. How cool would it be to understand the magic behind packages like <a href="http://wiringpi.com/wiringpi-deprecated">wiringPi</a>?</p>
+<h1 id="reading-schematics">Reading schematics</h1>
+<p>The Pine64 website hosts a <a href="http://files.pine64.org/doc/PinePhone/PinePhone%20v1.2%20Released%20Schematic.pdf">schematic</a>, which tells how the PinePhone is wired on the inside. Page 11 says how the RGB-led is connected:</p>
+<p><a href="images/pinephone_led_schematic.png"><img src="images/pinephone_led_schematic.png" alt="LED schematic"></a></p>
+<ul>
+<li>PD18-LED-R is connected to B+</li>
+<li>PD19-LED-G is connected to R+</li>
+<li>PD20-LED-B is connected to G+</li>
+</ul>
+<h1 id="figuring-out-how-to-control-the-io-pins">Figuring out how to control the IO pins</h1>
+<p>The schematic provided enough information. It&rsquo;s now time to start digging into the workings of the Allwinner A64 SoC. The A64 SoC has two lenghty documents;</p>
+<ul>
+<li>The <a href="https://files.pine64.org/doc/datasheet/pine64/A64_Datasheet_V1.1.pdf">datasheet</a> provides information about how to integrate the A64 SoC into a project and focuses on the electronic side of things.</li>
+<li>The <a href="https://linux-sunxi.org/images/b/b4/Allwinner_A64_User_Manual_V1.1.pdf">user manual</a> contains information about how the SoC works and contains information about the different registers present in the SoC.</li>
+</ul>
+<p>For this project, only the user manual will be used, as it contains all the required information.</p>
+<h2 id="finding-the-right-registers">Finding the right registers</h2>
+<p>Chapter 3.21 (page 376) of the <a href="https://linux-sunxi.org/images/b/b4/Allwinner_A64_User_Manual_V1.1.pdf">user manual</a> contains information about some of the registers in the A64 SoC. At the top of the page, the following text can be read:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">The chip has 7 ports for multi-functional input/out pins. They are shown below:
+- Port B(PB): 10 input/output port
+- Port C(PC): 17 input/output port
+- Port D(PD): 25 input/output port
+- Port E(PE): 18 input/output port
+- Port F(PF): 7 input/output port
+- Port G(PG): 14 input/output port
+- Port H(PH): 12 input/output port
+</code></pre></div><p>Port D is the one that will be controlled (<code>PD18</code>, <code>PD19</code> and <code>PD20</code>).</p>
+<p>Further down the same page, some memory offsets are shown. This is because the RGB led is connected using MMIO (Memory Mapped IO). When a certain part of memory is altered, the corresponding IO port will turn on or off. There are a few configure registers (which set pin modes), a data register (which turns the IO port on or off), a multi-driving register (to control voltage levels?) and a fell pull registers (for pull-down and pull-up purposes).</p>
+<p>For this project, only the configure register <code>PD_CFG2</code> and the data register <code>PD_DAT</code> will be used. All the other registers can be set if so desired, but it is not needed.</p>
+<h2 id="creating-code-to-handle-pin-modes">Creating code to handle pin modes</h2>
+<h3 id="memory-structure">Memory structure</h3>
+<p>In chapter 3.21.2.21 (page 387) of the <a href="https://linux-sunxi.org/images/b/b4/Allwinner_A64_User_Manual_V1.1.pdf">user manual</a>, the following information can be seen:</p>
+<table>
+<thead>
+<tr>
+<th>Offset: 0x74</th>
+<th style="text-align:center">Register Name: PD_CFG2_REG</th>
+</tr>
+</thead>
+</table>
+<table>
+<thead>
+<tr>
+<th>Bit</th>
+<th style="text-align:left">R/W</th>
+<th style="text-align:left">Default/Hex</th>
+<th style="text-align:center">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>&hellip;</td>
+<td style="text-align:left">&hellip;</td>
+<td style="text-align:left">&hellip;</td>
+<td style="text-align:center">&hellip;</td>
+</tr>
+<tr>
+<td>18:16</td>
+<td style="text-align:left">R/W</td>
+<td style="text-align:left">0x7</td>
+<td style="text-align:center">PD20_SELECT<br>000: Input <br> 001: Output<br>&hellip;</td>
+</tr>
+<tr>
+<td>15</td>
+<td style="text-align:left">/</td>
+<td style="text-align:left">/</td>
+<td style="text-align:center">/</td>
+</tr>
+<tr>
+<td>14:12</td>
+<td style="text-align:left">R/W</td>
+<td style="text-align:left">0x7</td>
+<td style="text-align:center">PD19_SELECT<br>000: Input <br> 001: Output<br>&hellip;</td>
+</tr>
+<tr>
+<td>11</td>
+<td style="text-align:left">/</td>
+<td style="text-align:left">/</td>
+<td style="text-align:center">/</td>
+</tr>
+<tr>
+<td>10:8</td>
+<td style="text-align:left">R/W</td>
+<td style="text-align:left">0x7</td>
+<td style="text-align:center">PD18_SELECT<br>000: Input <br> 001: Output<br>&hellip;</td>
+</tr>
+<tr>
+<td>&hellip;</td>
+<td style="text-align:left">&hellip;</td>
+<td style="text-align:left">&hellip;</td>
+<td style="text-align:center">&hellip;</td>
+</tr>
+</tbody>
+</table>
+<p>A 3 bit value controls pin modes in register <code>PD_CFG2_REG</code>. Let&rsquo;s set some pin modes using the C language</p>
+<p>The C language has a datatype called <code>struct</code>, which can be used to &ldquo;convert&rdquo; the table into the following code:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#66d9ef">typedef</span> <span style="color:#66d9ef">struct</span> {
+    <span style="color:#66d9ef">uint32_t</span> PD_16    : <span style="color:#ae81ff">3</span>;
+    <span style="color:#66d9ef">uint32_t</span> reserved : <span style="color:#ae81ff">1</span>;
+    <span style="color:#66d9ef">uint32_t</span> PD_17    : <span style="color:#ae81ff">3</span>;
+    <span style="color:#66d9ef">uint32_t</span> reserved : <span style="color:#ae81ff">1</span>;
+    <span style="color:#66d9ef">uint32_t</span> PD_18    : <span style="color:#ae81ff">3</span>;
+    <span style="color:#66d9ef">uint32_t</span> reserved : <span style="color:#ae81ff">1</span>;
+    <span style="color:#66d9ef">uint32_t</span> PD_19    : <span style="color:#ae81ff">3</span>;
+    <span style="color:#66d9ef">uint32_t</span> reserved : <span style="color:#ae81ff">1</span>;
+    <span style="color:#66d9ef">uint32_t</span> PD_20    : <span style="color:#ae81ff">3</span>;
+    <span style="color:#66d9ef">uint32_t</span> reserved : <span style="color:#ae81ff">1</span>;
+    <span style="color:#66d9ef">uint32_t</span> PD_21    : <span style="color:#ae81ff">3</span>;
+    <span style="color:#66d9ef">uint32_t</span> reserved : <span style="color:#ae81ff">1</span>;
+    <span style="color:#66d9ef">uint32_t</span> PD_22    : <span style="color:#ae81ff">3</span>;
+    <span style="color:#66d9ef">uint32_t</span> reserved : <span style="color:#ae81ff">1</span>;
+    <span style="color:#66d9ef">uint32_t</span> PD_23    : <span style="color:#ae81ff">3</span>;
+    <span style="color:#66d9ef">uint32_t</span> reserved : <span style="color:#ae81ff">1</span>;
+} PD_CFG2_REG_t;
+</code></pre></div><p>The <code>struct</code> will ensure that the right bits are set in memory, without having to set individual bits.</p>
+<h3 id="memory-location">Memory location</h3>
+<p>In the above table, an offset of <code>0x74</code> can be seen. The memory address of this MMIO register will be <code>PIO</code> (<code>0x01C20800</code>) + <code>0x74</code>. In code, this could look as follows:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#75715e">#define PIO 0x01C20800
+</span><span style="color:#75715e">#define PD_CFG2_REG_ADDRESS (PIO + 0x74)
+</span></code></pre></div><h2 id="altering-the-memory">Altering the memory</h2>
+<p>The code to alter a piece of memory looks a bit magical, but it works quite well:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#75715e">#define MODE_OUTPUT   0x1
+</span><span style="color:#75715e">#define MODE_DISABLED 0x7 </span><span style="color:#75715e">// default
+</span><span style="color:#75715e"></span>
+((<span style="color:#66d9ef">volatile</span> PD_CFG2_REG_t<span style="color:#f92672">*</span>)PD_CFG2_REG_ADDRESS)<span style="color:#f92672">-&gt;</span>PD18 <span style="color:#f92672">=</span> MODE_OUTPUT;
+((<span style="color:#66d9ef">volatile</span> PD_CFG2_REG_t<span style="color:#f92672">*</span>)PD_CFG2_REG_ADDRESS)<span style="color:#f92672">-&gt;</span>PD19 <span style="color:#f92672">=</span> MODE_OUTPUT;
+((<span style="color:#66d9ef">volatile</span> PD_CFG2_REG_t<span style="color:#f92672">*</span>)PD_CFG2_REG_ADDRESS)<span style="color:#f92672">-&gt;</span>PD20 <span style="color:#f92672">=</span> MODE_OUTPUT;
+</code></pre></div><ul>
+<li>The values <code>0x1</code> and <code>0x7</code> are copied from the user manual in hexadacimal form and set the right pin mode. The user manual includes many more pin modes, but those are not used here.</li>
+<li>The <code>volatile</code> keyword tells C that it should trust the programmer and just set the bits, as requested. Not including <code>volatile</code> will result in unpredictable behaviour.</li>
+<li>The <code>PD_CFG2_REG_t*</code> part is part of a cast. C is told that whatever resides at the memory location of <code>PD_CFG2_REG_ADDRESS</code> is of type <code>PD_CFG2_REG_t*</code>.</li>
+<li>So, <code>((volatile PD_CFG2_REG_t*)PD_CFG2_REG_ADDRESS)</code> can be seen as a pointer to a struct. Using this method, C can directly alter memory without the need for a variable.</li>
+</ul>
+<h2 id="turning-the-io-pins-on-or-off">Turning the IO pins on or off</h2>
+<p>The method that is used to set the pin modes will be used to turn the IO pins on or off as well. The required table is found in chapter 3.21.2.23 (page 388) of the <a href="https://linux-sunxi.org/images/b/b4/Allwinner_A64_User_Manual_V1.1.pdf">user manual</a> and the <code>struct</code> and <code>address</code> will be as follows:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#75715e">#define PIO 0x01C20800                      </span><span style="color:#75715e">// same PIO address as the configure code uses
+</span><span style="color:#75715e"></span><span style="color:#75715e">#define PD_DATA_REG_ADDRESS (PIO + 0x7C)    </span><span style="color:#75715e">// this time the offset is 0x7C
+</span><span style="color:#75715e"></span>
+<span style="color:#66d9ef">typedef</span> <span style="color:#66d9ef">struct</span> {
+    <span style="color:#66d9ef">uint32_t</span>  PD_0      : <span style="color:#ae81ff">1</span>;
+    <span style="color:#66d9ef">uint32_t</span>  PD_1      : <span style="color:#ae81ff">1</span>;
+    <span style="color:#66d9ef">uint32_t</span>  PD_2      : <span style="color:#ae81ff">1</span>;
+    <span style="color:#66d9ef">uint32_t</span>  PD_3      : <span style="color:#ae81ff">1</span>;
+    <span style="color:#66d9ef">uint32_t</span>  PD_4      : <span style="color:#ae81ff">1</span>;
+    <span style="color:#66d9ef">uint32_t</span>  PD_5      : <span style="color:#ae81ff">1</span>;
+    <span style="color:#66d9ef">uint32_t</span>  PD_6      : <span style="color:#ae81ff">1</span>;
+    <span style="color:#66d9ef">uint32_t</span>  PD_7      : <span style="color:#ae81ff">1</span>;
+    <span style="color:#66d9ef">uint32_t</span>  PD_8      : <span style="color:#ae81ff">1</span>;
+    <span style="color:#66d9ef">uint32_t</span>  PD_9      : <span style="color:#ae81ff">1</span>;
+    <span style="color:#66d9ef">uint32_t</span>  PD_10     : <span style="color:#ae81ff">1</span>;
+    <span style="color:#66d9ef">uint32_t</span>  PD_11     : <span style="color:#ae81ff">1</span>;
+    <span style="color:#66d9ef">uint32_t</span>  PD_12     : <span style="color:#ae81ff">1</span>;
+    <span style="color:#66d9ef">uint32_t</span>  PD_13     : <span style="color:#ae81ff">1</span>;
+    <span style="color:#66d9ef">uint32_t</span>  PD_14     : <span style="color:#ae81ff">1</span>;
+    <span style="color:#66d9ef">uint32_t</span>  PD_15     : <span style="color:#ae81ff">1</span>;
+    <span style="color:#66d9ef">uint32_t</span>  PD_16     : <span style="color:#ae81ff">1</span>;
+    <span style="color:#66d9ef">uint32_t</span>  PD_17     : <span style="color:#ae81ff">1</span>;
+    <span style="color:#66d9ef">uint32_t</span>  PD_18     : <span style="color:#ae81ff">1</span>;
+    <span style="color:#66d9ef">uint32_t</span>  PD_19     : <span style="color:#ae81ff">1</span>;
+    <span style="color:#66d9ef">uint32_t</span>  PD_20     : <span style="color:#ae81ff">1</span>;
+    <span style="color:#66d9ef">uint32_t</span>  PD_21     : <span style="color:#ae81ff">1</span>;
+    <span style="color:#66d9ef">uint32_t</span>  PD_22     : <span style="color:#ae81ff">1</span>;
+    <span style="color:#66d9ef">uint32_t</span>  PD_23     : <span style="color:#ae81ff">1</span>;
+    <span style="color:#66d9ef">uint32_t</span>  PD_24     : <span style="color:#ae81ff">1</span>;
+    <span style="color:#66d9ef">uint32_t</span>  reserved  : <span style="color:#ae81ff">7</span>;
+} PD_DATA_REG_t;
+</code></pre></div><p>And to then turn the IO pins on or off, very similar pointer-magic will be used:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c">((<span style="color:#66d9ef">volatile</span> PD_DATA_REG_t<span style="color:#f92672">*</span>)PD_DATA_REG_ADDRESS)<span style="color:#f92672">-&gt;</span>PD18 <span style="color:#f92672">=</span> true; <span style="color:#75715e">// or false
+</span><span style="color:#75715e"></span>((<span style="color:#66d9ef">volatile</span> PD_DATA_REG_t<span style="color:#f92672">*</span>)PD_DATA_REG_ADDRESS)<span style="color:#f92672">-&gt;</span>PD19 <span style="color:#f92672">=</span> true; <span style="color:#75715e">// or false
+</span><span style="color:#75715e"></span>((<span style="color:#66d9ef">volatile</span> PD_DATA_REG_t<span style="color:#f92672">*</span>)PD_DATA_REG_ADDRESS)<span style="color:#f92672">-&gt;</span>PD20 <span style="color:#f92672">=</span> true; <span style="color:#75715e">// or false;
+</span></code></pre></div><h1 id="creating-a-linux-kernel-module">Creating a linux kernel module</h1>
+<h2 id="a-bare-bones-linux-kernel-module">A bare bones linux kernel module</h2>
+<p>All the code that is required to set pinmodes is present, but if it&rsquo;s ran in userspace (even as superuser), it will result in a <code>segfault</code>. This is because the Linux kernel does not allow memory to be altered directly. To get around this, a kernel module will be written.</p>
+<p>A bare bones kernel module looks like this:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#75715e">// filename: mymodule.c (do not name it &#39;module.c&#39;!)
+</span><span style="color:#75715e"></span>
+<span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;linux/module.h&gt;</span><span style="color:#75715e">
+</span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;linux/kernel.h&gt;</span><span style="color:#75715e">
+</span><span style="color:#75715e"></span>
+<span style="color:#66d9ef">static</span> <span style="color:#66d9ef">int</span> <span style="color:#a6e22e">mymodule_init</span>(<span style="color:#66d9ef">void</span>) {
+    <span style="color:#75715e">// do initializing here
+</span><span style="color:#75715e"></span>    printk(KERN_INFO <span style="color:#e6db74">&#34;mymodule: Hello from kernel module!&#34;</span>);
+    <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">0</span>;
+}
+
+<span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">mymodule_exit</span>(<span style="color:#66d9ef">void</span>) {
+    <span style="color:#75715e">// do exit stuff here
+</span><span style="color:#75715e"></span>    printk(KERN_INFO <span style="color:#e6db74">&#34;mymodule: Goodbye from kernel module!&#34;</span>);
+    <span style="color:#66d9ef">return</span>;
+}
+
+module_init(mymodule_init);
+module_exit(mymodule_exit);
+</code></pre></div><p>Make sure to not name anything <code>module</code>. Use a custom name like <code>mymodule</code>, or it might not compile.</p>
+<p>The following <code>Makefile</code> will compile the kernel module:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-Makefile" data-lang="Makefile">obj-m <span style="color:#f92672">:=</span> mymodule.o
+
+KERNEL_VERSION <span style="color:#f92672">=</span> <span style="color:#66d9ef">$(</span>shell uname -r<span style="color:#66d9ef">)</span>
+KERNEL_DIR     <span style="color:#f92672">=</span> /usr/lib/modules/<span style="color:#66d9ef">$(</span>KERNEL_VERSION<span style="color:#66d9ef">)</span>/build/
+
+<span style="color:#a6e22e">all</span><span style="color:#f92672">:</span>
+	<span style="color:#75715e"># Create the kernel module</span>
+	<span style="color:#66d9ef">$(</span>MAKE<span style="color:#66d9ef">)</span> -C <span style="color:#66d9ef">$(</span>KERNEL_DIR<span style="color:#66d9ef">)</span> M<span style="color:#f92672">=</span><span style="color:#66d9ef">$(</span>PWD<span style="color:#66d9ef">)</span> modules
+	<span style="color:#75715e"># Delete every other temporary file, leaving only the .ko file in place</span>
+	<span style="color:#e6db74">`</span>rm mymodule.mo* mymodule.o modules.order Module.symvers ./.*.cmd<span style="color:#e6db74">`</span>
+
+<span style="color:#a6e22e">clean</span><span style="color:#f92672">:</span>
+	<span style="color:#75715e"># Delete all build files</span>
+	<span style="color:#66d9ef">$(</span>MAKE<span style="color:#66d9ef">)</span> -C <span style="color:#66d9ef">$(</span>KERNEL_DIR<span style="color:#66d9ef">)</span> M<span style="color:#f92672">=</span><span style="color:#66d9ef">$(</span>PWD<span style="color:#66d9ef">)</span> clean
+</code></pre></div><p>To then add the kernel module to the kernel, the command</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">sudo insmod mymodule.ko
+</code></pre></div><p>can be issued.</p>
+<p>After that, when the command</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">sudo dmesg
+</code></pre></div><p>can be executed to see the kernel logs. The new linux module should have logged a greeting. To see it happening in realtime, the <code>-w</code> option can de added to the dmesg command.</p>
+<p>To remove the kernel module from the linux kernel, the command</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">sudo rmmod mymodule
+</code></pre></div><p>can be used.</p>
+<h2 id="a-kernel-module-that-alters-memory">A kernel module that alters memory</h2>
+<p>To alter the MMIO registers of the PinePhone, a <code>character device</code> kernel module will be written. It will take an array of 3 characters and turn the right bits on and off using the values of the array. It will also be able to read the current state of the memory and return it in the form of a 3 character long array. All communication will happen through <code>/dev/mymodule</code>, a virtual device.</p>
+<p>All the used memory locations and structures will be put in a separate file called <code>mmio.h</code>. The new kernel module looks like this:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;linux/module.h&gt;</span><span style="color:#75715e">
+</span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;linux/kernel.h&gt;</span><span style="color:#75715e">
+</span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;linux/fs.h&gt;</span><span style="color:#75715e">
+</span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;linux/cdev.h&gt;</span><span style="color:#75715e">
+</span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;linux/semaphore.h&gt;</span><span style="color:#75715e">
+</span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;asm/io.h&gt;</span><span style="color:#75715e">
+</span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;asm/uaccess.h&gt;</span><span style="color:#75715e">
+</span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;stdbool.h&gt;</span><span style="color:#75715e">
+</span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;stdbool.h&gt;</span><span style="color:#75715e">
+</span><span style="color:#75715e"></span>
+<span style="color:#75715e">#include</span> <span style="color:#75715e">&#34;mmio.h&#34;   // contains all the structs and addresses</span><span style="color:#75715e">
+</span><span style="color:#75715e"></span>
+<span style="color:#75715e">#define DEVICE_NAME &#34;mymodule&#34;
+</span><span style="color:#75715e">#define MAX_BUFFER_SIZE 3
+</span><span style="color:#75715e"></span>
+MODULE_DESCRIPTION(DEVICE_NAME);
+MODULE_AUTHOR(<span style="color:#e6db74">&#34;Tom Niesse&#34;</span>);
+MODULE_LICENSE(<span style="color:#e6db74">&#34;GPLv3&#34;</span>);
+
+<span style="color:#75715e">// Create variables that have to do with registering a cdev object
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">struct</span> cdev<span style="color:#f92672">*</span> mcdev;
+<span style="color:#66d9ef">int</span> major_number;
+<span style="color:#66d9ef">int</span> return_value;
+dev_t dev_num;
+
+<span style="color:#75715e">// Create a structure for a virtual device
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">struct</span> virtual_device {
+	<span style="color:#66d9ef">char</span> data[MAX_BUFFER_SIZE];
+	<span style="color:#66d9ef">struct</span> semaphore sem;
+} virtual_device;
+
+<span style="color:#75715e">// Create file operations structure using define because it&#39;s position
+</span><span style="color:#75715e">// in the module is a bit un-intuitive (in-between functions)
+</span><span style="color:#75715e"></span><span style="color:#75715e">#define FILE_OPERATIONS_CALLBACKS \
+</span><span style="color:#75715e">struct file_operations fops = {\
+</span><span style="color:#75715e">    .owner = THIS_MODULE,\
+</span><span style="color:#75715e">    .open = device_open,\
+</span><span style="color:#75715e">    .release = device_close,\
+</span><span style="color:#75715e">    .write = device_write,\
+</span><span style="color:#75715e">    .read = device_read\
+</span><span style="color:#75715e">};
+</span><span style="color:#75715e"></span>
+<span style="color:#75715e">// Create variables that have to do with MMIO
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">volatile</span> PD_CFG2_REG_t<span style="color:#f92672">*</span> pd_cfg2_virtual_address <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
+<span style="color:#66d9ef">volatile</span> PD_DATA_REG_t<span style="color:#f92672">*</span> pd_data_virtual_address <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
+
+<span style="color:#75715e">// A user wants to read to or write from /dev/mymodule
+</span><span style="color:#75715e">// and opens the file
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">int</span> <span style="color:#a6e22e">device_open</span>(<span style="color:#66d9ef">struct</span> inode <span style="color:#f92672">*</span> inode, <span style="color:#66d9ef">struct</span> file <span style="color:#f92672">*</span>filp) {
+	<span style="color:#66d9ef">if</span>(down_interruptible(<span style="color:#f92672">&amp;</span>virtual_device.sem) <span style="color:#f92672">!=</span> <span style="color:#ae81ff">0</span>) {
+		printk(KERN_INFO <span style="color:#e6db74">&#34;mymodule: could not lock device for reading or writing.&#34;</span>);
+		<span style="color:#66d9ef">return</span> <span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>;
+	}
+	printk(KERN_INFO <span style="color:#e6db74">&#34;mymodule: device </span><span style="color:#ae81ff">\&#34;</span><span style="color:#e6db74">/dev/%s</span><span style="color:#ae81ff">\&#34;</span><span style="color:#e6db74"> is opened for reading or writing&#34;</span>, DEVICE_NAME);
+	<span style="color:#66d9ef">return</span> <span style="color:#ae81ff">0</span>;
+}
+
+<span style="color:#75715e">// A user is reading from /dev/mymodule
+</span><span style="color:#75715e"></span>ssize_t <span style="color:#a6e22e">device_read</span>(<span style="color:#66d9ef">struct</span> file<span style="color:#f92672">*</span> filp, <span style="color:#66d9ef">char</span><span style="color:#f92672">*</span> buffer, size_t buffer_size, loff_t<span style="color:#f92672">*</span> current_offset) {
+	printk(KERN_INFO <span style="color:#e6db74">&#34;mymodule: A user is reading from </span><span style="color:#ae81ff">\&#34;</span><span style="color:#e6db74">/dev/%s</span><span style="color:#ae81ff">\&#34;</span><span style="color:#e6db74">, writing information...&#34;</span>, DEVICE_NAME);
+
+	<span style="color:#75715e">// Convert the booleans to characters for all colors (red and green switched)
+</span><span style="color:#75715e"></span>	<span style="color:#66d9ef">if</span>(pd_data_virtual_address<span style="color:#f92672">-&gt;</span>PD19_DATA) {
+		virtual_device.data[<span style="color:#ae81ff">0</span>] <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;1&#39;</span>;
+	} <span style="color:#66d9ef">else</span> {
+		virtual_device.data[<span style="color:#ae81ff">0</span>] <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;0&#39;</span>;
+	}
+
+	<span style="color:#66d9ef">if</span>(pd_data_virtual_address<span style="color:#f92672">-&gt;</span>PD18_DATA) {
+            virtual_device.data[<span style="color:#ae81ff">1</span>] <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;1&#39;</span>;
+    } <span style="color:#66d9ef">else</span> {
+            virtual_device.data[<span style="color:#ae81ff">1</span>] <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;0&#39;</span>;
+    }
+
+    <span style="color:#66d9ef">if</span>(pd_data_virtual_address<span style="color:#f92672">-&gt;</span>PD20_DATA) {
+            virtual_device.data[<span style="color:#ae81ff">2</span>] <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;1&#39;</span>;
+    } <span style="color:#66d9ef">else</span> {
+            virtual_device.data[<span style="color:#ae81ff">2</span>] <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;0&#39;</span>;
+    }
+
+	return_value <span style="color:#f92672">=</span> copy_to_user(buffer, virtual_device.data, buffer_size);
+	<span style="color:#66d9ef">return</span> return_value;
+}
+
+<span style="color:#75715e">// A user is writing to /dev/mymodule
+</span><span style="color:#75715e"></span>ssize_t <span style="color:#a6e22e">device_write</span>(<span style="color:#66d9ef">struct</span> file<span style="color:#f92672">*</span> filp, <span style="color:#66d9ef">const</span> <span style="color:#66d9ef">char</span><span style="color:#f92672">*</span> buffer, size_t buffer_size, loff_t<span style="color:#f92672">*</span> current_offset) {
+	<span style="color:#66d9ef">int</span> pos;
+
+	<span style="color:#75715e">// Make sure the buffer is exactly 3 in length
+</span><span style="color:#75715e"></span>	<span style="color:#66d9ef">if</span>(buffer_size <span style="color:#f92672">!=</span> <span style="color:#ae81ff">3</span>) {
+		<span style="color:#66d9ef">return</span> <span style="color:#ae81ff">1</span>;
+	}
+
+	printk(KERN_INFO <span style="color:#e6db74">&#34;mymodule: A user is writing to </span><span style="color:#ae81ff">\&#34;</span><span style="color:#e6db74">/dev/%s</span><span style="color:#ae81ff">\&#34;</span><span style="color:#e6db74">, reading information...&#34;</span>, DEVICE_NAME);
+	return_value <span style="color:#f92672">=</span> copy_from_user(virtual_device.data, buffer, buffer_size);
+
+	<span style="color:#75715e">// Set color red
+</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">if</span>(virtual_device.data[<span style="color:#ae81ff">0</span>] <span style="color:#f92672">==</span> <span style="color:#e6db74">&#39;1&#39;</span>) {
+        pd_data_virtual_address<span style="color:#f92672">-&gt;</span>PD19_DATA <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>;
+    } <span style="color:#66d9ef">else</span> {
+        pd_data_virtual_address<span style="color:#f92672">-&gt;</span>PD19_DATA <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
+    }
+
+	<span style="color:#75715e">// Set color green
+</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">if</span>(virtual_device.data[<span style="color:#ae81ff">1</span>] <span style="color:#f92672">==</span> <span style="color:#e6db74">&#39;1&#39;</span>) {
+        pd_data_virtual_address<span style="color:#f92672">-&gt;</span>PD18_DATA <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>;
+    } <span style="color:#66d9ef">else</span> {
+        pd_data_virtual_address<span style="color:#f92672">-&gt;</span>PD18_DATA <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
+    }
+
+	<span style="color:#75715e">// Set color blue
+</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">if</span>(virtual_device.data[<span style="color:#ae81ff">2</span>] <span style="color:#f92672">==</span> <span style="color:#e6db74">&#39;1&#39;</span>) {
+        pd_data_virtual_address<span style="color:#f92672">-&gt;</span>PD20_DATA <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>;
+    } <span style="color:#66d9ef">else</span> {
+        pd_data_virtual_address<span style="color:#f92672">-&gt;</span>PD20_DATA <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
+    }
+
+    <span style="color:#75715e">// Log for debugging purposes
+</span><span style="color:#75715e"></span>	<span style="color:#66d9ef">for</span>(pos <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>; pos <span style="color:#f92672">&lt;</span> MAX_BUFFER_SIZE; pos<span style="color:#f92672">++</span>) {
+        printk(KERN_INFO <span style="color:#e6db74">&#34;Setting POS = %d to value %c&#34;</span>, pos, virtual_device.data[pos]);
+	}
+	<span style="color:#66d9ef">return</span> return_value;
+}
+
+<span style="color:#75715e">// A user is done with /dev/mymodule,
+</span><span style="color:#75715e">// the file can be closed
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">int</span> <span style="color:#a6e22e">device_close</span>(<span style="color:#66d9ef">struct</span> inode<span style="color:#f92672">*</span> inode, <span style="color:#66d9ef">struct</span> file<span style="color:#f92672">*</span> filp) {
+	up(<span style="color:#f92672">&amp;</span>virtual_device.sem);
+	printk(KERN_INFO <span style="color:#e6db74">&#34;mymodule: closed device </span><span style="color:#ae81ff">\&#34;</span><span style="color:#e6db74">/dev/%s</span><span style="color:#ae81ff">\&#34;</span><span style="color:#e6db74">.&#34;</span>, DEVICE_NAME);
+	<span style="color:#66d9ef">return</span> <span style="color:#ae81ff">0</span>;
+}
+
+<span style="color:#75715e">// Place file operations callback structure here
+</span><span style="color:#75715e"></span>FILE_OPERATIONS_CALLBACKS
+
+<span style="color:#66d9ef">static</span> <span style="color:#66d9ef">int</span> <span style="color:#a6e22e">mymodule_init</span>(<span style="color:#66d9ef">void</span>) {
+	<span style="color:#75715e">// Ask for virtual addresses to control MMIO
+</span><span style="color:#75715e"></span>	pd_cfg2_virtual_address <span style="color:#f92672">=</span> ioremap((<span style="color:#66d9ef">long</span> <span style="color:#66d9ef">long</span> <span style="color:#66d9ef">unsigned</span> <span style="color:#66d9ef">int</span>)PD_CFG2_REG_ADDRESS, <span style="color:#66d9ef">sizeof</span>(PD_CFG2_REG_t));
+	pd_data_virtual_address <span style="color:#f92672">=</span> ioremap((<span style="color:#66d9ef">long</span> <span style="color:#66d9ef">long</span> <span style="color:#66d9ef">unsigned</span> <span style="color:#66d9ef">int</span>)PD_DATA_REG_ADDRESS, <span style="color:#66d9ef">sizeof</span>(PD_DATA_REG_t));
+
+	<span style="color:#75715e">// Register the /dev/mymodule connection
+</span><span style="color:#75715e"></span>	return_value <span style="color:#f92672">=</span> alloc_chrdev_region(<span style="color:#f92672">&amp;</span>dev_num, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">1</span>, DEVICE_NAME);
+	<span style="color:#66d9ef">if</span>(return_value <span style="color:#f92672">&lt;</span> <span style="color:#ae81ff">0</span>) {
+		printk(KERN_INFO <span style="color:#e6db74">&#34;mymodule: failed to allocate a major number. virtual device will NOT work!&#34;</span>);
+		<span style="color:#66d9ef">return</span> return_value;
+	}
+
+	major_number <span style="color:#f92672">=</span> MAJOR(dev_num);
+	printk(KERN_INFO <span style="color:#e6db74">&#34;mymodule: major number is %d&#34;</span>, major_number);
+	printk(KERN_INFO <span style="color:#e6db74">&#34;use </span><span style="color:#ae81ff">\&#34;</span><span style="color:#e6db74">mknod /dev/%s c %d 0</span><span style="color:#ae81ff">\&#34;</span><span style="color:#e6db74"> to create a virtual device for this module.&#34;</span>, DEVICE_NAME, major_number);
+
+	mcdev <span style="color:#f92672">=</span> cdev_alloc();
+	mcdev<span style="color:#f92672">-&gt;</span>ops <span style="color:#f92672">=</span> <span style="color:#f92672">&amp;</span>fops;
+	mcdev<span style="color:#f92672">-&gt;</span>owner <span style="color:#f92672">=</span> THIS_MODULE;
+
+	return_value <span style="color:#f92672">=</span> cdev_add(mcdev, dev_num, <span style="color:#ae81ff">1</span>);
+	<span style="color:#66d9ef">if</span>(return_value <span style="color:#f92672">&lt;</span> <span style="color:#ae81ff">0</span>) {
+		printk(KERN_INFO <span style="color:#e6db74">&#34;mymodule: could not add cdev to kernel. virtual device will NOT work!&#34;</span>);
+		<span style="color:#66d9ef">return</span> return_value;
+	}
+
+	sema_init(<span style="color:#f92672">&amp;</span>virtual_device.sem, <span style="color:#ae81ff">1</span>);
+
+	<span style="color:#66d9ef">return</span> <span style="color:#ae81ff">0</span>;
+}
+
+<span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">mymodule_exit</span>(<span style="color:#66d9ef">void</span>) {
+	<span style="color:#75715e">// Free the MMIO virtual addresses
+</span><span style="color:#75715e"></span>	iounmap((<span style="color:#66d9ef">void</span><span style="color:#f92672">*</span>)pd_cfg2_virtual_address);
+	iounmap((<span style="color:#66d9ef">void</span><span style="color:#f92672">*</span>)pd_data_virtual_address);
+
+	<span style="color:#75715e">// Unregister the module
+</span><span style="color:#75715e"></span>	cdev_del(mcdev);
+	unregister_chrdev_region(dev_num, <span style="color:#ae81ff">1</span>);
+
+	printk(KERN_INFO <span style="color:#e6db74">&#34;mymodule: module has exited. make sure to delete </span><span style="color:#ae81ff">\&#34;</span><span style="color:#e6db74">/dev/%s</span><span style="color:#ae81ff">\&#34;</span><span style="color:#e6db74">&#34;</span>, DEVICE_NAME);
+}
+
+module_init(mymodule_init);
+module_exit(mymodule_exit);
+</code></pre></div><p>When this module is loaded in using</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">sudo insmod mymodule.ko
+</code></pre></div><p>it will log how to make a virtual device. After executing that command as superuser, a virtual device called <code>/dev/mymodule</code> will have been created.</p>
+<h1 id="communicating-with-the-kernel-module">Communicating with the kernel module</h1>
+<p>Communication can be done using a C or C++ program that runs in userland (as superuser):</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#75715e">// main.c
+</span><span style="color:#75715e"></span>
+<span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;stdio.h&gt;</span><span style="color:#75715e">
+</span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;fcntl.h&gt;</span><span style="color:#75715e">
+</span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;unistd.h&gt;</span><span style="color:#75715e">
+</span><span style="color:#75715e"></span>
+<span style="color:#75715e">#define MAX_BUFFER_SIZE 3
+</span><span style="color:#75715e">#define DEVICE          &#34;/dev/mymodule&#34;
+</span><span style="color:#75715e"></span>
+<span style="color:#66d9ef">char</span> buffer[MAX_BUFFER_SIZE];
+
+<span style="color:#66d9ef">int</span> <span style="color:#a6e22e">main</span>() {
+    <span style="color:#75715e">// Perform a read operation
+</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">int</span> fd <span style="color:#f92672">=</span> open(DEVICE, O_RDWR);
+    read(fd, this<span style="color:#f92672">-&gt;</span>buffer, MAX_BUFFER_SIZE);
+    close(fd);
+
+    <span style="color:#75715e">// Perform a write operation
+</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">int</span> fd <span style="color:#f92672">=</span> open(DEVICE, O_RDWR);
+    write(fd, this<span style="color:#f92672">-&gt;</span>buffer, MAX_BUFFER_SIZE);
+    close(fd);
+
+    <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">0</span>;
+}
+</code></pre></div><h1 id="controlling-other-peripherals">Controlling other peripherals</h1>
+<p>The built-in motor, which makes the phone vibrate when a message arrives, is also directly controlled by a MMIO register of the A64 SoC. Another kernel module can be written to enable, disable and control that motor.</p>
+
+      </div>
+    </article>
+
+    <hr />
+
+    <div class="post-info">
+      
+    <p>
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-tag meta-icon"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7" y2="7"></line></svg>
+
+        <span class="tag"><a href="https://tomniesse.github.io/blog/tags/untagged/">untagged</a></span>
+        
+    </p>
+
+      
+
+      <p>
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+          <polyline points="14 2 14 8 20 8"></polyline>
+          <line x1="16" y1="13" x2="8" y2="13"></line>
+          <line x1="16" y1="17" x2="8" y2="17"></line>
+          <polyline points="10 9 9 9 8 9"></polyline>
+        </svg>
+        2217 Words
+      </p>
+
+      <p>
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-calendar">
+          <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+          <line x1="16" y1="2" x2="16" y2="6"></line>
+          <line x1="8" y1="2" x2="8" y2="6"></line>
+          <line x1="3" y1="10" x2="21" y2="10"></line>
+        </svg>
+        
+          2021-11-03 12:28
+        
+
+         
+          
+        
+      </p>
+    </div>
+      <hr />
+      <div class="sharing-buttons">
+        
+<a class="resp-sharing-button__link" href="https://facebook.com/sharer/sharer.php?u=https%3a%2f%2ftomniesse.github.io%2fblog%2fposts%2fpinephone-linux-kernel-programming%2f" target="_blank" rel="noopener" aria-label="" title="Share on facebook">
+  <div class="resp-sharing-button resp-sharing-button--facebook resp-sharing-button--small"><div aria-hidden="true" class="resp-sharing-button__icon resp-sharing-button__icon--solid">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>
+    </div>
+  </div>
+</a>
+
+
+<a class="resp-sharing-button__link" href="https://twitter.com/intent/tweet/?url=https%3a%2f%2ftomniesse.github.io%2fblog%2fposts%2fpinephone-linux-kernel-programming%2f" target="_blank" rel="noopener" aria-label="" title="Share on twitter">
+  <div class="resp-sharing-button resp-sharing-button--twitter resp-sharing-button--small">
+      <div aria-hidden="true" class="resp-sharing-button__icon resp-sharing-button__icon--solid">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"></path></svg>
+    </div>
+  </div>
+</a>
+
+
+<a class="resp-sharing-button__link" href="https://www.tumblr.com/widgets/share/tool?posttype=link&amp;title=Programming%20a%20character%20device%20driver%20%28PinePhone%20and%20Linux%29&amp;caption=Programming%20a%20character%20device%20driver%20%28PinePhone%20and%20Linux%29&amp;canonicalUrl=https%3a%2f%2ftomniesse.github.io%2fblog%2fposts%2fpinephone-linux-kernel-programming%2f" target="_blank" rel="noopener" aria-label="" title="Share on tumblr">
+  <div class="resp-sharing-button resp-sharing-button--tumblr resp-sharing-button--small">
+    <div aria-hidden="true" class="resp-sharing-button__icon resp-sharing-button__icon--solid">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" stroke="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.563 24c-5.093 0-7.031-3.756-7.031-6.411V9.747H5.116V6.648c3.63-1.313 4.512-4.596 4.71-6.469C9.84.051 9.941 0 9.999 0h3.517v6.114h4.801v3.633h-4.82v7.47c.016 1.001.375 2.371 2.207 2.371h.09c.631-.02 1.486-.205 1.936-.419l1.156 3.425c-.436.636-2.4 1.374-4.156 1.404h-.178l.011.002z"/></svg>
+    </div>
+  </div>
+</a>
+
+
+<a class="resp-sharing-button__link" href="mailto:?subject=Programming%20a%20character%20device%20driver%20%28PinePhone%20and%20Linux%29&amp;body=https%3a%2f%2ftomniesse.github.io%2fblog%2fposts%2fpinephone-linux-kernel-programming%2f" target="_self" rel="noopener" aria-label="" title="Share via email">
+  <div class="resp-sharing-button resp-sharing-button--email resp-sharing-button--small"><div aria-hidden="true" class="resp-sharing-button__icon resp-sharing-button__icon--solid">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+    </div>
+  </div>
+</a>
+
+
+<a class="resp-sharing-button__link" href="https://pinterest.com/pin/create/button/?url=https%3a%2f%2ftomniesse.github.io%2fblog%2fposts%2fpinephone-linux-kernel-programming%2f&amp;media=https%3a%2f%2ftomniesse.github.io%2fblog%2fposts%2fpinephone-linux-kernel-programming%2f;description=Programming%20a%20character%20device%20driver%20%28PinePhone%20and%20Linux%29" target="_blank" rel="noopener" aria-label="" title="Share on pinterest">
+  <div class="resp-sharing-button resp-sharing-button--pinterest resp-sharing-button--small"><div aria-hidden="true" class="resp-sharing-button__icon resp-sharing-button__icon--solid">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12.017 0C5.396 0 .029 5.367.029 11.987c0 5.079 3.158 9.417 7.618 11.162-.105-.949-.199-2.403.041-3.439.219-.937 1.406-5.957 1.406-5.957s-.359-.72-.359-1.781c0-1.663.967-2.911 2.168-2.911 1.024 0 1.518.769 1.518 1.688 0 1.029-.653 2.567-.992 3.992-.285 1.193.6 2.165 1.775 2.165 2.128 0 3.768-2.245 3.768-5.487 0-2.861-2.063-4.869-5.008-4.869-3.41 0-5.409 2.562-5.409 5.199 0 1.033.394 2.143.889 2.741.099.12.112.225.085.345-.09.375-.293 1.199-.334 1.363-.053.225-.172.271-.401.165-1.495-.69-2.433-2.878-2.433-4.646 0-3.776 2.748-7.252 7.92-7.252 4.158 0 7.392 2.967 7.392 6.923 0 4.135-2.607 7.462-6.233 7.462-1.214 0-2.354-.629-2.758-1.379l-.749 2.848c-.269 1.045-1.004 2.352-1.498 3.146 1.123.345 2.306.535 3.55.535 6.607 0 11.985-5.365 11.985-11.987C23.97 5.39 18.592.026 11.985.026L12.017 0z"/></svg>
+    </div>
+  </div>
+</a>
+
+
+<a class="resp-sharing-button__link" href="https://www.linkedin.com/shareArticle?mini=true&amp;url=https%3a%2f%2ftomniesse.github.io%2fblog%2fposts%2fpinephone-linux-kernel-programming%2f&amp;title=Programming%20a%20character%20device%20driver%20%28PinePhone%20and%20Linux%29&amp;summary=Programming%20a%20character%20device%20driver%20%28PinePhone%20and%20Linux%29&amp;source=https%3a%2f%2ftomniesse.github.io%2fblog%2fposts%2fpinephone-linux-kernel-programming%2f" target="_blank" rel="noopener" aria-label="" title="Share on linkedin">
+  <div class="resp-sharing-button resp-sharing-button--linkedin resp-sharing-button--small"><div aria-hidden="true" class="resp-sharing-button__icon resp-sharing-button__icon--solid">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg>
+    </div>
+  </div>
+</a>
+
+
+<a class="resp-sharing-button__link" href="https://reddit.com/submit/?url=https%3a%2f%2ftomniesse.github.io%2fblog%2fposts%2fpinephone-linux-kernel-programming%2f&amp;resubmit=true&amp;title=Programming%20a%20character%20device%20driver%20%28PinePhone%20and%20Linux%29" target="_blank" rel="noopener" aria-label="" title="Share on reddit">
+  <div class="resp-sharing-button resp-sharing-button--reddit resp-sharing-button--small"><div aria-hidden="true" class="resp-sharing-button__icon resp-sharing-button__icon--solid">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0zm5.01 4.744c.688 0 1.25.561 1.25 1.249a1.25 1.25 0 0 1-2.498.056l-2.597-.547-.8 3.747c1.824.07 3.48.632 4.674 1.488.308-.309.73-.491 1.207-.491.968 0 1.754.786 1.754 1.754 0 .716-.435 1.333-1.01 1.614a3.111 3.111 0 0 1 .042.52c0 2.694-3.13 4.87-7.004 4.87-3.874 0-7.004-2.176-7.004-4.87 0-.183.015-.366.043-.534A1.748 1.748 0 0 1 4.028 12c0-.968.786-1.754 1.754-1.754.463 0 .898.196 1.207.49 1.207-.883 2.878-1.43 4.744-1.487l.885-4.182a.342.342 0 0 1 .14-.197.35.35 0 0 1 .238-.042l2.906.617a1.214 1.214 0 0 1 1.108-.701zM9.25 12C8.561 12 8 12.562 8 13.25c0 .687.561 1.248 1.25 1.248.687 0 1.248-.561 1.248-1.249 0-.688-.561-1.249-1.249-1.249zm5.5 0c-.687 0-1.248.561-1.248 1.25 0 .687.561 1.248 1.249 1.248.688 0 1.249-.561 1.249-1.249 0-.687-.562-1.249-1.25-1.249zm-5.466 3.99a.327.327 0 0 0-.231.094.33.33 0 0 0 0 .463c.842.842 2.484.913 2.961.913.477 0 2.105-.056 2.961-.913a.361.361 0 0 0 .029-.463.33.33 0 0 0-.464 0c-.547.533-1.684.73-2.512.73-.828 0-1.979-.196-2.512-.73a.326.326 0 0 0-.232-.095z"/></svg>
+    </div>
+  </div>
+</a>
+
+
+<a class="resp-sharing-button__link" href="https://www.xing.com/app/user?op=share;url=https%3a%2f%2ftomniesse.github.io%2fblog%2fposts%2fpinephone-linux-kernel-programming%2f;title=Programming%20a%20character%20device%20driver%20%28PinePhone%20and%20Linux%29" target="_blank" rel="noopener" aria-label="" title="Share on xing">
+  <div class="resp-sharing-button resp-sharing-button--xing resp-sharing-button--small"><div aria-hidden="true" class="resp-sharing-button__icon resp-sharing-button__icon--solid">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M18.188 0c-.517 0-.741.325-.927.66 0 0-7.455 13.224-7.702 13.657.015.024 4.919 9.023 4.919 9.023.17.308.436.66.967.66h3.454c.211 0 .375-.078.463-.22.089-.151.089-.346-.009-.536l-4.879-8.916c-.004-.006-.004-.016 0-.022L22.139.756c.095-.191.097-.387.006-.535C22.056.078 21.894 0 21.686 0h-3.498zM3.648 4.74c-.211 0-.385.074-.473.216-.09.149-.078.339.02.531l2.34 4.05c.004.01.004.016 0 .021L1.86 16.051c-.099.188-.093.381 0 .529.085.142.239.234.45.234h3.461c.518 0 .766-.348.945-.667l3.734-6.609-2.378-4.155c-.172-.315-.434-.659-.962-.659H3.648v.016z"/></svg>
+    </div>
+  </div>
+</a>
+
+
+<a class="resp-sharing-button__link" href="whatsapp://send?text=Programming%20a%20character%20device%20driver%20%28PinePhone%20and%20Linux%29%20https%3a%2f%2ftomniesse.github.io%2fblog%2fposts%2fpinephone-linux-kernel-programming%2f" target="_blank" rel="noopener" aria-label="" title="Share on whatsapp">
+  <div class="resp-sharing-button resp-sharing-button--whatsapp resp-sharing-button--small"><div aria-hidden="true" class="resp-sharing-button__icon resp-sharing-button__icon--solid">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" stroke="none" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+    </div>
+  </div>
+</a>
+
+
+<a class="resp-sharing-button__link" href="https://news.ycombinator.com/submitlink?u=https%3a%2f%2ftomniesse.github.io%2fblog%2fposts%2fpinephone-linux-kernel-programming%2f&amp;t=Programming%20a%20character%20device%20driver%20%28PinePhone%20and%20Linux%29" target="_blank" rel="noopener" aria-label="" title="Share on hacker news">
+  <div class="resp-sharing-button resp-sharing-button--hackernews resp-sharing-button--small"><div aria-hidden="true" class="resp-sharing-button__icon resp-sharing-button__icon--solid">
+			<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M0 24V0h24v24H0zM6.951 5.896l4.112 7.708v5.064h1.583v-4.972l4.148-7.799h-1.749l-2.457 4.875c-.372.745-.688 1.434-.688 1.434s-.297-.708-.651-1.434L8.831 5.896h-1.88z"/></svg>
+    </div>
+  </div>
+</a>
+
+
+<a class="resp-sharing-button__link" href="https://telegram.me/share/url?text=Programming%20a%20character%20device%20driver%20%28PinePhone%20and%20Linux%29&amp;url=https%3a%2f%2ftomniesse.github.io%2fblog%2fposts%2fpinephone-linux-kernel-programming%2f" target="_blank" rel="noopener" aria-label="" title="Share on telegram">
+  <div class="resp-sharing-button resp-sharing-button--telegram resp-sharing-button--small"><div aria-hidden="true" class="resp-sharing-button__icon resp-sharing-button__icon--solid">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+    </div>
+  </div>
+</a>
+
+      </div>
+
+    
+    <div class="pagination">
+        
+        <div class="pagination__title">
+            <span class="pagination__title-h">Read other posts</span>
+            <hr />
+        </div>
+        
+
+        <div class="pagination__buttons">
+            
+            <span class="button previous">
+                <a href="https://tomniesse.github.io/blog/posts/c-sdl2-programming/">
+                    <span class="button__icon">←</span>
+                    <span class="button__text">C and SDL2 programming</span>
+                </a>
+            </span>
+            
+
+            
+        </div>
+    </div>
+
+
+    
+
+    
+
+  </main>
+
+            </div>
+
+            
+                <footer class="footer">
+    
+    
+</footer>
+
+            
+        </div>
+
+        
+
+
+
+<script type="text/javascript" src="/blog/bundle.min.644292943ae47eef02fcd64b11757aeb8caeeaebf473a823b62099edccac808e8d82689359f285e5d95994e5ad5ae3b9c1ccc281eb1828e67d0ba6630f95b832.js" integrity="sha512-ZEKSlDrkfu8C/NZLEXV664yu6uv0c6gjtiCZ7cysgI6NgmiTWfKF5dlZlOWtWuO5wczCgesYKOZ9C6ZjD5W4Mg=="></script>
+
+
+
+    </body>
+</html>

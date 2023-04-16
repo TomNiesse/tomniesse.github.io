@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="author" content="">
+<meta name="description" content="Introduction This page describes how a minimal router OS can be created using buildroot.
+All configurations and build commands are documented on this page.
+The resulting OS will boot, connect to the first LAN-network it can find and then start an access point.
+Previous work This post is based on another post in which a basic embedded OS is created.
+Editing the minimal Buildroot OS Configuring the access point part of the target system With the options above all set, the Raspberry Pi 4 should boot the target system without any issues." />
+<meta name="keywords" content=", untagged" />
+<meta name="robots" content="noodp" />
+<meta name="theme-color" content="" />
+<link rel="canonical" href="https://tomniesse.github.io/blog/posts/buildroot-ap/" />
+
+
+    <title>
+        
+            Creating an access point using buildroot :: Welcome!  — The place where I write about hobby stuff
+        
+    </title>
+
+
+
+
+
+<link rel="stylesheet" href="/blog/main.5b3e37caf5f369f54ba730903dd9043b99e0b3792e27db9a87f21a3634934b96.css" integrity="sha256-Wz43yvXzafVLpzCQPdkEO5ngs3kuJ9uah/IaNjSTS5Y=">
+
+
+
+    <link rel="apple-touch-icon" sizes="180x180" href="/blog/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/blog/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/blog/favicon-16x16.png">
+    <link rel="manifest" href="/blog/site.webmanifest">
+    <link rel="mask-icon" href="/blog/safari-pinned-tab.svg" color="">
+    <link rel="shortcut icon" href="/blog/favicon.ico">
+    <meta name="msapplication-TileColor" content="">
+
+
+<meta itemprop="name" content="Creating an access point using buildroot">
+<meta itemprop="description" content="Introduction This page describes how a minimal router OS can be created using buildroot.
+All configurations and build commands are documented on this page.
+The resulting OS will boot, connect to the first LAN-network it can find and then start an access point.
+Previous work This post is based on another post in which a basic embedded OS is created.
+Editing the minimal Buildroot OS Configuring the access point part of the target system With the options above all set, the Raspberry Pi 4 should boot the target system without any issues."><meta itemprop="datePublished" content="2021-12-20T13:28:55+02:00" />
+<meta itemprop="dateModified" content="2021-12-20T13:28:55+02:00" />
+<meta itemprop="wordCount" content="1173"><meta itemprop="image" content="https://tomniesse.github.io/blog"/>
+<meta itemprop="keywords" content="untagged," />
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:image" content="https://tomniesse.github.io/blog"/>
+
+<meta name="twitter:title" content="Creating an access point using buildroot"/>
+<meta name="twitter:description" content="Introduction This page describes how a minimal router OS can be created using buildroot.
+All configurations and build commands are documented on this page.
+The resulting OS will boot, connect to the first LAN-network it can find and then start an access point.
+Previous work This post is based on another post in which a basic embedded OS is created.
+Editing the minimal Buildroot OS Configuring the access point part of the target system With the options above all set, the Raspberry Pi 4 should boot the target system without any issues."/>
+
+
+
+    <meta property="og:title" content="Creating an access point using buildroot" />
+<meta property="og:description" content="Introduction This page describes how a minimal router OS can be created using buildroot.
+All configurations and build commands are documented on this page.
+The resulting OS will boot, connect to the first LAN-network it can find and then start an access point.
+Previous work This post is based on another post in which a basic embedded OS is created.
+Editing the minimal Buildroot OS Configuring the access point part of the target system With the options above all set, the Raspberry Pi 4 should boot the target system without any issues." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://tomniesse.github.io/blog/posts/buildroot-ap/" /><meta property="og:image" content="https://tomniesse.github.io/blog"/><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2021-12-20T13:28:55+02:00" />
+<meta property="article:modified_time" content="2021-12-20T13:28:55+02:00" /><meta property="og:site_name" content="Welcome!" />
+
+
+
+
+
+
+
+    <meta property="article:published_time" content="2021-12-20 13:28:55 &#43;0200 &#43;0200" />
+
+
+
+
+
+
+
+
+
+
+
+    </head>
+
+    
+        <body>
+    
+    
+        <div class="container">
+            <header class="header">
+    <span class="header__inner">
+        <a href="/blog" style="text-decoration: none;">
+    <div class="logo">
+        
+            <span class="logo__mark">></span>
+            <span class="logo__text ">
+                Tom&#39;s blogposts</span>
+            <span class="logo__cursor" style=
+                  "
+                   
+                   ">
+            </span>
+        
+    </div>
+</a>
+
+
+        <span class="header__right">
+            
+                <nav class="menu">
+    <ul class="menu__inner"><li><a href="/blog/posts">Blogposts</a></li>
+    </ul>
+</nav>
+
+                <span class="menu-trigger">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                        <path d="M0 0h24v24H0z" fill="none"/>
+                        <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/>
+                    </svg>
+                </span>
+            
+        </span>
+    </span>
+</header>
+
+
+            <div class="content">
+                
+  <main class="post">
+
+    <div class="post-info">
+      <p>
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-clock">
+          <circle cx="12" cy="12" r="10"></circle>
+          <polyline points="12 6 12 12 16 14"></polyline>
+        </svg>
+        6 minutes
+
+        
+      </p>
+    </div>
+
+    <article>
+      <h1 class="post-title">
+        <a href="https://tomniesse.github.io/blog/posts/buildroot-ap/">Creating an access point using buildroot</a>
+      </h1>
+
+      
+
+      
+
+      
+
+      <div class="post-content">
+        <h1 id="introduction">Introduction</h1>
+<p>This page describes how a minimal router OS can be created using <a href="https://buildroot.org">buildroot</a>.<br>
+All configurations and build commands are documented on this page.</p>
+<p>The resulting OS will boot, connect to the first LAN-network it can find and then start an access point.</p>
+<h1 id="previous-work">Previous work</h1>
+<p>This post is based on <a href="/blog/posts/buildroot">another post</a> in which a basic embedded OS is created.</p>
+<h1 id="editing-the-minimal-buildroot-os">Editing the minimal Buildroot OS</h1>
+<h2 id="configuring-the-access-point-part-of-the-target-system">Configuring the access point part of the target system</h2>
+<p>With the options above all set, the Raspberry Pi 4 should boot the target system without any issues. But, because the goal is to create a router out of the Raspberry Pi 4, some extra configuration is needed.</p>
+<p>In the <code>menuconfig</code> of buildroot, make the following extra changes:</p>
+<ul>
+<li>Under <code>Build options</code>, the option <code>RELRO Protection</code> is set to partial</li>
+<li>Under <code>Target packages</code> -&gt; <code>BusyBox</code>, the option <code>Show packages that are also provided by busybox</code></li>
+<li>Under <code>Target packages</code> -&gt; <code>Networking applications</code>, the option <code>iptables</code> is enabled, along with the following options:
+<ul>
+<li><code>bpfc and nfsynproxy</code></li>
+<li><code>nftables compat</code></li>
+</ul>
+</li>
+<li>Under <code>Target packages</code> -&gt; <code>Networking applications</code>, the option <code>dhcp (ISC)</code> is enabled, along with the following options:
+<ul>
+<li><code>dhcp server</code>, along with:
+<ul>
+<li><code>Enable delayed ACK feature</code></li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Under <code>Target packages</code> -&gt; <code>Networking applications</code> -&gt; <code>wpa_supplicant</code>, the following options are enabled:
+<ul>
+<li><code>Enable nl80211 support</code></li>
+<li><code>Enable AP mode</code></li>
+<li><code>Enable EAP</code></li>
+<li><code>Enable WPA3 support</code></li>
+<li><code>Install wpa_passphrase binary</code></li>
+<li><code>Enable support for the DBus control interface</code> (optional, if control via DBus is desired)</li>
+<li><code>Introspection support</code> (optional, also has to do with control via DBus)</li>
+</ul>
+</li>
+<li>Under <code>Target packages</code> -&gt; <code>Hardware handling</code> -&gt; <code>Firmware</code>, the option <code>rpi-wifi-firmware</code> is enabled.</li>
+</ul>
+<p>Using the command <code>make linux-menuconfig</code>, the following additional changes are made to the kernel configuration (still within Buildroot):</p>
+<ul>
+<li>Under <code>CPU Power Management</code> -&gt; <code>CPU Frequency scaling</code>, the option <code>Default CPUFreq governor</code> is set to <code>ondemand</code></li>
+</ul>
+<h2 id="adding-external-network-configuration-files-to-the-target-system">Adding external (network) configuration files to the target system</h2>
+<p>Some configuration files are needed by the target system in order to make the access point a reality. Normally, configuration files would be created on the target system. In this case, this is not desireable. Fortunately, Buildroot had a file called <code>post-build.sh</code>, located in <code>buildroot-&lt;VERSION_GOES_HERE&gt;/board/raspberrypi/</code>. This file will be used to automatically copy network configurations to the target system after it&rsquo;s been built.</p>
+<h3 id="wpa_supplicantconf">wpa_supplicant.conf</h3>
+<p>The tool <code>wpa_supplicant</code> is often used to connect to networks, but it can also be configured to act as an access point. In order to do this, it needs a configuration file called <code>wpa_supplicant.conf</code>.</p>
+<p>To create a wireless access point on the target system, create a file called <code>wpa_supplicant.conf</code> and place it in <code>buildroot-&lt;VERSION_GOES_HERE&gt;/board/raspberrypi/</code>. The file has the following contents:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">network<span style="color:#f92672">={</span>
+    ssid<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;buildrootAP&#34;</span>  <span style="color:#75715e"># network name</span>
+    psk<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;welcome01&#34;</span>     <span style="color:#75715e"># network password</span>
+    mode<span style="color:#f92672">=</span><span style="color:#ae81ff">2</span>              <span style="color:#75715e"># act as an access point</span>
+    proto<span style="color:#f92672">=</span>RSN
+    key_mgmt<span style="color:#f92672">=</span>WPA-PSK
+    pairwise<span style="color:#f92672">=</span>CCMP
+    group<span style="color:#f92672">=</span>CCMP          <span style="color:#75715e"># allow only AES, not TKIP</span>
+    <span style="color:#75715e">#frequency=5200     # uncomment to run access point on 5GHz</span>
+<span style="color:#f92672">}</span>
+</code></pre></div><p>This configuration will create a WPA2 network with the name <code>buildrootAP</code> and password <code>welcome01</code>.</p>
+<p>Frequency options are as follows:</p>
+<ul>
+<li>For a 2.4GHz access point: <code>2412</code>, <code>2417</code>, <code>2422</code>, <code>2427</code>, <code>2432</code>, <code>2437</code>, <code>2442</code>, <code>2447</code>, <code>2452</code>, <code>2457</code>, <code>2462</code>, <code>2467</code> or <code>2472</code></li>
+<li>For a 5GHz access point: <code>5170</code>, <code>5180</code>, <code>5190</code>, <code>5200</code>, <code>5210</code>, <code>5220</code>, <code>5230</code>, <code>5240</code>, <code>5260</code>, <code>5280</code>, <code>5300</code>, <code>5320</code>, <code>5500</code>, <code>5520</code>, <code>5540</code>, <code>5560</code>, <code>5580</code>, <code>5600</code>, <code>5620</code>, <code>5640</code>, <code>5660</code>, <code>5680</code> or <code>5700</code></li>
+</ul>
+<p>On 5GHz, if the frequency is set too high, the signal will probably not travel through walls very well. A higher frequency does result in a faster internet speed. Not all frequencies may be supported by the wireless interface of the Raspberry Pi 4. If the network SSID does not appear after the Raspberry Pi 4 has started, change the frequency to another value.</p>
+<h3 id="interfaces">interfaces</h3>
+<p>Another common file found in Linux-based operating systems is a file called <code>interfaces</code>. This file often contains configurations regarding IP addressing of certain interfaces.</p>
+<p>To create interface configuration for the target system, create a file called <code>interfaces</code> and place it in <code>buildroot-&lt;VERSION_GOES_HERE&gt;/board/raspberrypi/</code>. The file is to contain the following configuration:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">auto lo
+iface lo inet loopback
+auto eth0
+iface eth0 inet dhcp
+    udhcpc_opts -t <span style="color:#ae81ff">99</span> <span style="color:#75715e"># try 99 times before giving up</span>
+    pre-up /etc/network/nfs_check
+    wait-delay <span style="color:#ae81ff">15</span>
+auto wlan0
+iface wlan0 inet static
+    address 192.168.200.1
+    netmask 255.255.255.0
+    network 192.168.200.0
+    gateway 192.168.200.1
+    pre-up wpa_supplicant -B -Dnl80211 -iwlan0 -c/etc/wpa_supplicant.conf
+    post-down killall -q wpa_supplicant
+    wait-delay <span style="color:#ae81ff">15</span>
+iface default inet dhcp
+</code></pre></div><h3 id="dhcpdconf">dhcpd.conf</h3>
+<p>Almost every modern router has a DHCP server built in. So, the target system should also have one.</p>
+<p>To configure the DHCP server on the target system, create a file called <code>dhcpd.conf</code> and place it in <code>buildroot-&lt;VERSION_GOES_HERE&gt;/board/raspberrypi/</code>. The file is to have the following contents:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">ddns-update-style none;
+default-lease-time 600;
+max-lease-time 7200;
+authoritative;
+
+subnet 192.168.200.0 netmask 255.255.255.0 <span style="color:#f92672">{</span>
+  range 192.168.200.10 192.168.200.50;
+  option broadcast-address 192.168.200.255;
+  option routers 192.168.200.1;
+  default-lease-time 600;
+  max-lease-time 7200;
+  option domain-name <span style="color:#e6db74">&#34;local&#34;</span>;
+  option domain-name-servers 9.9.9.9, 1.1.1.1;
+<span style="color:#f92672">}</span>
+</code></pre></div><h3 id="sysctlconf">sysctl.conf</h3>
+<p>To allow packages to flow from one linux network interface to another, a file called <code>sysctl.conf</code> has to be created and placed in <code>buildroot-&lt;VERSION_GOES_HERE&gt;/board/raspberrypi/</code>. The file is to have the following contents:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">net.ipv4.ip_forward <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>
+</code></pre></div><h3 id="s02procps">S02procps</h3>
+<p>To activate the above configuration file (<code>sysctl.conf</code>) when the target OS boots, a startup/service file called <code>S02procps</code> is created and placed in <code>buildroot-&lt;VERSION_GOES_HERE&gt;/board/raspberrypi/</code>. The file will have the following contents:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh"><span style="color:#75715e">#! /bin/sh
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">if</span> <span style="color:#f92672">[</span> <span style="color:#e6db74">&#34;</span>$1<span style="color:#e6db74">&#34;</span> <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;start&#34;</span> <span style="color:#f92672">]</span>; <span style="color:#66d9ef">then</span>
+    sysctl -p
+<span style="color:#66d9ef">fi</span>
+</code></pre></div><h3 id="s99firewall">S99firewall</h3>
+<p>To configure firewall settings when the target OS boots, a service will be created. The file will be called <code>s99firewall</code> and placed in <code>buildroot-&lt;VERSION_GOES_HERE&gt;/board/raspberrypi/</code>. The file will have the following contents:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh"><span style="color:#75715e">#! /bin/sh
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">if</span> <span style="color:#f92672">[</span> <span style="color:#e6db74">&#34;</span>$1<span style="color:#e6db74">&#34;</span> <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;start&#34;</span> <span style="color:#f92672">]</span>; <span style="color:#66d9ef">then</span>
+    iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
+    iptables -P FORWARD DROP
+    iptables -A FORWARD -i eth0 -o wlan0 -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
+    iptables -A FORWARD -i wlan0 -o eth0 -j ACCEPT
+    iptables -P INPUT DROP
+    iptables -A INPUT -i eth0 -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
+    iptables -A INPUT -i wlan0 -j ACCEPT
+<span style="color:#66d9ef">fi</span>
+</code></pre></div><h2 id="copying-all-files-to-the-target-system">Copying all files to the target system</h2>
+<p>To automatically copy all configuration files and services into the target system after it has been built, the following lines will be appended to <code>buildroot-&lt;VERSION_GOES_HERE&gt;/board/raspberrypi/post-build.sh</code>:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#75715e"># copy configuration files</span>
+cp board/raspberrypi/interfaces <span style="color:#e6db74">${</span>TARGET_DIR<span style="color:#e6db74">}</span>/etc/network/interfaces
+cp board/raspberrypi/wpa_supplicant.conf <span style="color:#e6db74">${</span>TARGET_DIR<span style="color:#e6db74">}</span>/etc/wpa_supplicant.conf
+cp board/raspberrypi/dhcpd.conf <span style="color:#e6db74">${</span>TARGET_DIR<span style="color:#e6db74">}</span>/etc/dhcp/dhcpd.conf
+cp board/raspberrypi/sysctl.conf <span style="color:#e6db74">${</span>TARGET_DIR<span style="color:#e6db74">}</span>/etc/sysctl.conf
+
+<span style="color:#75715e"># copy init scripts</span>
+cp board/raspberrypi/S02procps <span style="color:#e6db74">${</span>TARGET_DIR<span style="color:#e6db74">}</span>/etc/init.d/S02procps
+cp board/raspberrypi/S99firewall <span style="color:#e6db74">${</span>TARGET_DIR<span style="color:#e6db74">}</span>/etc/init.d/S99firewall
+
+<span style="color:#75715e"># set permissions on the new init scripts</span>
+chmod <span style="color:#ae81ff">755</span> <span style="color:#e6db74">${</span>TARGET_DIR<span style="color:#e6db74">}</span>/etc/init.d/S02procps
+chmod <span style="color:#ae81ff">755</span> <span style="color:#e6db74">${</span>TARGET_DIR<span style="color:#e6db74">}</span>/etc/init.d/S99firewall
+
+<span style="color:#75715e"># make the init scripts executable</span>
+chmod +x <span style="color:#e6db74">${</span>TARGET_DIR<span style="color:#e6db74">}</span>/etc/init.d/S02procps
+chmod +x <span style="color:#e6db74">${</span>TARGET_DIR<span style="color:#e6db74">}</span>/etc/init.d/S99firewall
+</code></pre></div><h2 id="rebuilding-the-os">Rebuilding the OS</h2>
+<p>After all configurations are done, rebuild the system as explained in the previous post.</p>
+<h1 id="testing">Testing</h1>
+<p>After the <code>system.img</code> file is flashed to an SD card, the SD card can be plugged into any Raspberry Pi 4.<br>
+If a monitor is connected to the <code>HDMI0</code> port of the Raspberry Pi 4, the following logs can be seen:</p>
+<p><a href="images/started.jpg"><img src="images/started.jpg" alt="Startup logs"></a></p>
+<p>The Raspberry Pi successfully connected to a lan network and then started it&rsquo;s wireless access point. The network SSID should now be visible to client devices and connections can now be made.</p>
+<p>The OS will fail to start the access point if it cannot connect to another LAN network via DHCP. If <code>udhcpc</code> fails after trying 99 times, the OS will not start a wireless network.</p>
+<h1 id="sources">Sources</h1>
+<ul>
+<li><a href="https://bootlin.com/doc/training/buildroot/buildroot-slides.pdf">https://bootlin.com/doc/training/buildroot/buildroot-slides.pdf</a></li>
+<li><a href="https://blog.crysys.hu/2018/06/enabling-wifi-and-converting-the-raspberry-pi-into-a-wifi-ap/">https://blog.crysys.hu/2018/06/enabling-wifi-and-converting-the-raspberry-pi-into-a-wifi-ap/</a></li>
+<li><a href="https://unix.stackexchange.com/questions/439559/udhcpc-no-lease-failing-when-booting-on-embedded-linux-created-by-buildroot">https://unix.stackexchange.com/questions/439559/udhcpc-no-lease-failing-when-booting-on-embedded-linux-created-by-buildroot</a></li>
+<li><a href="https://raspberrypi.stackexchange.com/questions/107858/raspberry-pi-4-b-5ghz-wifi-access-point-problem">https://raspberrypi.stackexchange.com/questions/107858/raspberry-pi-4-b-5ghz-wifi-access-point-problem</a></li>
+<li><a href="http://lists.busybox.net/pipermail/buildroot/2019-June/252256.html">http://lists.busybox.net/pipermail/buildroot/2019-June/252256.html</a></li>
+</ul>
+
+      </div>
+    </article>
+
+    <hr />
+
+    <div class="post-info">
+      
+    <p>
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-tag meta-icon"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7" y2="7"></line></svg>
+
+        <span class="tag"><a href="https://tomniesse.github.io/blog/tags/untagged/">untagged</a></span>
+        
+    </p>
+
+      
+
+      <p>
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+          <polyline points="14 2 14 8 20 8"></polyline>
+          <line x1="16" y1="13" x2="8" y2="13"></line>
+          <line x1="16" y1="17" x2="8" y2="17"></line>
+          <polyline points="10 9 9 9 8 9"></polyline>
+        </svg>
+        1173 Words
+      </p>
+
+      <p>
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-calendar">
+          <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+          <line x1="16" y1="2" x2="16" y2="6"></line>
+          <line x1="8" y1="2" x2="8" y2="6"></line>
+          <line x1="3" y1="10" x2="21" y2="10"></line>
+        </svg>
+        
+          2021-12-20 12:28
+        
+
+         
+          
+        
+      </p>
+    </div>
+      <hr />
+      <div class="sharing-buttons">
+        
+<a class="resp-sharing-button__link" href="https://facebook.com/sharer/sharer.php?u=https%3a%2f%2ftomniesse.github.io%2fblog%2fposts%2fbuildroot-ap%2f" target="_blank" rel="noopener" aria-label="" title="Share on facebook">
+  <div class="resp-sharing-button resp-sharing-button--facebook resp-sharing-button--small"><div aria-hidden="true" class="resp-sharing-button__icon resp-sharing-button__icon--solid">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>
+    </div>
+  </div>
+</a>
+
+
+<a class="resp-sharing-button__link" href="https://twitter.com/intent/tweet/?url=https%3a%2f%2ftomniesse.github.io%2fblog%2fposts%2fbuildroot-ap%2f" target="_blank" rel="noopener" aria-label="" title="Share on twitter">
+  <div class="resp-sharing-button resp-sharing-button--twitter resp-sharing-button--small">
+      <div aria-hidden="true" class="resp-sharing-button__icon resp-sharing-button__icon--solid">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"></path></svg>
+    </div>
+  </div>
+</a>
+
+
+<a class="resp-sharing-button__link" href="https://www.tumblr.com/widgets/share/tool?posttype=link&amp;title=Creating%20an%20access%20point%20using%20buildroot&amp;caption=Creating%20an%20access%20point%20using%20buildroot&amp;canonicalUrl=https%3a%2f%2ftomniesse.github.io%2fblog%2fposts%2fbuildroot-ap%2f" target="_blank" rel="noopener" aria-label="" title="Share on tumblr">
+  <div class="resp-sharing-button resp-sharing-button--tumblr resp-sharing-button--small">
+    <div aria-hidden="true" class="resp-sharing-button__icon resp-sharing-button__icon--solid">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" stroke="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.563 24c-5.093 0-7.031-3.756-7.031-6.411V9.747H5.116V6.648c3.63-1.313 4.512-4.596 4.71-6.469C9.84.051 9.941 0 9.999 0h3.517v6.114h4.801v3.633h-4.82v7.47c.016 1.001.375 2.371 2.207 2.371h.09c.631-.02 1.486-.205 1.936-.419l1.156 3.425c-.436.636-2.4 1.374-4.156 1.404h-.178l.011.002z"/></svg>
+    </div>
+  </div>
+</a>
+
+
+<a class="resp-sharing-button__link" href="mailto:?subject=Creating%20an%20access%20point%20using%20buildroot&amp;body=https%3a%2f%2ftomniesse.github.io%2fblog%2fposts%2fbuildroot-ap%2f" target="_self" rel="noopener" aria-label="" title="Share via email">
+  <div class="resp-sharing-button resp-sharing-button--email resp-sharing-button--small"><div aria-hidden="true" class="resp-sharing-button__icon resp-sharing-button__icon--solid">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+    </div>
+  </div>
+</a>
+
+
+<a class="resp-sharing-button__link" href="https://pinterest.com/pin/create/button/?url=https%3a%2f%2ftomniesse.github.io%2fblog%2fposts%2fbuildroot-ap%2f&amp;media=https%3a%2f%2ftomniesse.github.io%2fblog%2fposts%2fbuildroot-ap%2f;description=Creating%20an%20access%20point%20using%20buildroot" target="_blank" rel="noopener" aria-label="" title="Share on pinterest">
+  <div class="resp-sharing-button resp-sharing-button--pinterest resp-sharing-button--small"><div aria-hidden="true" class="resp-sharing-button__icon resp-sharing-button__icon--solid">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12.017 0C5.396 0 .029 5.367.029 11.987c0 5.079 3.158 9.417 7.618 11.162-.105-.949-.199-2.403.041-3.439.219-.937 1.406-5.957 1.406-5.957s-.359-.72-.359-1.781c0-1.663.967-2.911 2.168-2.911 1.024 0 1.518.769 1.518 1.688 0 1.029-.653 2.567-.992 3.992-.285 1.193.6 2.165 1.775 2.165 2.128 0 3.768-2.245 3.768-5.487 0-2.861-2.063-4.869-5.008-4.869-3.41 0-5.409 2.562-5.409 5.199 0 1.033.394 2.143.889 2.741.099.12.112.225.085.345-.09.375-.293 1.199-.334 1.363-.053.225-.172.271-.401.165-1.495-.69-2.433-2.878-2.433-4.646 0-3.776 2.748-7.252 7.92-7.252 4.158 0 7.392 2.967 7.392 6.923 0 4.135-2.607 7.462-6.233 7.462-1.214 0-2.354-.629-2.758-1.379l-.749 2.848c-.269 1.045-1.004 2.352-1.498 3.146 1.123.345 2.306.535 3.55.535 6.607 0 11.985-5.365 11.985-11.987C23.97 5.39 18.592.026 11.985.026L12.017 0z"/></svg>
+    </div>
+  </div>
+</a>
+
+
+<a class="resp-sharing-button__link" href="https://www.linkedin.com/shareArticle?mini=true&amp;url=https%3a%2f%2ftomniesse.github.io%2fblog%2fposts%2fbuildroot-ap%2f&amp;title=Creating%20an%20access%20point%20using%20buildroot&amp;summary=Creating%20an%20access%20point%20using%20buildroot&amp;source=https%3a%2f%2ftomniesse.github.io%2fblog%2fposts%2fbuildroot-ap%2f" target="_blank" rel="noopener" aria-label="" title="Share on linkedin">
+  <div class="resp-sharing-button resp-sharing-button--linkedin resp-sharing-button--small"><div aria-hidden="true" class="resp-sharing-button__icon resp-sharing-button__icon--solid">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg>
+    </div>
+  </div>
+</a>
+
+
+<a class="resp-sharing-button__link" href="https://reddit.com/submit/?url=https%3a%2f%2ftomniesse.github.io%2fblog%2fposts%2fbuildroot-ap%2f&amp;resubmit=true&amp;title=Creating%20an%20access%20point%20using%20buildroot" target="_blank" rel="noopener" aria-label="" title="Share on reddit">
+  <div class="resp-sharing-button resp-sharing-button--reddit resp-sharing-button--small"><div aria-hidden="true" class="resp-sharing-button__icon resp-sharing-button__icon--solid">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0zm5.01 4.744c.688 0 1.25.561 1.25 1.249a1.25 1.25 0 0 1-2.498.056l-2.597-.547-.8 3.747c1.824.07 3.48.632 4.674 1.488.308-.309.73-.491 1.207-.491.968 0 1.754.786 1.754 1.754 0 .716-.435 1.333-1.01 1.614a3.111 3.111 0 0 1 .042.52c0 2.694-3.13 4.87-7.004 4.87-3.874 0-7.004-2.176-7.004-4.87 0-.183.015-.366.043-.534A1.748 1.748 0 0 1 4.028 12c0-.968.786-1.754 1.754-1.754.463 0 .898.196 1.207.49 1.207-.883 2.878-1.43 4.744-1.487l.885-4.182a.342.342 0 0 1 .14-.197.35.35 0 0 1 .238-.042l2.906.617a1.214 1.214 0 0 1 1.108-.701zM9.25 12C8.561 12 8 12.562 8 13.25c0 .687.561 1.248 1.25 1.248.687 0 1.248-.561 1.248-1.249 0-.688-.561-1.249-1.249-1.249zm5.5 0c-.687 0-1.248.561-1.248 1.25 0 .687.561 1.248 1.249 1.248.688 0 1.249-.561 1.249-1.249 0-.687-.562-1.249-1.25-1.249zm-5.466 3.99a.327.327 0 0 0-.231.094.33.33 0 0 0 0 .463c.842.842 2.484.913 2.961.913.477 0 2.105-.056 2.961-.913a.361.361 0 0 0 .029-.463.33.33 0 0 0-.464 0c-.547.533-1.684.73-2.512.73-.828 0-1.979-.196-2.512-.73a.326.326 0 0 0-.232-.095z"/></svg>
+    </div>
+  </div>
+</a>
+
+
+<a class="resp-sharing-button__link" href="https://www.xing.com/app/user?op=share;url=https%3a%2f%2ftomniesse.github.io%2fblog%2fposts%2fbuildroot-ap%2f;title=Creating%20an%20access%20point%20using%20buildroot" target="_blank" rel="noopener" aria-label="" title="Share on xing">
+  <div class="resp-sharing-button resp-sharing-button--xing resp-sharing-button--small"><div aria-hidden="true" class="resp-sharing-button__icon resp-sharing-button__icon--solid">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M18.188 0c-.517 0-.741.325-.927.66 0 0-7.455 13.224-7.702 13.657.015.024 4.919 9.023 4.919 9.023.17.308.436.66.967.66h3.454c.211 0 .375-.078.463-.22.089-.151.089-.346-.009-.536l-4.879-8.916c-.004-.006-.004-.016 0-.022L22.139.756c.095-.191.097-.387.006-.535C22.056.078 21.894 0 21.686 0h-3.498zM3.648 4.74c-.211 0-.385.074-.473.216-.09.149-.078.339.02.531l2.34 4.05c.004.01.004.016 0 .021L1.86 16.051c-.099.188-.093.381 0 .529.085.142.239.234.45.234h3.461c.518 0 .766-.348.945-.667l3.734-6.609-2.378-4.155c-.172-.315-.434-.659-.962-.659H3.648v.016z"/></svg>
+    </div>
+  </div>
+</a>
+
+
+<a class="resp-sharing-button__link" href="whatsapp://send?text=Creating%20an%20access%20point%20using%20buildroot%20https%3a%2f%2ftomniesse.github.io%2fblog%2fposts%2fbuildroot-ap%2f" target="_blank" rel="noopener" aria-label="" title="Share on whatsapp">
+  <div class="resp-sharing-button resp-sharing-button--whatsapp resp-sharing-button--small"><div aria-hidden="true" class="resp-sharing-button__icon resp-sharing-button__icon--solid">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" stroke="none" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+    </div>
+  </div>
+</a>
+
+
+<a class="resp-sharing-button__link" href="https://news.ycombinator.com/submitlink?u=https%3a%2f%2ftomniesse.github.io%2fblog%2fposts%2fbuildroot-ap%2f&amp;t=Creating%20an%20access%20point%20using%20buildroot" target="_blank" rel="noopener" aria-label="" title="Share on hacker news">
+  <div class="resp-sharing-button resp-sharing-button--hackernews resp-sharing-button--small"><div aria-hidden="true" class="resp-sharing-button__icon resp-sharing-button__icon--solid">
+			<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M0 24V0h24v24H0zM6.951 5.896l4.112 7.708v5.064h1.583v-4.972l4.148-7.799h-1.749l-2.457 4.875c-.372.745-.688 1.434-.688 1.434s-.297-.708-.651-1.434L8.831 5.896h-1.88z"/></svg>
+    </div>
+  </div>
+</a>
+
+
+<a class="resp-sharing-button__link" href="https://telegram.me/share/url?text=Creating%20an%20access%20point%20using%20buildroot&amp;url=https%3a%2f%2ftomniesse.github.io%2fblog%2fposts%2fbuildroot-ap%2f" target="_blank" rel="noopener" aria-label="" title="Share on telegram">
+  <div class="resp-sharing-button resp-sharing-button--telegram resp-sharing-button--small"><div aria-hidden="true" class="resp-sharing-button__icon resp-sharing-button__icon--solid">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+    </div>
+  </div>
+</a>
+
+      </div>
+
+    
+    <div class="pagination">
+        
+        <div class="pagination__title">
+            <span class="pagination__title-h">Read other posts</span>
+            <hr />
+        </div>
+        
+
+        <div class="pagination__buttons">
+            
+            <span class="button previous">
+                <a href="https://tomniesse.github.io/blog/posts/buildroot-dune-dynasty/">
+                    <span class="button__icon">←</span>
+                    <span class="button__text">Creating an embedded OS that runs a DOS game</span>
+                </a>
+            </span>
+            
+
+            
+            <span class="button next">
+                <a href="https://tomniesse.github.io/blog/posts/docker/">
+                    <span class="button__text">Introduction to docker(-compose)</span>
+                    <span class="button__icon">→</span>
+                </a>
+            </span>
+            
+        </div>
+    </div>
+
+
+    
+
+    
+
+  </main>
+
+            </div>
+
+            
+                <footer class="footer">
+    
+    
+</footer>
+
+            
+        </div>
+
+        
+
+
+
+<script type="text/javascript" src="/blog/bundle.min.644292943ae47eef02fcd64b11757aeb8caeeaebf473a823b62099edccac808e8d82689359f285e5d95994e5ad5ae3b9c1ccc281eb1828e67d0ba6630f95b832.js" integrity="sha512-ZEKSlDrkfu8C/NZLEXV664yu6uv0c6gjtiCZ7cysgI6NgmiTWfKF5dlZlOWtWuO5wczCgesYKOZ9C6ZjD5W4Mg=="></script>
+
+
+
+    </body>
+</html>

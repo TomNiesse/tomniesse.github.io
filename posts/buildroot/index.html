@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="author" content="">
+<meta name="description" content="What is an embedded OS? An Embedded Operating System is an Operating System designed to run on specific hardware. For example, many smart TV&amp;rsquo;s these days are running an embedded OS. Because the OS is made for the specific hardware, it can be configured to start up in the blink of an eye.
+What is Buildroot? Buildroot, just like the yocto project, is a set of tools to help automate the build process of an embedded Linux based OS." />
+<meta name="keywords" content=", untagged" />
+<meta name="robots" content="noodp" />
+<meta name="theme-color" content="" />
+<link rel="canonical" href="https://tomniesse.github.io/blog/posts/buildroot/" />
+
+
+    <title>
+        
+            Creating a minimal OS using buildroot (Raspberry Pi) :: Welcome!  — The place where I write about hobby stuff
+        
+    </title>
+
+
+
+
+
+<link rel="stylesheet" href="/blog/main.5b3e37caf5f369f54ba730903dd9043b99e0b3792e27db9a87f21a3634934b96.css" integrity="sha256-Wz43yvXzafVLpzCQPdkEO5ngs3kuJ9uah/IaNjSTS5Y=">
+
+
+
+    <link rel="apple-touch-icon" sizes="180x180" href="/blog/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/blog/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/blog/favicon-16x16.png">
+    <link rel="manifest" href="/blog/site.webmanifest">
+    <link rel="mask-icon" href="/blog/safari-pinned-tab.svg" color="">
+    <link rel="shortcut icon" href="/blog/favicon.ico">
+    <meta name="msapplication-TileColor" content="">
+
+
+<meta itemprop="name" content="Creating a minimal OS using buildroot (Raspberry Pi)">
+<meta itemprop="description" content="What is an embedded OS? An Embedded Operating System is an Operating System designed to run on specific hardware. For example, many smart TV&rsquo;s these days are running an embedded OS. Because the OS is made for the specific hardware, it can be configured to start up in the blink of an eye.
+What is Buildroot? Buildroot, just like the yocto project, is a set of tools to help automate the build process of an embedded Linux based OS."><meta itemprop="datePublished" content="2021-11-18T13:28:55+02:00" />
+<meta itemprop="dateModified" content="2021-11-18T13:28:55+02:00" />
+<meta itemprop="wordCount" content="2620"><meta itemprop="image" content="https://tomniesse.github.io/blog"/>
+<meta itemprop="keywords" content="untagged," />
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:image" content="https://tomniesse.github.io/blog"/>
+
+<meta name="twitter:title" content="Creating a minimal OS using buildroot (Raspberry Pi)"/>
+<meta name="twitter:description" content="What is an embedded OS? An Embedded Operating System is an Operating System designed to run on specific hardware. For example, many smart TV&rsquo;s these days are running an embedded OS. Because the OS is made for the specific hardware, it can be configured to start up in the blink of an eye.
+What is Buildroot? Buildroot, just like the yocto project, is a set of tools to help automate the build process of an embedded Linux based OS."/>
+
+
+
+    <meta property="og:title" content="Creating a minimal OS using buildroot (Raspberry Pi)" />
+<meta property="og:description" content="What is an embedded OS? An Embedded Operating System is an Operating System designed to run on specific hardware. For example, many smart TV&rsquo;s these days are running an embedded OS. Because the OS is made for the specific hardware, it can be configured to start up in the blink of an eye.
+What is Buildroot? Buildroot, just like the yocto project, is a set of tools to help automate the build process of an embedded Linux based OS." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://tomniesse.github.io/blog/posts/buildroot/" /><meta property="og:image" content="https://tomniesse.github.io/blog"/><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2021-11-18T13:28:55+02:00" />
+<meta property="article:modified_time" content="2021-11-18T13:28:55+02:00" /><meta property="og:site_name" content="Welcome!" />
+
+
+
+
+
+
+
+    <meta property="article:published_time" content="2021-11-18 13:28:55 &#43;0200 &#43;0200" />
+
+
+
+
+
+
+
+
+
+
+
+    </head>
+
+    
+        <body>
+    
+    
+        <div class="container">
+            <header class="header">
+    <span class="header__inner">
+        <a href="/blog" style="text-decoration: none;">
+    <div class="logo">
+        
+            <span class="logo__mark">></span>
+            <span class="logo__text ">
+                Tom&#39;s blogposts</span>
+            <span class="logo__cursor" style=
+                  "
+                   
+                   ">
+            </span>
+        
+    </div>
+</a>
+
+
+        <span class="header__right">
+            
+                <nav class="menu">
+    <ul class="menu__inner"><li><a href="/blog/posts">Blogposts</a></li>
+    </ul>
+</nav>
+
+                <span class="menu-trigger">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                        <path d="M0 0h24v24H0z" fill="none"/>
+                        <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/>
+                    </svg>
+                </span>
+            
+        </span>
+    </span>
+</header>
+
+
+            <div class="content">
+                
+  <main class="post">
+
+    <div class="post-info">
+      <p>
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-clock">
+          <circle cx="12" cy="12" r="10"></circle>
+          <polyline points="12 6 12 12 16 14"></polyline>
+        </svg>
+        13 minutes
+
+        
+      </p>
+    </div>
+
+    <article>
+      <h1 class="post-title">
+        <a href="https://tomniesse.github.io/blog/posts/buildroot/">Creating a minimal OS using buildroot (Raspberry Pi)</a>
+      </h1>
+
+      
+
+      
+
+      
+
+      <div class="post-content">
+        <h1 id="what-is-an-embedded-os">What is an embedded OS?</h1>
+<p>An Embedded Operating System is an Operating System designed to run on specific hardware. For example, many smart TV&rsquo;s these days are running an embedded OS. Because the OS is made for the specific hardware, it can be configured to start up in the blink of an eye.</p>
+<h1 id="what-is-buildroot">What is Buildroot?</h1>
+<p>Buildroot, just like the <a href="https://www.yoctoproject.org/">yocto project</a>, is a set of tools to help automate the build process of an embedded Linux based OS. Buildroot is configured through a set of configuration files, after which it builds an entire Linux based OS.</p>
+<h1 id="what-are-the-benefits-of-creating-a-custom-embedded-os">What are the benefits of creating a custom embedded OS?</h1>
+<p>There are a few great benefits to creating a custom embedded OS (and not using a prebuilt image file):</p>
+<ul>
+<li>The kernel and root filesystem can be seperated from the bootloader and stored on a remote server, to make the local system image really small.</li>
+<li>If Buildroot is configured to only create a root filesystem, the resulting OS can run from a bootloader and/or kernel that is not built by Buildroot.</li>
+<li>The U-boot bootloader is very configurable and can be configured to start the right kernel for the right Raspberry Pi board if needed. This includes downloading the right kernel (and device tree) from a remote server and then booting it.</li>
+<li>The embedded OS built by buildroot supports many init systems (busybox, openrc, systemd, etc.).</li>
+<li>The embedded OS is <em>very</em> minimal. This saves space and teaches how a Linux based OS works.</li>
+<li>Almost any program that would normally run on Raspberry Pi OS (formerly called Raspbian) can easily be cross-compiled during the build process. This includes using CMake.</li>
+<li>There are many debugging tools that can be built into the embedded OS to debug a certain application.</li>
+<li>The cross-compiling toolchain can be fully configured within Buildroot. An external cross-compiling toolchain can also be used if desired (<a href="https://crosstool-ng.github.io">crosstool-NG</a> for example).</li>
+</ul>
+<h1 id="the-goal">The goal</h1>
+<p>In this post, a basic Buildroot OS will be created. This will be a minimal build; it boots but is utterly useless. At the end of this post, the minimal Buildroot OS will be used for two other projects:</p>
+<ul>
+<li>Creating an OS that serves as an access point.</li>
+<li>Cross-compiling <a href="https://liballeg.org">Allegro5</a> and <a href="https://dunedynasty.sourceforge.net">Dune Dynasty</a> and adding it to the minimal OS.</li>
+</ul>
+<h1 id="setting-up-a-cross-compiling-toolchain">Setting up a cross-compiling toolchain</h1>
+<p>If the kernel is compiled using <code>arm-none-eabi-gcc</code> and the rest of the system is compiled using <code>aarch64-linux-gnu-gcc</code>, the system will not run. To ensure that the system runs (well) on the target board, a cross-compiling toolchain will be set up. This toolchain contains a cross-compiling <code>gcc</code>, <code>ld</code> and other tools that would normally be used to (cross-)compile a program or OS. The tools in the toolchain will be used to compile the whole system.</p>
+<p>In this post, <a href="https://crosstool-ng.github.io">crosstool-NG</a> is used.</p>
+<h2 id="downloading">Downloading</h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">git clone https://github.com/crosstool-ng/crosstool-ng
+</code></pre></div><h2 id="compiling">Compiling</h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">./bootstrap <span style="color:#75715e"># only if crosstool-NG is cloned from github</span>
+./configure --enable-local
+make
+</code></pre></div><h2 id="configuring-a-cross-compiling-toolchain">Configuring a cross-compiling toolchain</h2>
+<p>The command</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">./ct-ng list-samples
+</code></pre></div><p>will give a list of possible targets to compile for. The entry <code>aarch64-rpi4-linux-gnu</code> is used by executing the following command:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">./ct-ng aarch64-rpi4-linux-gnu
+</code></pre></div><p>Because the GNU C library is quite big compared to something like uClibc, the <code>.config</code> file will be edited to use uClibc instead of the GNU C library. The goal is to make the target system a little smaller in disk size. The <code>.config</code> file is edited using the following command:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">./ct-ng menuconfig
+</code></pre></div><p>The following changes were made inside the menuconfig menu:</p>
+<ul>
+<li>Under <code>C library</code>, the option <code>C library</code> is changed to <code>uClibc</code></li>
+</ul>
+<p>Then the menuconfig is exited and restarted to reload all options:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">./ct-ng menuconfig
+</code></pre></div><ul>
+<li>Under <code>C library</code>, the option <code>Add support for locales</code> is enabled</li>
+<li>Under <code>C library</code>, the option <code>Add support for IPv6</code> is enabled</li>
+<li>Under <code>C library</code>, the option <code>enable iconv</code> is enabled</li>
+<li>Under <code>C library</code>, the option <code>Add support for fenv.h</code> is enabled</li>
+<li>Under <code>C compiler</code>, the option <code>Version of gcc</code> is set to the second to latest version (at time of writing this was set to version <code>10.3.0</code>)</li>
+<li>Under <code>C compiler</code>, the option <code>C++</code> is enabled</li>
+<li>Under <code>Operating system</code>, the option <code>Version of linux</code> is set to the latest version (at time of writing this was version <code>5.15.2</code>)</li>
+<li>Under <code>Debug facilities</code>, the option <code>gdb</code> is disabled (optional)</li>
+<li>Under <code>Toolchain options</code>, the option <code>Tuple's alias</code> is set to <code>toolchain</code> (optional)</li>
+</ul>
+<h2 id="building-the-toolchain">Building the toolchain</h2>
+<p>After the toolchain is configured, it can be built using the following command:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">./ct-ng build -j<span style="color:#e6db74">`</span>nproc<span style="color:#e6db74">`</span>
+</code></pre></div><p>This build process will take a <em>long</em> time. Therefore, it should <em>not</em> be done in a (misconfigured) VM, but on a pc with lots of cores and/or threads. This can reduce the build time from a day to a few hours (maybe even less).</p>
+<h2 id="checking-if-the-toolchain-works">Checking if the toolchain works</h2>
+<p>After crosstool-NG is done creating a toolchain, a folder called <code>x-tools</code> can be found in the home-directory of the current user (<code>/home/$USER/x-tools</code>). Inside the <code>x-tools</code> directory, all cross-compiling toolchains can be found. To test if the new toolchain is the right version, the following command is executed inside <code>/home/$USER/x-tools/aarch64-rpi4-linux-uclibc/bin</code>:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">toolchain-gcc -v
+<span style="color:#75715e"># or, if the &#34;Tuple&#39;s alias&#34; option was not set when configuring the toolchain:</span>
+aarch64-rpi4-linux-uclibc-gcc -v
+</code></pre></div><p>The executed binary states that it is version <code>10.3.0</code>, just like the version that was specified in the menuconfig of crosstool-NG. For now, it is assumed that the binary will cross-compile without errors.</p>
+<h1 id="creating-a-basic-buildroot-os">Creating a basic Buildroot OS</h1>
+<h2 id="downloading-buildroot">Downloading Buildroot</h2>
+<p>To get started, Buildroot can be downloaded from the <a href="https://buildroot.org/download.html">Buildroot website</a>. There are two download options to choose from; &ldquo;LTS&rdquo; or &ldquo;stable&rdquo;. For newer devices, the stable option is a good option. For this blog, the stable <em>.tar.gz</em> archive is used.</p>
+<h2 id="extracting">Extracting</h2>
+<p>To extract the <em>.tar.gz</em> file, the following command can be executed:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">tar -xvf buildroot-&lt;VERSION_GOES_HERE&gt;.tar.gz
+</code></pre></div><h2 id="initial-setup">Initial setup</h2>
+<p>To view the target devices Buildroot can build systems for, the following command can be executed:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">make list-defconfigs
+</code></pre></div><p>To configure Buildroot to build for the Raspberry Pi 4 (64 bit), the following command can be issued from the Buildroot directory:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">make raspberrypi4_64_defconfig
+</code></pre></div><p>To then configure the system, run the following command:</p>
+<h2 id="configuring-the-target-system">Configuring the target system</h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">make menuconfig
+</code></pre></div><p>For this post, the following changed were made to the configuration:</p>
+<ul>
+<li>Under <code>Build options</code>, the option <code>Enable compiler cache</code> is enabled</li>
+<li>Under <code>Bootloaders</code>, all the options are disabled (the bootloader will be compiled manually)</li>
+<li>Under <code>Filesystem images</code>, the option <code>ext2/3/4 root filesystem</code> is disabled</li>
+<li>Under <code>Filesystem images</code>, the option <code>tar the root filesystem</code> is enabled, along with the <code>Compression method</code> set to <code>gzip</code></li>
+<li>Under <code>Toolchain</code>, the option <code>Toolchain type</code> is set to <code>External toolchain</code> (this post uses a toolchain built by crosstool-NG)</li>
+<li>Under <code>Toolchain</code>, the option <code>Toolchain</code> is set to <code>Custom toolchain</code></li>
+<li>Under <code>Toolchain</code>, the option <code>Toolchain origin</code> is set to <code>Pre-installed toolchain</code></li>
+<li>Under <code>Toolchain</code>, the option <code>Toolchain path</code> is set to <code>/home/&lt;YOUR_USERNAME_GOES_HERE&gt;/x-tools/aarch64-rpi4-linux-uclibc</code> (the path has to be absolute and may not contain <code>~/</code> or <code>/home/$USER/</code>!).</li>
+<li>Under <code>Toolchain</code>, the option <code>Toolchain prefix</code> is set to <code>aarch64-rpi4-linux-uclibc</code></li>
+<li>Under <code>Toolchain</code>, the option <code>External toolchain gcc version</code> is set to <code>10.x</code> (this version has to match the version from the cross-compiling toolchain)</li>
+<li>Under <code>Toolchain</code>, the option <code>External toolchain kernel headers series</code> is set to <code>5.15.x or later</code> (this version has to match the version from the cross-compiling toolchain)</li>
+<li>Under <code>Toolchain</code>, the option <code>Toolchain has locale support?</code> is enabled</li>
+<li>Under <code>Toolchain</code>, the option <code>Toolchain has C++ support?</code> is enabled</li>
+<li>Under <code>Toolchain</code>, the option <code>Toolchain has SSP support?</code> is enabled</li>
+<li>Under <code>System configuration</code>, the option <code>System hostname</code> is set to <code>embedded</code></li>
+<li>Under <code>System configuration</code>, the option <code>System banner</code> is set to <code>Welcome to embedded OS!</code></li>
+<li>Under <code>System configuration</code>, the option <code>Root password</code> is set to <code>root</code> (for testing test builds)</li>
+<li>Under <code>System configuration</code>, the option <code>/dev management</code> is set to <code>Dynamic using devtmpfs + mdev</code> (to load drivers automatically when the target device boots)</li>
+</ul>
+<p>Most linux desktops use <code>udev</code> to manage device drivers, but because this system uses <code>BusyBox</code> as init system, so <code>mdev</code> is used. To enable <code>mdev</code> at boot, the file <code>buildroot-&lt;VERSION_GOES_HERE&gt;/board/raspberrypi/post-build.sh</code> needs the following extra lines at the bottom, leaving the rest of the file as is:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">cp package/busybox/S10mdev <span style="color:#e6db74">${</span>TARGET_DIR<span style="color:#e6db74">}</span>/etc/init.d/S10mdev
+chmod <span style="color:#ae81ff">755</span> <span style="color:#e6db74">${</span>TARGET_DIR<span style="color:#e6db74">}</span>/etc/init.d/S10mdev
+cp package/busybox/mdev.conf <span style="color:#e6db74">${</span>TARGET_DIR<span style="color:#e6db74">}</span>/etc/mdev.conf
+</code></pre></div><h2 id="building">Building</h2>
+<p>To build the embedded OS, the following command can be executed:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">make clean <span style="color:#f92672">&amp;&amp;</span> make
+</code></pre></div><p>The reason for the <code>make clean</code> part is that Buildroot remembers <em>a lot</em>, and will sometimes refuse to build (correctly) because of a cached configuration.</p>
+<h2 id="after-compiling">After compiling</h2>
+<p>When buildroot is done compiling, a file called <code>rootfs.tar.gz</code> can be found in the <code>output/images</code> folder. This is the entire embedded OS, minus the bootloader. The bootloader will be compiled manually.</p>
+<p>The same <code>output/images</code> folder also contains a linux image called <code>Image</code>. This image needs to be converted into a U-boot image (<code>uImage</code>)</p>
+<p>In addition to the <code>rootfs.tar.gz</code> file being present, the folder <code>output/images</code> will also contain a folder called <code>rpi-firmware</code>.<br>
+The files, <code>start4.elf</code> and <code>fixup4.dat</code> are needed later. These firmware files are files needed to boot the Raspberry Pi 4.</p>
+<h2 id="converting-the-linux-image-into-a-uimage">Converting the linux Image into a uImage</h2>
+<p>Buildroot created a file called <code>Image</code>. However, the U-boot bootloader (which wil be built in the next chapter) cannot boot this image file as it is. In order for U-boot to boot the kernel, the image file has to be converted to a U-boot image (<code>uImage</code>).</p>
+<p>To convert the linux image into a uImage, the package <code>u-boot-tools</code> (or <code>uboot-tools</code>) is required. Then the <code>Image</code> file can be converted using the following command:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">mkimage -n <span style="color:#e6db74">&#39;Linux kernel&#39;</span> -A arm64 -O linux -C none -T kernel -a 0x00080000 -e 0x00080000 -d arch/arm64/boot/Image uImage
+</code></pre></div><p>A file called <code>uImage</code> will now be created. This file contains the entire linux kernel binary, including some extra header stuff that <code>u-boot-tools</code> added. This file is the kernel which runs the system.</p>
+<h1 id="adding-a-bootloader-u-boot">Adding a bootloader (U-boot)</h1>
+<p>Although Buildroot can include the U-boot bootloader (among others) by enabling some settings, it might be nice to go a little more in depth to learn how U-boot actually works.</p>
+<h2 id="downloading-u-boot">Downloading U-boot</h2>
+<p>The U-boot bootloader can be downloaded from <a href="https://github.com/u-boot/u-boot">github</a>.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">git clone https://github.com/u-boot/u-boot
+cd u-boot/
+</code></pre></div><h2 id="configuring-the-u-boot-source">Configuring the U-boot source</h2>
+<p>To see which default configurations U-boot has, execute the following command:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">ls configs
+<span style="color:#75715e"># or, to only see raspberry pi entries</span>
+ls configs | grep rpi
+</code></pre></div><p>To create a basic configuration for the Raspberry Pi 4, the following command can be executed:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">ARCH<span style="color:#f92672">=</span>arm64 CROSS_COMPILE<span style="color:#f92672">=</span>~/x-tools/aarch64-rpi4-linux-uclibc/bin/aarch64-rpi4-linux-uclibc- make rpi_4_defconfig
+</code></pre></div><p>To then further configure the source, the <code>make menuconfig</code> command can be given:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">ARCH<span style="color:#f92672">=</span>arm64 CROSS_COMPILE<span style="color:#f92672">=</span>~/x-tools/aarch64-rpi4-linux-uclibc/bin/aarch64-rpi4-linux-uclibc- make menuconfig
+</code></pre></div><p>In this post, the autoboot timer is changed from <code>2</code> to <code>0</code> for production-builds. This option can be changed in the following region:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">Boot options -&gt;
+    Autoboot options -&gt;
+        delay in seconds before automatically booting
+</code></pre></div><p>For test builds, it is recommended to leave this value as is.</p>
+<h2 id="compiling-u-boot">Compiling U-boot</h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">ARCH<span style="color:#f92672">=</span>arm64 CROSS_COMPILE<span style="color:#f92672">=</span>~/x-tools/aarch64-rpi4-linux-uclibc/bin/aarch64-rpi4-linux-uclibc- make -j<span style="color:#e6db74">`</span>nproc<span style="color:#e6db74">`</span>
+</code></pre></div><p>The compile process will not take long. After the compilation is complete, a file called <code>u-boot.bin</code> (the U-boot binary) will exist.</p>
+<h2 id="creating-raspberry-pi-boot-configuration">Creating Raspberry Pi boot configuration</h2>
+<p>Normally, the Raspberry Pi 4 boots a file called <code>kernel.img</code> (sometimes <code>kernel&lt;version number here&gt;.img</code>). In this post, the Raspberry Pi 4 should start the U-boot bootloader instead of the kernel. This can be done by creating a file called <code>config.txt</code> with the following content:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#75715e"># Enable UART communication</span>
+enable_uart<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span>
+
+<span style="color:#75715e"># Enable 64 bit mode</span>
+arm_64bit<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span>
+
+<span style="color:#75715e"># Make the raspberry Pi 4 start U-boot (u-boot.bin) instead of the default kernel8.img</span>
+kernel<span style="color:#f92672">=</span>u-boot.bin
+
+<span style="color:#75715e"># If the bluetooth device interferes with any uart/serial messages, uncomment this</span>
+<span style="color:#75715e">#dtoverlay=miniuart-bt</span>
+
+<span style="color:#75715e"># Uncomment to go fast</span>
+<span style="color:#75715e">#arm_boost=1</span>
+
+<span style="color:#75715e"># Uncomment to enable DRM VC4 V3D driver</span>
+<span style="color:#75715e">#dtoverlay=vc4-kms-v3d</span>
+<span style="color:#75715e">#max_framebuffers=2</span>
+
+<span style="color:#75715e"># Uncomment to disable overscan</span>
+<span style="color:#75715e">#disable_overscan=1</span>
+</code></pre></div><h2 id="creating-a-u-boot-boot-script">Creating a U-boot boot script</h2>
+<p>By default, when the U-boot bootloader starts up, it will look for a file called <code>boot.scr</code>. The <code>boot.scr</code> file is a boot script. This script will be used to load the kernel (<code>uImage</code>) and device tree (<code>bcm2711-rpi-4-b.dtb</code>) into memory and boot the system.</p>
+<p>To create a bootscript, a file called <code>boot.txt</code> is created. This file will be converted to <code>boot.scr</code> and contains the following:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">sleep <span style="color:#ae81ff">1</span> <span style="color:#75715e"># some SD cards are slow and will fail to list files in time</span>
+
+echo +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+echo +-----------------------------------------------------------+
+echo +----------------Embedded OS is starting!-------------------+
+echo +-----------------------------------------------------------+
+echo +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+echo ++++ Setting kernel parameters ++++++++++++++++++++++++++++++
+setenv bootargs <span style="color:#e6db74">&#39;dwc_otg.lpm_enable=0 console=ttyAMA0,115200 console=tty1 kgdboc=ttyAMA0,115200 root=/dev/mmcblk0p2 rootwait&#39;</span>
+
+echo ++++ Loading kernel into memory +++++++++++++++++++++++++++++
+load mmc <span style="color:#ae81ff">0</span> $kernel_addr_r uImage
+
+echo ++++ Loading device tree into memory ++++++++++++++++++++++++
+load mmc <span style="color:#ae81ff">0</span> $fdt_addr_r bcm2711-rpi-4-b.dtb
+
+echo ++++ Starting system ++++++++++++++++++++++++++++++++++++++++
+bootm $kernel_addr_r - $fdt_addr_r
+</code></pre></div><p>The <code>boot.txt</code> file is then converted to <code>boot.scr</code> using the following command:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">mkimage -A arm64 -O linux -T script -C none -a <span style="color:#ae81ff">0</span> -e <span style="color:#ae81ff">0</span> -n <span style="color:#e6db74">&#34;bootscript&#34;</span> -d boot.txt boot.scr
+</code></pre></div><h1 id="creating-a-system-image">Creating a system image</h1>
+<h2 id="creating-an-image-file">Creating an image file</h2>
+<p>To create partitions, the program <code>parted</code> will be used. There will be two partitions: a boot partition called <code>BOOT</code> and a root partition called <code>ROOTFS</code>. The boot partition will have a fat16 filesystem and the root filesystem will use the ext4 filesystem.</p>
+<p>To prevent disks from being destroyed, a virtual disk image will be created using dd:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#75715e"># create a file called `system.img` with a size of 600MiB</span>
+dd <span style="color:#66d9ef">if</span><span style="color:#f92672">=</span>/dev/zero of<span style="color:#f92672">=</span>system.img bs<span style="color:#f92672">=</span>1MiB count<span style="color:#f92672">=</span><span style="color:#ae81ff">600</span> status<span style="color:#f92672">=</span>progress
+</code></pre></div><p>Then, this virtual disk image will be partitioned using <code>parted</code>:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">parted system.img
+</code></pre></div><p>Within <code>parted</code>, run the <code>mklabel</code> command and set the partition table type to <code>msdos</code>:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#f92672">(</span>parted<span style="color:#f92672">)</span> mklabel msdos
+</code></pre></div><p>Then create the boot and root partitions:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#f92672">(</span>parted<span style="color:#f92672">)</span> mkpart primary fat16 2048s 30MiB
+<span style="color:#f92672">(</span>parted<span style="color:#f92672">)</span> mkpart primary ext4 30MiB 100%
+<span style="color:#f92672">(</span>parted<span style="color:#f92672">)</span> set <span style="color:#ae81ff">1</span> boot on
+<span style="color:#f92672">(</span>parted<span style="color:#f92672">)</span> print
+</code></pre></div><p>When done, exit parted by entering <code>quit</code>:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#f92672">(</span>parted<span style="color:#f92672">)</span> quit
+</code></pre></div><h2 id="partitioning-the-system-image">Partitioning the system image</h2>
+<p>First, mount the virtual disk image as follows:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#75715e"># Create a variable for the mount drive path</span>
+SYSTEM_IMAGE<span style="color:#f92672">=</span><span style="color:#e6db74">`</span>sudo losetup -Pf system.img --show<span style="color:#e6db74">`</span>
+</code></pre></div><p>Normally, disk devices in linux have paths like <code>/dev/sda</code>, <code>/dev/sdb</code>, <code>/dev/mmcblk0</code>, etc. This virtual device will have the path <code>/dev/loop0</code>. Multiple virtual devices can be mounted. The next mounted virtual disks will have the path <code>/dev/loop1</code>, <code>/dev/loop2</code>, <code>/dev/loop3</code>, etc.</p>
+<p>In this post, the path to the virtual disk is stored in the <code>SYSTEM_IMAGE</code> variable. To view the path to the virtual disk device, run the following command:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">echo $SYSTEM_IMAGE
+</code></pre></div><p>Then, partition it using the following command:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#75715e"># Create actual partitions for boot and rootfs now</span>
+sudo mkfs.vfat -n BOOT <span style="color:#e6db74">`</span>echo <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">${</span>SYSTEM_IMAGE<span style="color:#e6db74">}</span><span style="color:#e6db74">p1&#34;</span><span style="color:#e6db74">`</span>   <span style="color:#75715e"># Create a fat16 partition for boot files</span>
+sudo mkfs.ext4 -L ROOTFS <span style="color:#e6db74">`</span>echo <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">${</span>SYSTEM_IMAGE<span style="color:#e6db74">}</span><span style="color:#e6db74">p2&#34;</span><span style="color:#e6db74">`</span> <span style="color:#75715e"># Create an ext4 partition for rootfs files</span>
+</code></pre></div><h2 id="mounting-the-partitions">Mounting the partitions</h2>
+<p>To mount the system image, use the following commands to mount the virtual disk image to a folder called <code>target_mnt</code>:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">mkdir ./target_mnt
+sudo mount <span style="color:#e6db74">`</span>echo <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">${</span>SYSTEM_IMAGE<span style="color:#e6db74">}</span><span style="color:#e6db74">p2&#34;</span><span style="color:#e6db74">`</span> ./target_mnt
+sudo mkdir ./target_mnt/boot
+sudo mount <span style="color:#e6db74">`</span>echo <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">${</span>SYSTEM_IMAGE<span style="color:#e6db74">}</span><span style="color:#e6db74">p1&#34;</span><span style="color:#e6db74">`</span> ./target_mnt/boot
+</code></pre></div><h2 id="copying-boot-files">Copying boot files</h2>
+<p>First, all required firmware files will be copied from the buildroot output folder to the boot folder:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">sudo cp ./buildroot-&lt;VERSION_GOES_HERE&gt;/output/images/bcm2711-rpi-4-b.dtb ./target_mnt/boot/
+sudo cp ./buildroot-&lt;VERSION_GOES_HERE&gt;/output/images/rpi-firmware/start4.elf ./target_mnt/boot/
+sudo cp ./buildroot-&lt;VERSION_GOES_HERE&gt;/output/images/rpi-firmware/fixup4.dat ./target_mnt/boot/
+</code></pre></div><p>Then, the kernel is copied to the boot folder:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">sudo cp ./buildroot-&lt;VERSION_GOES_HERE&gt;/output/images/uImage ./target_mnt/boot/
+</code></pre></div><p>After that, the bootloader and related configurations are copied to the boot folder:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#75715e"># Copy the bootloader</span>
+sudo cp ./u-boot/u-boot.bin ./target_mnt/boot/
+
+<span style="color:#75715e"># Copy config.txt, to the Raspberry Pi boots U-boot</span>
+sudo cp ./u-boot/config.txt ./target_mnt/boot/
+
+<span style="color:#75715e"># Copy boot.scr, this bootscript starts the embedded OS</span>
+sudo cp ./u-boot/boot.scr ./target_mnt/boot/
+</code></pre></div><h2 id="extracting-the-root-filesystem-to-the-rootfs-partition">Extracting the root filesystem to the <code>ROOTFS</code> partition</h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">cd ./target_mnt
+sudo tar -xvf ../buildroot-&lt;VERSION_GOES_HERE&gt;/output/images/rootfs.tar.gz .
+cd ../
+</code></pre></div><h2 id="unmounting-the-image">Unmounting the image</h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">sudo sync
+sudo umount ./target_mnt/boot -l
+sudo umount ./target_mnt -l
+sudo losetup -D
+sudo rm -rf ./target_mnt
+</code></pre></div><h1 id="flashing-the-virtual-disk-image-to-an-sd">Flashing the virtual disk image to an SD</h1>
+<p>The <code>system.img</code> file (which now contains the entire embedded OS) can be flashed to an SD card using <code>dd</code> as follows:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">sudo dd <span style="color:#66d9ef">if</span><span style="color:#f92672">=</span>system.img of<span style="color:#f92672">=</span>/dev/YOUR_DEVICE_GOES_HERE bs<span style="color:#f92672">=</span>1MiB status<span style="color:#f92672">=</span>progress
+sudo sync
+</code></pre></div><p>Since <code>system.img</code> is an image file the flashing process is exactly the same as all other &ldquo;Raspberry Pi Linux distro&rsquo;s&rdquo;.<br>
+Therefore, if <code>dd</code> seems too scary, the following tools can be used to flash the <code>system.img</code> file:<br>
+<a href="https://www.raspberrypi.com/software">Raspberry Pi Imager</a>,<br>
+<a href="https://www.balena.io/etcher">Etcher</a>,<br>
+<a href="https://wiki.gnome.org/Apps/Disks">GNOME Disks</a> or<br>
+<a href="https://community.chocolatey.org/packages/win32diskimager">Win32 Disk Imager</a>.</p>
+<!-- # Extra's
+
+There are two other posts that use this basic buildroot OS to create two other projects:
+
+- [Creating an access point](/?blog%2Fbuildroot_routerOS)
+- [Adding Allegro5 and a Dune Dynasty remake to the basic Buildroot OS](/?blog%2Fbuildroot_dune_dynasty) -->
+<h1 id="sources">Sources</h1>
+<ul>
+<li><a href="https://bootlin.com/doc/training/buildroot/buildroot-slides.pdf">https://bootlin.com/doc/training/buildroot/buildroot-slides.pdf</a></li>
+<li><a href="https://blog.crysys.hu/2018/06/enabling-wifi-and-converting-the-raspberry-pi-into-a-wifi-ap/">https://blog.crysys.hu/2018/06/enabling-wifi-and-converting-the-raspberry-pi-into-a-wifi-ap/</a></li>
+<li><a href="https://unix.stackexchange.com/questions/439559/udhcpc-no-lease-failing-when-booting-on-embedded-linux-created-by-buildroot">https://unix.stackexchange.com/questions/439559/udhcpc-no-lease-failing-when-booting-on-embedded-linux-created-by-buildroot</a></li>
+<li><a href="https://raspberrypi.stackexchange.com/questions/107858/raspberry-pi-4-b-5ghz-wifi-access-point-problem">https://raspberrypi.stackexchange.com/questions/107858/raspberry-pi-4-b-5ghz-wifi-access-point-problem</a></li>
+<li><a href="http://lists.busybox.net/pipermail/buildroot/2019-June/252256.html">http://lists.busybox.net/pipermail/buildroot/2019-June/252256.html</a></li>
+</ul>
+
+      </div>
+    </article>
+
+    <hr />
+
+    <div class="post-info">
+      
+    <p>
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-tag meta-icon"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7" y2="7"></line></svg>
+
+        <span class="tag"><a href="https://tomniesse.github.io/blog/tags/untagged/">untagged</a></span>
+        
+    </p>
+
+      
+
+      <p>
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+          <polyline points="14 2 14 8 20 8"></polyline>
+          <line x1="16" y1="13" x2="8" y2="13"></line>
+          <line x1="16" y1="17" x2="8" y2="17"></line>
+          <polyline points="10 9 9 9 8 9"></polyline>
+        </svg>
+        2620 Words
+      </p>
+
+      <p>
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-calendar">
+          <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+          <line x1="16" y1="2" x2="16" y2="6"></line>
+          <line x1="8" y1="2" x2="8" y2="6"></line>
+          <line x1="3" y1="10" x2="21" y2="10"></line>
+        </svg>
+        
+          2021-11-18 12:28
+        
+
+         
+          
+        
+      </p>
+    </div>
+      <hr />
+      <div class="sharing-buttons">
+        
+<a class="resp-sharing-button__link" href="https://facebook.com/sharer/sharer.php?u=https%3a%2f%2ftomniesse.github.io%2fblog%2fposts%2fbuildroot%2f" target="_blank" rel="noopener" aria-label="" title="Share on facebook">
+  <div class="resp-sharing-button resp-sharing-button--facebook resp-sharing-button--small"><div aria-hidden="true" class="resp-sharing-button__icon resp-sharing-button__icon--solid">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>
+    </div>
+  </div>
+</a>
+
+
+<a class="resp-sharing-button__link" href="https://twitter.com/intent/tweet/?url=https%3a%2f%2ftomniesse.github.io%2fblog%2fposts%2fbuildroot%2f" target="_blank" rel="noopener" aria-label="" title="Share on twitter">
+  <div class="resp-sharing-button resp-sharing-button--twitter resp-sharing-button--small">
+      <div aria-hidden="true" class="resp-sharing-button__icon resp-sharing-button__icon--solid">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"></path></svg>
+    </div>
+  </div>
+</a>
+
+
+<a class="resp-sharing-button__link" href="https://www.tumblr.com/widgets/share/tool?posttype=link&amp;title=Creating%20a%20minimal%20OS%20using%20buildroot%20%28Raspberry%20Pi%29&amp;caption=Creating%20a%20minimal%20OS%20using%20buildroot%20%28Raspberry%20Pi%29&amp;canonicalUrl=https%3a%2f%2ftomniesse.github.io%2fblog%2fposts%2fbuildroot%2f" target="_blank" rel="noopener" aria-label="" title="Share on tumblr">
+  <div class="resp-sharing-button resp-sharing-button--tumblr resp-sharing-button--small">
+    <div aria-hidden="true" class="resp-sharing-button__icon resp-sharing-button__icon--solid">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" stroke="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.563 24c-5.093 0-7.031-3.756-7.031-6.411V9.747H5.116V6.648c3.63-1.313 4.512-4.596 4.71-6.469C9.84.051 9.941 0 9.999 0h3.517v6.114h4.801v3.633h-4.82v7.47c.016 1.001.375 2.371 2.207 2.371h.09c.631-.02 1.486-.205 1.936-.419l1.156 3.425c-.436.636-2.4 1.374-4.156 1.404h-.178l.011.002z"/></svg>
+    </div>
+  </div>
+</a>
+
+
+<a class="resp-sharing-button__link" href="mailto:?subject=Creating%20a%20minimal%20OS%20using%20buildroot%20%28Raspberry%20Pi%29&amp;body=https%3a%2f%2ftomniesse.github.io%2fblog%2fposts%2fbuildroot%2f" target="_self" rel="noopener" aria-label="" title="Share via email">
+  <div class="resp-sharing-button resp-sharing-button--email resp-sharing-button--small"><div aria-hidden="true" class="resp-sharing-button__icon resp-sharing-button__icon--solid">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+    </div>
+  </div>
+</a>
+
+
+<a class="resp-sharing-button__link" href="https://pinterest.com/pin/create/button/?url=https%3a%2f%2ftomniesse.github.io%2fblog%2fposts%2fbuildroot%2f&amp;media=https%3a%2f%2ftomniesse.github.io%2fblog%2fposts%2fbuildroot%2f;description=Creating%20a%20minimal%20OS%20using%20buildroot%20%28Raspberry%20Pi%29" target="_blank" rel="noopener" aria-label="" title="Share on pinterest">
+  <div class="resp-sharing-button resp-sharing-button--pinterest resp-sharing-button--small"><div aria-hidden="true" class="resp-sharing-button__icon resp-sharing-button__icon--solid">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12.017 0C5.396 0 .029 5.367.029 11.987c0 5.079 3.158 9.417 7.618 11.162-.105-.949-.199-2.403.041-3.439.219-.937 1.406-5.957 1.406-5.957s-.359-.72-.359-1.781c0-1.663.967-2.911 2.168-2.911 1.024 0 1.518.769 1.518 1.688 0 1.029-.653 2.567-.992 3.992-.285 1.193.6 2.165 1.775 2.165 2.128 0 3.768-2.245 3.768-5.487 0-2.861-2.063-4.869-5.008-4.869-3.41 0-5.409 2.562-5.409 5.199 0 1.033.394 2.143.889 2.741.099.12.112.225.085.345-.09.375-.293 1.199-.334 1.363-.053.225-.172.271-.401.165-1.495-.69-2.433-2.878-2.433-4.646 0-3.776 2.748-7.252 7.92-7.252 4.158 0 7.392 2.967 7.392 6.923 0 4.135-2.607 7.462-6.233 7.462-1.214 0-2.354-.629-2.758-1.379l-.749 2.848c-.269 1.045-1.004 2.352-1.498 3.146 1.123.345 2.306.535 3.55.535 6.607 0 11.985-5.365 11.985-11.987C23.97 5.39 18.592.026 11.985.026L12.017 0z"/></svg>
+    </div>
+  </div>
+</a>
+
+
+<a class="resp-sharing-button__link" href="https://www.linkedin.com/shareArticle?mini=true&amp;url=https%3a%2f%2ftomniesse.github.io%2fblog%2fposts%2fbuildroot%2f&amp;title=Creating%20a%20minimal%20OS%20using%20buildroot%20%28Raspberry%20Pi%29&amp;summary=Creating%20a%20minimal%20OS%20using%20buildroot%20%28Raspberry%20Pi%29&amp;source=https%3a%2f%2ftomniesse.github.io%2fblog%2fposts%2fbuildroot%2f" target="_blank" rel="noopener" aria-label="" title="Share on linkedin">
+  <div class="resp-sharing-button resp-sharing-button--linkedin resp-sharing-button--small"><div aria-hidden="true" class="resp-sharing-button__icon resp-sharing-button__icon--solid">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg>
+    </div>
+  </div>
+</a>
+
+
+<a class="resp-sharing-button__link" href="https://reddit.com/submit/?url=https%3a%2f%2ftomniesse.github.io%2fblog%2fposts%2fbuildroot%2f&amp;resubmit=true&amp;title=Creating%20a%20minimal%20OS%20using%20buildroot%20%28Raspberry%20Pi%29" target="_blank" rel="noopener" aria-label="" title="Share on reddit">
+  <div class="resp-sharing-button resp-sharing-button--reddit resp-sharing-button--small"><div aria-hidden="true" class="resp-sharing-button__icon resp-sharing-button__icon--solid">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0zm5.01 4.744c.688 0 1.25.561 1.25 1.249a1.25 1.25 0 0 1-2.498.056l-2.597-.547-.8 3.747c1.824.07 3.48.632 4.674 1.488.308-.309.73-.491 1.207-.491.968 0 1.754.786 1.754 1.754 0 .716-.435 1.333-1.01 1.614a3.111 3.111 0 0 1 .042.52c0 2.694-3.13 4.87-7.004 4.87-3.874 0-7.004-2.176-7.004-4.87 0-.183.015-.366.043-.534A1.748 1.748 0 0 1 4.028 12c0-.968.786-1.754 1.754-1.754.463 0 .898.196 1.207.49 1.207-.883 2.878-1.43 4.744-1.487l.885-4.182a.342.342 0 0 1 .14-.197.35.35 0 0 1 .238-.042l2.906.617a1.214 1.214 0 0 1 1.108-.701zM9.25 12C8.561 12 8 12.562 8 13.25c0 .687.561 1.248 1.25 1.248.687 0 1.248-.561 1.248-1.249 0-.688-.561-1.249-1.249-1.249zm5.5 0c-.687 0-1.248.561-1.248 1.25 0 .687.561 1.248 1.249 1.248.688 0 1.249-.561 1.249-1.249 0-.687-.562-1.249-1.25-1.249zm-5.466 3.99a.327.327 0 0 0-.231.094.33.33 0 0 0 0 .463c.842.842 2.484.913 2.961.913.477 0 2.105-.056 2.961-.913a.361.361 0 0 0 .029-.463.33.33 0 0 0-.464 0c-.547.533-1.684.73-2.512.73-.828 0-1.979-.196-2.512-.73a.326.326 0 0 0-.232-.095z"/></svg>
+    </div>
+  </div>
+</a>
+
+
+<a class="resp-sharing-button__link" href="https://www.xing.com/app/user?op=share;url=https%3a%2f%2ftomniesse.github.io%2fblog%2fposts%2fbuildroot%2f;title=Creating%20a%20minimal%20OS%20using%20buildroot%20%28Raspberry%20Pi%29" target="_blank" rel="noopener" aria-label="" title="Share on xing">
+  <div class="resp-sharing-button resp-sharing-button--xing resp-sharing-button--small"><div aria-hidden="true" class="resp-sharing-button__icon resp-sharing-button__icon--solid">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M18.188 0c-.517 0-.741.325-.927.66 0 0-7.455 13.224-7.702 13.657.015.024 4.919 9.023 4.919 9.023.17.308.436.66.967.66h3.454c.211 0 .375-.078.463-.22.089-.151.089-.346-.009-.536l-4.879-8.916c-.004-.006-.004-.016 0-.022L22.139.756c.095-.191.097-.387.006-.535C22.056.078 21.894 0 21.686 0h-3.498zM3.648 4.74c-.211 0-.385.074-.473.216-.09.149-.078.339.02.531l2.34 4.05c.004.01.004.016 0 .021L1.86 16.051c-.099.188-.093.381 0 .529.085.142.239.234.45.234h3.461c.518 0 .766-.348.945-.667l3.734-6.609-2.378-4.155c-.172-.315-.434-.659-.962-.659H3.648v.016z"/></svg>
+    </div>
+  </div>
+</a>
+
+
+<a class="resp-sharing-button__link" href="whatsapp://send?text=Creating%20a%20minimal%20OS%20using%20buildroot%20%28Raspberry%20Pi%29%20https%3a%2f%2ftomniesse.github.io%2fblog%2fposts%2fbuildroot%2f" target="_blank" rel="noopener" aria-label="" title="Share on whatsapp">
+  <div class="resp-sharing-button resp-sharing-button--whatsapp resp-sharing-button--small"><div aria-hidden="true" class="resp-sharing-button__icon resp-sharing-button__icon--solid">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" stroke="none" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+    </div>
+  </div>
+</a>
+
+
+<a class="resp-sharing-button__link" href="https://news.ycombinator.com/submitlink?u=https%3a%2f%2ftomniesse.github.io%2fblog%2fposts%2fbuildroot%2f&amp;t=Creating%20a%20minimal%20OS%20using%20buildroot%20%28Raspberry%20Pi%29" target="_blank" rel="noopener" aria-label="" title="Share on hacker news">
+  <div class="resp-sharing-button resp-sharing-button--hackernews resp-sharing-button--small"><div aria-hidden="true" class="resp-sharing-button__icon resp-sharing-button__icon--solid">
+			<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M0 24V0h24v24H0zM6.951 5.896l4.112 7.708v5.064h1.583v-4.972l4.148-7.799h-1.749l-2.457 4.875c-.372.745-.688 1.434-.688 1.434s-.297-.708-.651-1.434L8.831 5.896h-1.88z"/></svg>
+    </div>
+  </div>
+</a>
+
+
+<a class="resp-sharing-button__link" href="https://telegram.me/share/url?text=Creating%20a%20minimal%20OS%20using%20buildroot%20%28Raspberry%20Pi%29&amp;url=https%3a%2f%2ftomniesse.github.io%2fblog%2fposts%2fbuildroot%2f" target="_blank" rel="noopener" aria-label="" title="Share on telegram">
+  <div class="resp-sharing-button resp-sharing-button--telegram resp-sharing-button--small"><div aria-hidden="true" class="resp-sharing-button__icon resp-sharing-button__icon--solid">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+    </div>
+  </div>
+</a>
+
+      </div>
+
+    
+    <div class="pagination">
+        
+        <div class="pagination__title">
+            <span class="pagination__title-h">Read other posts</span>
+            <hr />
+        </div>
+        
+
+        <div class="pagination__buttons">
+            
+            <span class="button previous">
+                <a href="https://tomniesse.github.io/blog/posts/docker/">
+                    <span class="button__icon">←</span>
+                    <span class="button__text">Introduction to docker(-compose)</span>
+                </a>
+            </span>
+            
+
+            
+            <span class="button next">
+                <a href="https://tomniesse.github.io/blog/posts/c-sdl2-programming/">
+                    <span class="button__text">C and SDL2 programming</span>
+                    <span class="button__icon">→</span>
+                </a>
+            </span>
+            
+        </div>
+    </div>
+
+
+    
+
+    
+
+  </main>
+
+            </div>
+
+            
+                <footer class="footer">
+    
+    
+</footer>
+
+            
+        </div>
+
+        
+
+
+
+<script type="text/javascript" src="/blog/bundle.min.644292943ae47eef02fcd64b11757aeb8caeeaebf473a823b62099edccac808e8d82689359f285e5d95994e5ad5ae3b9c1ccc281eb1828e67d0ba6630f95b832.js" integrity="sha512-ZEKSlDrkfu8C/NZLEXV664yu6uv0c6gjtiCZ7cysgI6NgmiTWfKF5dlZlOWtWuO5wczCgesYKOZ9C6ZjD5W4Mg=="></script>
+
+
+
+    </body>
+</html>
