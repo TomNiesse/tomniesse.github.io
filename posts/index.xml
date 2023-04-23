@@ -1195,10 +1195,10 @@ sudo cp ./buildroot-&lt;VERSION_GOES_HERE&gt;/output/images/rpi-firmware/fixup4.
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#75715e"># Copy the bootloader</span>
 sudo cp ./u-boot/u-boot.bin ./target_mnt/boot/
 
-<span style="color:#75715e"># Copy config.txt, to the Raspberry Pi boots U-boot</span>
+<span style="color:#75715e"># Copy config.txt, so the Raspberry Pi boots U-boot instead of &#34;kernel.img&#34;</span>
 sudo cp ./u-boot/config.txt ./target_mnt/boot/
 
-<span style="color:#75715e"># Copy boot.scr, this bootscript starts the embedded OS</span>
+<span style="color:#75715e"># Copy boot.scr, this bootscript tells U-boot to start the embedded OS</span>
 sudo cp ./u-boot/boot.scr ./target_mnt/boot/
 </code></pre></div><h2 id="extracting-the-root-filesystem-to-the-rootfs-partition">Extracting the root filesystem to the <code>ROOTFS</code> partition</h2>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">cd ./target_mnt
