@@ -507,7 +507,7 @@ tar -xvf allegro-5.2.7.0.tar.gz
 rm -rf allegro-5.2.7.0.tar.gz
 cd allegro-5.2.7.0/
 </code></pre></div><h3 id="configuring-cmake">Configuring CMake</h3>
-<p>In the folder <code>allegro-5.2.7.0/cmake</code> are a bunch of files related to CMake. Within the list of files there is a file called <a href="https://github.com/liballeg/allegro5/blob/master/cmake/Toolchain-raspberrypi.cmake">Toolchain-raspberrypi.cmake</a>. This file contains configuration that tells CMake how to build the library for the first Raspberry Pi. The first Raspberry Pi is 32 bit and the toolchain does <em>not</em> have multilib support enabled. Therefor, a new toolchain must be created.</p>
+<p>In the folder <code>allegro-5.2.7.0/cmake</code> are a bunch of files related to CMake. Within the list of files there is a file called <a href="https://github.com/liballeg/allegro5/blob/master/cmake/Toolchain-raspberrypi.cmake">Toolchain-raspberrypi.cmake</a>. This file contains configuration that tells CMake how to build the library for the first Raspberry Pi. The first Raspberry Pi is 32 bit and the toolchain does <em>not</em> have multilib support enabled. Therefore, a new toolchain must be created.</p>
 <p>A custom file called <code>Toolchain-raspberrypi4_64.cmake</code> will be created and placed inside the <code>allegro-5.2.7.0/cmake</code> directory. The file will contain the following contents:</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#75715e">#############</span>
 <span style="color:#75715e"># Set target OS</span>
@@ -734,7 +734,7 @@ iface wlan0 inet static
     wait-delay <span style="color:#ae81ff">15</span>
 iface default inet dhcp
 </code></pre></div><h3 id="dhcpdconf">dhcpd.conf</h3>
-<p>Almost every modern router has a DHCP server built in. So, the target system should also have one.</p>
+<p>Almost every modern access point has a DHCP server built in. So, the target system should also have one.</p>
 <p>To configure the DHCP server on the target system, create a file called <code>dhcpd.conf</code> and place it in <code>buildroot-&lt;VERSION_GOES_HERE&gt;/board/raspberrypi/</code>. The file is to have the following contents:</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">ddns-update-style none;
 default-lease-time 600;

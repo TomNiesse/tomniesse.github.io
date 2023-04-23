@@ -46,7 +46,7 @@ The resulting OS will boot, connect to the first LAN-network it can find (using 
 Previous work This post is based on another post in which a basic embedded OS is created.
 Editing the minimal Buildroot OS Configuring the access point part of the target system With the options above all set, the Raspberry Pi 4 should boot the target system without any issues."><meta itemprop="datePublished" content="2021-12-20T13:28:55+02:00" />
 <meta itemprop="dateModified" content="2021-12-20T13:28:55+02:00" />
-<meta itemprop="wordCount" content="1181"><meta itemprop="image" content="https://tomniesse.github.io/"/>
+<meta itemprop="wordCount" content="1182"><meta itemprop="image" content="https://tomniesse.github.io/"/>
 <meta itemprop="keywords" content="untagged," />
 <meta name="twitter:card" content="summary_large_image"/>
 <meta name="twitter:image" content="https://tomniesse.github.io/"/>
@@ -249,7 +249,7 @@ iface wlan0 inet static
     wait-delay <span style="color:#ae81ff">15</span>
 iface default inet dhcp
 </code></pre></div><h3 id="dhcpdconf">dhcpd.conf</h3>
-<p>Almost every modern router has a DHCP server built in. So, the target system should also have one.</p>
+<p>Almost every modern access point has a DHCP server built in. So, the target system should also have one.</p>
 <p>To configure the DHCP server on the target system, create a file called <code>dhcpd.conf</code> and place it in <code>buildroot-&lt;VERSION_GOES_HERE&gt;/board/raspberrypi/</code>. The file is to have the following contents:</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">ddns-update-style none;
 default-lease-time 600;
@@ -346,7 +346,7 @@ If a monitor is connected to the <code>HDMI0</code> port of the Raspberry Pi 4, 
           <line x1="16" y1="17" x2="8" y2="17"></line>
           <polyline points="10 9 9 9 8 9"></polyline>
         </svg>
-        1181 Words
+        1182 Words
       </p>
 
       <p>
