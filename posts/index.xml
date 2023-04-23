@@ -986,7 +986,7 @@ What is Buildroot? Buildroot, just like the yocto project, is a set of tools to 
 <p>The host PC has to run the latest version of Ubuntu.</p>
 <h1 id="setting-up-a-cross-compiling-toolchain">Setting up a cross-compiling toolchain</h1>
 <p>If the kernel is compiled using <code>arm-none-eabi-gcc</code> and the rest of the system is compiled using <code>aarch64-linux-gnu-gcc</code>, the system will not run. To ensure that the system runs (well) on the target board, a cross-compiling toolchain will be set up. This toolchain contains a cross-compiling <code>gcc</code>, <code>ld</code> and other tools that would normally be used to (cross-)compile a program or OS. The tools in the toolchain will be used to compile the whole system.</p>
-<p>In this post, <a href="https://crosstool-ng.github.io">crosstool-NG</a> is used.</p>
+<p>In this post, <a href="https://crosstool-ng.github.io">crosstool-NG</a> is used as a cross-compiling toolchain.</p>
 <h2 id="downloading">Downloading</h2>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">git clone https://github.com/crosstool-ng/crosstool-ng
 </code></pre></div><h2 id="compiling">Compiling</h2>
