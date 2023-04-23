@@ -1111,7 +1111,7 @@ enable_uart<span style="color:#f92672">=</span><span style="color:#ae81ff">1</sp
 <span style="color:#75715e"># Enable 64 bit mode</span>
 arm_64bit<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span>
 
-<span style="color:#75715e"># Make the raspberry Pi 4 start U-boot (u-boot.bin) instead of the default kernel8.img</span>
+<span style="color:#75715e"># Make the raspberry Pi 4 starts U-boot (u-boot.bin) instead of the default kernel (kernel8.img)</span>
 kernel<span style="color:#f92672">=</span>u-boot.bin
 
 <span style="color:#75715e"># If the bluetooth device interferes with any uart/serial messages, uncomment this</span>
