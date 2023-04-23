@@ -641,20 +641,20 @@ make -j<span style="color:#e6db74">`</span>nproc<span style="color:#e6db74">`</s
             <pubDate>Mon, 20 Dec 2021 13:28:55 +0200</pubDate>
             
             <guid>https://tomniesse.github.io/posts/buildroot-ap/</guid>
-            <description>Introduction This page describes how a minimal router OS can be created using buildroot.
+            <description>Introduction This page describes how a minimal access point can be created using buildroot.
 All configurations and build commands are documented on this page.
-The resulting OS will boot, connect to the first LAN-network it can find and then start an access point.
+The resulting OS will boot, connect to the first LAN-network it can find (using DHCP) and then start an access point.
 Previous work This post is based on another post in which a basic embedded OS is created.
 Editing the minimal Buildroot OS Configuring the access point part of the target system With the options above all set, the Raspberry Pi 4 should boot the target system without any issues.</description>
             <content type="html"><![CDATA[<h1 id="introduction">Introduction</h1>
-<p>This page describes how a minimal router OS can be created using <a href="https://buildroot.org">buildroot</a>.<br>
+<p>This page describes how a minimal access point can be created using <a href="https://buildroot.org">buildroot</a>.<br>
 All configurations and build commands are documented on this page.</p>
-<p>The resulting OS will boot, connect to the first LAN-network it can find and then start an access point.</p>
+<p>The resulting OS will boot, connect to the first LAN-network it can find (using DHCP) and then start an access point.</p>
 <h1 id="previous-work">Previous work</h1>
 <p>This post is based on <a href="/posts/buildroot">another post</a> in which a basic embedded OS is created.</p>
 <h1 id="editing-the-minimal-buildroot-os">Editing the minimal Buildroot OS</h1>
 <h2 id="configuring-the-access-point-part-of-the-target-system">Configuring the access point part of the target system</h2>
-<p>With the options above all set, the Raspberry Pi 4 should boot the target system without any issues. But, because the goal is to create a router out of the Raspberry Pi 4, some extra configuration is needed.</p>
+<p>With the options above all set, the Raspberry Pi 4 should boot the target system without any issues. But, because the goal is to turn a Raspberry Pi 4 into a wireless access point, some extra configuration is needed.</p>
 <p>In the <code>menuconfig</code> of buildroot, make the following extra changes:</p>
 <ul>
 <li>Under <code>Build options</code>, the option <code>RELRO Protection</code> is set to partial</li>
@@ -712,7 +712,7 @@ All configurations and build commands are documented on this page.</p>
 <li>For a 2.4GHz access point: <code>2412</code>, <code>2417</code>, <code>2422</code>, <code>2427</code>, <code>2432</code>, <code>2437</code>, <code>2442</code>, <code>2447</code>, <code>2452</code>, <code>2457</code>, <code>2462</code>, <code>2467</code> or <code>2472</code></li>
 <li>For a 5GHz access point: <code>5170</code>, <code>5180</code>, <code>5190</code>, <code>5200</code>, <code>5210</code>, <code>5220</code>, <code>5230</code>, <code>5240</code>, <code>5260</code>, <code>5280</code>, <code>5300</code>, <code>5320</code>, <code>5500</code>, <code>5520</code>, <code>5540</code>, <code>5560</code>, <code>5580</code>, <code>5600</code>, <code>5620</code>, <code>5640</code>, <code>5660</code>, <code>5680</code> or <code>5700</code></li>
 </ul>
-<p>On 5GHz, if the frequency is set too high, the signal will probably not travel through walls very well. A higher frequency does result in a faster internet speed. Not all frequencies may be supported by the wireless interface of the Raspberry Pi 4. If the network SSID does not appear after the Raspberry Pi 4 has started, change the frequency to another value.</p>
+<p>On 5GHz, if the frequency is set too high, the signal will probably not travel through walls very well. A higher frequency results in a faster internet speed, but the signal will be weaker. Not all frequencies may be supported by the wireless interface of the Raspberry Pi 4. If the network SSID does not appear after the Raspberry Pi 4 has started, change the frequency to another value.</p>
 <h3 id="interfaces">interfaces</h3>
 <p>Another common file found in Linux-based operating systems is a file called <code>interfaces</code>. This file often contains configurations regarding IP addressing of certain interfaces.</p>
 <p>To create interface configuration for the target system, create a file called <code>interfaces</code> and place it in <code>buildroot-&lt;VERSION_GOES_HERE&gt;/board/raspberrypi/</code>. The file is to contain the following configuration:</p>
