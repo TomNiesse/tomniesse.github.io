@@ -1095,7 +1095,7 @@ ls configs | grep rpi
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">ARCH<span style="color:#f92672">=</span>arm64 CROSS_COMPILE<span style="color:#f92672">=</span>~/x-tools/aarch64-rpi4-linux-uclibc/bin/aarch64-rpi4-linux-uclibc- make rpi_4_defconfig
 </code></pre></div><p>To then further configure the source, the <code>make menuconfig</code> command can be given:</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">ARCH<span style="color:#f92672">=</span>arm64 CROSS_COMPILE<span style="color:#f92672">=</span>~/x-tools/aarch64-rpi4-linux-uclibc/bin/aarch64-rpi4-linux-uclibc- make menuconfig
-</code></pre></div><p>In this post, the autoboot timer is changed from <code>2</code> to <code>0</code> for production-builds. This option can be changed in the following region:</p>
+</code></pre></div><p>In this post, the autoboot timer is changed from <code>2</code> to <code>0</code> for production builds. This option can be changed in the following region:</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">Boot options -&gt;
     Autoboot options -&gt;
         delay in seconds before automatically booting
