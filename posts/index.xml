@@ -983,6 +983,7 @@ What is Buildroot? Buildroot, just like the yocto project, is a set of tools to 
 <li>Creating an OS that serves as an access point.</li>
 <li>Cross-compiling <a href="https://liballeg.org">Allegro5</a> and <a href="https://dunedynasty.sourceforge.net">Dune Dynasty</a> and adding it to the minimal OS.</li>
 </ul>
+<p>The host PC has to run the latest version of Ubuntu.</p>
 <h1 id="setting-up-a-cross-compiling-toolchain">Setting up a cross-compiling toolchain</h1>
 <p>If the kernel is compiled using <code>arm-none-eabi-gcc</code> and the rest of the system is compiled using <code>aarch64-linux-gnu-gcc</code>, the system will not run. To ensure that the system runs (well) on the target board, a cross-compiling toolchain will be set up. This toolchain contains a cross-compiling <code>gcc</code>, <code>ld</code> and other tools that would normally be used to (cross-)compile a program or OS. The tools in the toolchain will be used to compile the whole system.</p>
 <p>In this post, <a href="https://crosstool-ng.github.io">crosstool-NG</a> is used.</p>
@@ -1061,7 +1062,7 @@ aarch64-rpi4-linux-uclibc-gcc -v
 <li>Under <code>System configuration</code>, the option <code>Root password</code> is set to <code>root</code> (for testing test builds)</li>
 <li>Under <code>System configuration</code>, the option <code>/dev management</code> is set to <code>Dynamic using devtmpfs + mdev</code> (to load drivers automatically when the target device boots)</li>
 </ul>
-<p>Most linux desktops use <code>udev</code> to manage device drivers, but because this system uses <code>BusyBox</code> as init system, so <code>mdev</code> is used. To enable <code>mdev</code> at boot, the file <code>buildroot-&lt;VERSION_GOES_HERE&gt;/board/raspberrypi/post-build.sh</code> needs the following extra lines at the bottom, leaving the rest of the file as is:</p>
+<p>Most linux desktops use <code>udev</code> to manage device drivers, but because this system uses <code>BusyBox</code> as init system, <code>mdev</code> is used. To enable <code>mdev</code> at boot, the file <code>buildroot-&lt;VERSION_GOES_HERE&gt;/board/raspberrypi/post-build.sh</code> needs the following extra lines at the bottom, leaving the rest of the file as is:</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">cp package/busybox/S10mdev <span style="color:#e6db74">${</span>TARGET_DIR<span style="color:#e6db74">}</span>/etc/init.d/S10mdev
 chmod <span style="color:#ae81ff">755</span> <span style="color:#e6db74">${</span>TARGET_DIR<span style="color:#e6db74">}</span>/etc/init.d/S10mdev
 cp package/busybox/mdev.conf <span style="color:#e6db74">${</span>TARGET_DIR<span style="color:#e6db74">}</span>/etc/mdev.conf
@@ -1075,8 +1076,8 @@ cp package/busybox/mdev.conf <span style="color:#e6db74">${</span>TARGET_DIR<spa
 <p>In addition to the <code>rootfs.tar.gz</code> file being present, the folder <code>output/images</code> will also contain a folder called <code>rpi-firmware</code>.<br>
 The files, <code>start4.elf</code> and <code>fixup4.dat</code> are needed later. These firmware files are files needed to boot the Raspberry Pi 4.</p>
 <h2 id="converting-the-linux-image-into-a-uimage">Converting the linux Image into a uImage</h2>
-<p>Buildroot created a file called <code>Image</code>. However, the U-boot bootloader (which wil be built in the next chapter) cannot boot this image file as it is. In order for U-boot to boot the kernel, the image file has to be converted to a U-boot image (<code>uImage</code>).</p>
-<p>To convert the linux image into a uImage, the package <code>u-boot-tools</code> (or <code>uboot-tools</code>) is required. Then the <code>Image</code> file can be converted using the following command:</p>
+<p>Buildroot created a file called <code>Image</code>. To make integrity checks at boot time possible, the image file will be converted to a U-boot image (<code>uImage</code>). This makes sure there are no memory errors before Linux starts booting.</p>
+<p>To convert the linux image into a uImage, the package <code>u-boot-tools</code> is required. Then the <code>Image</code> file can be converted using the following command:</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">mkimage -n <span style="color:#e6db74">&#39;Linux kernel&#39;</span> -A arm64 -O linux -C none -T kernel -a 0x00080000 -e 0x00080000 -d arch/arm64/boot/Image uImage
 </code></pre></div><p>A file called <code>uImage</code> will now be created. This file contains the entire linux kernel binary, including some extra header stuff that <code>u-boot-tools</code> added. This file is the kernel which runs the system.</p>
 <h1 id="adding-a-bootloader-u-boot">Adding a bootloader (U-boot)</h1>
