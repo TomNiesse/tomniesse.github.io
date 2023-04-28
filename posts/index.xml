@@ -734,13 +734,13 @@ make -j<span style="color:#e6db74">`</span>nproc<span style="color:#e6db74">`</s
             <pubDate>Mon, 20 Dec 2021 13:28:55 +0200</pubDate>
             
             <guid>https://tomniesse.github.io/posts/buildroot-ap/</guid>
-            <description>Introduction This page describes how a minimal router OS can be created using buildroot.
+            <description>Introduction This page describes how a minimal access point OS can be created using buildroot.
 All configurations and build commands are documented on this page.
 The resulting OS will boot, connect to the first LAN-network it can find and then start an access point.
 Previous work This post is based on another post in which a basic embedded OS is created.
 Editing the minimal Buildroot OS Configuring the access point part of the target system With the options above all set, the Raspberry Pi 4 should boot the target system without any issues.</description>
             <content type="html"><![CDATA[<h1 id="introduction">Introduction</h1>
-<p>This page describes how a minimal router OS can be created using <a href="https://buildroot.org">buildroot</a>.<br>
+<p>This page describes how a minimal access point OS can be created using <a href="https://buildroot.org">buildroot</a>.<br>
 All configurations and build commands are documented on this page.</p>
 <p>The resulting OS will boot, connect to the first LAN-network it can find and then start an access point.</p>
 <h1 id="previous-work">Previous work</h1>

@@ -47,7 +47,7 @@ Previous work This post is based on another post in which a basic embedded OS is
       <pubDate>Mon, 20 Dec 2021 13:28:55 +0200</pubDate>
       
       <guid>https://tomniesse.github.io/posts/buildroot-ap/</guid>
-      <description>Introduction This page describes how a minimal router OS can be created using buildroot.
+      <description>Introduction This page describes how a minimal access point OS can be created using buildroot.
 All configurations and build commands are documented on this page.
 The resulting OS will boot, connect to the first LAN-network it can find and then start an access point.
 Previous work This post is based on another post in which a basic embedded OS is created.
