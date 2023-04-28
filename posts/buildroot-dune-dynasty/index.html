@@ -46,7 +46,7 @@ The below image shows the game (and embedded OS) running.
 
 Previous work This post is based on another post in which a basic embedded OS is created. However, the toolchain used uClibc as C library, which will not work here."><meta itemprop="datePublished" content="2021-12-21T13:28:55+02:00" />
 <meta itemprop="dateModified" content="2021-12-21T13:28:55+02:00" />
-<meta itemprop="wordCount" content="3091"><meta itemprop="image" content="https://tomniesse.github.io/"/>
+<meta itemprop="wordCount" content="3094"><meta itemprop="image" content="https://tomniesse.github.io/"/>
 <meta itemprop="keywords" content="untagged," />
 <meta name="twitter:card" content="summary_large_image"/>
 <meta name="twitter:image" content="https://tomniesse.github.io/"/>
@@ -195,10 +195,10 @@ Not very interesting.</p>
 <p><em>If <code>~/x-tools/</code> already contains a toolchain with the same name; move, rename or delete that toolchain. If it is not dealt with, the wrong linux headers might still be present and the target OS will fail to run. crosstool-NG will not build a shiny new toolchain automatically.</em></p>
 <p>To then build the new toolchain, execute the build command:</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">./ct-ng build -j<span style="color:#e6db74">`</span>nproc<span style="color:#e6db74">`</span>
-</code></pre></div><h1 id="creating-the-new-buildroot-os">Creating the new Buildroot OS</h1>
-<p>The previous post describes how to make a Buildroot OS using uClibc. Because this does not apply here anymore, many changes will have to be made to the buildroot configuration.</p>
-<h2 id="editing-build-options">Editing build options</h2>
-<p>Within Buildroot, using <code>make menuconfig</code>, the following options are changed:</p>
+</code></pre></div><h1 id="creating-a-new-buildroot-os">Creating a new Buildroot OS</h1>
+<p>The previous post describes how to make a Buildroot OS using uClibc. Because this does not apply here anymore, a completely new Buildroot OS will be created.</p>
+<h2 id="creating-a-new-configuration">Creating a new configuration</h2>
+<p>Within Buildroot, using <code>make menuconfig</code>, the following options are changed to create a new OS:</p>
 <ul>
 <li>Under <code>Build options</code>, the option <code>Enable compiler cache</code> is enabled</li>
 <li>Under <code>Build options</code>, the option <code>RELR0 protection</code> is set to <code>Partial</code></li>
@@ -419,7 +419,7 @@ make -j<span style="color:#e6db74">`</span>nproc<span style="color:#e6db74">`</s
 DESTDIR<span style="color:#f92672">=</span><span style="color:#e6db74">${</span>TARGET_DIR<span style="color:#e6db74">}</span> make install <span style="color:#75715e"># install to target system</span>
 
 cd ../../../
-</code></pre></div><h2 id="creating-a-new-buildroot-os">Creating a new Buildroot OS</h2>
+</code></pre></div><h2 id="creating-a-new-buildroot-os-1">Creating a new Buildroot OS</h2>
 <p>To then create a new OS, the make command is executed within Buildroot:</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">make clean
 make
@@ -595,7 +595,7 @@ tar -xvf allegro-5.2.7.0.tar.gz
 rm -rf allegro-5.2.7.0.tar.gz
 cd allegro-5.2.7.0/
 </code></pre></div><h3 id="configuring-cmake">Configuring CMake</h3>
-<p>In the folder <code>allegro-5.2.7.0/cmake</code> are a bunch of files related to CMake. Within the list of files there is a file called <a href="https://github.com/liballeg/allegro5/blob/master/cmake/Toolchain-raspberrypi.cmake">Toolchain-raspberrypi.cmake</a>. This file contains configuration that tells CMake how to build the library for the first Raspberry Pi. The first Raspberry Pi is 32 bit and the toolchain does <em>not</em> have multilib support enabled. Therefore, a new toolchain must be created.</p>
+<p>In the folder <code>allegro-5.2.7.0/cmake</code> are a bunch of files related to CMake. Within the list of files there is a file called <a href="https://github.com/liballeg/allegro5/blob/master/cmake/Toolchain-raspberrypi.cmake">Toolchain-raspberrypi.cmake</a>. This file contains configuration that tells CMake how to build the library for the first Raspberry Pi. The first Raspberry Pi is 32 bit and the toolchain does <em>not</em> have multilib support enabled. Therefor, a new toolchain must be created.</p>
 <p>A custom file called <code>Toolchain-raspberrypi4_64.cmake</code> will be created and placed inside the <code>allegro-5.2.7.0/cmake</code> directory. The file will contain the following contents:</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#75715e">#############</span>
 <span style="color:#75715e"># Set target OS</span>
@@ -745,7 +745,7 @@ make -j<span style="color:#e6db74">`</span>nproc<span style="color:#e6db74">`</s
           <line x1="16" y1="17" x2="8" y2="17"></line>
           <polyline points="10 9 9 9 8 9"></polyline>
         </svg>
-        3091 Words
+        3094 Words
       </p>
 
       <p>

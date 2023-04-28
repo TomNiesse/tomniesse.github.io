@@ -40,7 +40,7 @@ What is Buildroot? Buildroot, just like the yocto project, is a set of tools to 
 <meta itemprop="description" content="What is an embedded OS? An Embedded Operating System is an Operating System designed to run on specific hardware. For example, many smart TV&rsquo;s these days are running an embedded OS. Because the OS is made for the specific hardware, it can be configured to start up in the blink of an eye.
 What is Buildroot? Buildroot, just like the yocto project, is a set of tools to help automate the build process of an embedded Linux based OS."><meta itemprop="datePublished" content="2021-11-18T13:28:55+02:00" />
 <meta itemprop="dateModified" content="2021-11-18T13:28:55+02:00" />
-<meta itemprop="wordCount" content="2639"><meta itemprop="image" content="https://tomniesse.github.io/"/>
+<meta itemprop="wordCount" content="2620"><meta itemprop="image" content="https://tomniesse.github.io/"/>
 <meta itemprop="keywords" content="untagged," />
 <meta name="twitter:card" content="summary_large_image"/>
 <meta name="twitter:image" content="https://tomniesse.github.io/"/>
@@ -171,10 +171,9 @@ What is Buildroot? Buildroot, just like the yocto project, is a set of tools to 
 <li>Creating an OS that serves as an access point.</li>
 <li>Cross-compiling <a href="https://liballeg.org">Allegro5</a> and <a href="https://dunedynasty.sourceforge.net">Dune Dynasty</a> and adding it to the minimal OS.</li>
 </ul>
-<p>The host PC has to run the latest version of Ubuntu.</p>
 <h1 id="setting-up-a-cross-compiling-toolchain">Setting up a cross-compiling toolchain</h1>
 <p>If the kernel is compiled using <code>arm-none-eabi-gcc</code> and the rest of the system is compiled using <code>aarch64-linux-gnu-gcc</code>, the system will not run. To ensure that the system runs (well) on the target board, a cross-compiling toolchain will be set up. This toolchain contains a cross-compiling <code>gcc</code>, <code>ld</code> and other tools that would normally be used to (cross-)compile a program or OS. The tools in the toolchain will be used to compile the whole system.</p>
-<p>In this post, <a href="https://crosstool-ng.github.io">crosstool-NG</a> is used as a cross-compiling toolchain.</p>
+<p>In this post, <a href="https://crosstool-ng.github.io">crosstool-NG</a> is used.</p>
 <h2 id="downloading">Downloading</h2>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">git clone https://github.com/crosstool-ng/crosstool-ng
 </code></pre></div><h2 id="compiling">Compiling</h2>
@@ -240,8 +239,8 @@ aarch64-rpi4-linux-uclibc-gcc -v
 <li>Under <code>Toolchain</code>, the option <code>Toolchain origin</code> is set to <code>Pre-installed toolchain</code></li>
 <li>Under <code>Toolchain</code>, the option <code>Toolchain path</code> is set to <code>/home/&lt;YOUR_USERNAME_GOES_HERE&gt;/x-tools/aarch64-rpi4-linux-uclibc</code> (the path has to be absolute and may not contain <code>~/</code> or <code>/home/$USER/</code>!).</li>
 <li>Under <code>Toolchain</code>, the option <code>Toolchain prefix</code> is set to <code>aarch64-rpi4-linux-uclibc</code></li>
-<li>Under <code>Toolchain</code>, the option <code>External toolchain gcc version</code> is set to <code>10.x</code> (this version has to match the version from the cross-compiling toolchain)</li>
-<li>Under <code>Toolchain</code>, the option <code>External toolchain kernel headers series</code> is set to <code>5.15.x or later</code> (this version has to match the version from the cross-compiling toolchain)</li>
+<li>Under <code>Toolchain</code>, the option <code>External toolchain gcc version</code> is set to <code>10.x</code> (this version has to match the version of the cross-compiling toolchain)</li>
+<li>Under <code>Toolchain</code>, the option <code>External toolchain kernel headers series</code> is set to <code>5.15.x or later</code> (this version has to match the version of the cross-compiling toolchain)</li>
 <li>Under <code>Toolchain</code>, the option <code>Toolchain has locale support?</code> is enabled</li>
 <li>Under <code>Toolchain</code>, the option <code>Toolchain has C++ support?</code> is enabled</li>
 <li>Under <code>Toolchain</code>, the option <code>Toolchain has SSP support?</code> is enabled</li>
@@ -250,7 +249,7 @@ aarch64-rpi4-linux-uclibc-gcc -v
 <li>Under <code>System configuration</code>, the option <code>Root password</code> is set to <code>root</code> (for testing test builds)</li>
 <li>Under <code>System configuration</code>, the option <code>/dev management</code> is set to <code>Dynamic using devtmpfs + mdev</code> (to load drivers automatically when the target device boots)</li>
 </ul>
-<p>Most linux desktops use <code>udev</code> to manage device drivers, but because this system uses <code>BusyBox</code> as init system, <code>mdev</code> is used. To enable <code>mdev</code> at boot, the file <code>buildroot-&lt;VERSION_GOES_HERE&gt;/board/raspberrypi/post-build.sh</code> needs the following extra lines at the bottom, leaving the rest of the file as is:</p>
+<p>Most linux desktops use <code>udev</code> to manage device drivers, but because this system uses <code>BusyBox</code> as init system, so <code>mdev</code> is used. To enable <code>mdev</code> at boot, the file <code>buildroot-&lt;VERSION_GOES_HERE&gt;/board/raspberrypi/post-build.sh</code> needs the following extra lines at the bottom, leaving the rest of the file as is:</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">cp package/busybox/S10mdev <span style="color:#e6db74">${</span>TARGET_DIR<span style="color:#e6db74">}</span>/etc/init.d/S10mdev
 chmod <span style="color:#ae81ff">755</span> <span style="color:#e6db74">${</span>TARGET_DIR<span style="color:#e6db74">}</span>/etc/init.d/S10mdev
 cp package/busybox/mdev.conf <span style="color:#e6db74">${</span>TARGET_DIR<span style="color:#e6db74">}</span>/etc/mdev.conf
@@ -264,12 +263,12 @@ cp package/busybox/mdev.conf <span style="color:#e6db74">${</span>TARGET_DIR<spa
 <p>In addition to the <code>rootfs.tar.gz</code> file being present, the folder <code>output/images</code> will also contain a folder called <code>rpi-firmware</code>.<br>
 The files, <code>start4.elf</code> and <code>fixup4.dat</code> are needed later. These firmware files are files needed to boot the Raspberry Pi 4.</p>
 <h2 id="converting-the-linux-image-into-a-uimage">Converting the linux Image into a uImage</h2>
-<p>Buildroot created a file called <code>Image</code>. To make integrity checks at boot time possible, the image file will be converted to a U-boot image (<code>uImage</code>). This makes sure there are no memory errors before Linux starts booting.</p>
-<p>To convert the linux image into a uImage, the package <code>u-boot-tools</code> is required. Then the <code>Image</code> file can be converted using the following command:</p>
+<p>Buildroot created a file called <code>Image</code>. However, the U-boot bootloader (which wil be built in the next chapter) cannot boot this image file as it is. In order for U-boot to boot the kernel, the image file has to be converted to a U-boot image (<code>uImage</code>).</p>
+<p>To convert the linux image into a uImage, the package <code>u-boot-tools</code> (or <code>uboot-tools</code>) is required. Then the <code>Image</code> file can be converted using the following command:</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">mkimage -n <span style="color:#e6db74">&#39;Linux kernel&#39;</span> -A arm64 -O linux -C none -T kernel -a 0x00080000 -e 0x00080000 -d arch/arm64/boot/Image uImage
-</code></pre></div><p>A file called <code>uImage</code> will now be created. This file contains the entire linux kernel binary, including some extra header stuff that <code>u-boot-tools</code> added. This file is the kernel which runs on the target system.</p>
+</code></pre></div><p>A file called <code>uImage</code> will now be created. This file contains the entire linux kernel binary, including some extra header stuff that <code>u-boot-tools</code> added. This file is the kernel which runs the system.</p>
 <h1 id="adding-a-bootloader-u-boot">Adding a bootloader (U-boot)</h1>
-<p>Although Buildroot can include the U-boot bootloader (among others) by enabling some settings, it will be compiled manually. The reason U-boot is added to this buildroot OS, is that many embedded devices run U-boot as bootloader.</p>
+<p>Although Buildroot can include the U-boot bootloader (among others) by enabling some settings, it might be nice to go a little more in depth to learn how U-boot actually works.</p>
 <h2 id="downloading-u-boot">Downloading U-boot</h2>
 <p>The U-boot bootloader can be downloaded from <a href="https://github.com/u-boot/u-boot">github</a>.</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">git clone https://github.com/u-boot/u-boot
@@ -283,7 +282,7 @@ ls configs | grep rpi
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">ARCH<span style="color:#f92672">=</span>arm64 CROSS_COMPILE<span style="color:#f92672">=</span>~/x-tools/aarch64-rpi4-linux-uclibc/bin/aarch64-rpi4-linux-uclibc- make rpi_4_defconfig
 </code></pre></div><p>To then further configure the source, the <code>make menuconfig</code> command can be given:</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">ARCH<span style="color:#f92672">=</span>arm64 CROSS_COMPILE<span style="color:#f92672">=</span>~/x-tools/aarch64-rpi4-linux-uclibc/bin/aarch64-rpi4-linux-uclibc- make menuconfig
-</code></pre></div><p>In this post, the autoboot timer is changed from <code>2</code> to <code>0</code> for production builds. This option can be changed in the following region:</p>
+</code></pre></div><p>In this post, the autoboot timer is changed from <code>2</code> to <code>0</code> for production-builds. This option can be changed in the following region:</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">Boot options -&gt;
     Autoboot options -&gt;
         delay in seconds before automatically booting
@@ -299,7 +298,7 @@ enable_uart<span style="color:#f92672">=</span><span style="color:#ae81ff">1</sp
 <span style="color:#75715e"># Enable 64 bit mode</span>
 arm_64bit<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span>
 
-<span style="color:#75715e"># Make the raspberry Pi 4 starts U-boot (u-boot.bin) instead of the default kernel (kernel8.img)</span>
+<span style="color:#75715e"># Make the raspberry Pi 4 start U-boot (u-boot.bin) instead of the default kernel8.img</span>
 kernel<span style="color:#f92672">=</span>u-boot.bin
 
 <span style="color:#75715e"># If the bluetooth device interferes with any uart/serial messages, uncomment this</span>
@@ -383,10 +382,10 @@ sudo cp ./buildroot-&lt;VERSION_GOES_HERE&gt;/output/images/rpi-firmware/fixup4.
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#75715e"># Copy the bootloader</span>
 sudo cp ./u-boot/u-boot.bin ./target_mnt/boot/
 
-<span style="color:#75715e"># Copy config.txt, so the Raspberry Pi boots U-boot instead of &#34;kernel.img&#34;</span>
+<span style="color:#75715e"># Copy config.txt, to the Raspberry Pi boots U-boot</span>
 sudo cp ./u-boot/config.txt ./target_mnt/boot/
 
-<span style="color:#75715e"># Copy boot.scr, this bootscript tells U-boot to start the embedded OS</span>
+<span style="color:#75715e"># Copy boot.scr, this bootscript starts the embedded OS</span>
 sudo cp ./u-boot/boot.scr ./target_mnt/boot/
 </code></pre></div><h2 id="extracting-the-root-filesystem-to-the-rootfs-partition">Extracting the root filesystem to the <code>ROOTFS</code> partition</h2>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">cd ./target_mnt
@@ -447,7 +446,7 @@ There are two other posts that use this basic buildroot OS to create two other p
           <line x1="16" y1="17" x2="8" y2="17"></line>
           <polyline points="10 9 9 9 8 9"></polyline>
         </svg>
-        2639 Words
+        2620 Words
       </p>
 
       <p>

@@ -7,7 +7,16 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>&lt;a href=&#34;https://creativecommons.org/licenses/by-nc/4.0/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;CC BY-NC 4.0&lt;/a&gt;</copyright>
-    <lastBuildDate>Sun, 09 Apr 2023 13:28:55 +0200</lastBuildDate><atom:link href="https://tomniesse.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Fri, 28 Apr 2023 13:28:55 +0200</lastBuildDate><atom:link href="https://tomniesse.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Hosting a lokinet SNApp from inside a docker container</title>
+      <link>https://tomniesse.github.io/posts/lokinet-inside-docker/</link>
+      <pubDate>Fri, 28 Apr 2023 13:28:55 +0200</pubDate>
+      
+      <guid>https://tomniesse.github.io/posts/lokinet-inside-docker/</guid>
+      <description>What is lokinet? Like the tor project, lokinet is a decentralized onion router that routes (all) traffic through multiple other servers. The nice thing about it is, that it runs on a lower network layer than tor. This makes lokinet able to route traffic using any network protocol, instead of sending everything over TCP. A good example of this is SSH. If a lokinet server is hosting an SSH or VPN service, it can be accessed without the need for port forwarding.</description>
+    </item>
+    
     <item>
       <title>Printing ABS using an Ender 3 (v1), without an enclosure</title>
       <link>https://tomniesse.github.io/posts/ender3-abs-printing/</link>
@@ -38,9 +47,9 @@ Previous work This post is based on another post in which a basic embedded OS is
       <pubDate>Mon, 20 Dec 2021 13:28:55 +0200</pubDate>
       
       <guid>https://tomniesse.github.io/posts/buildroot-ap/</guid>
-      <description>Introduction This page describes how a minimal access point can be created using buildroot.
+      <description>Introduction This page describes how a minimal router OS can be created using buildroot.
 All configurations and build commands are documented on this page.
-The resulting OS will boot, connect to the first LAN-network it can find (using DHCP) and then start an access point.
+The resulting OS will boot, connect to the first LAN-network it can find and then start an access point.
 Previous work This post is based on another post in which a basic embedded OS is created.
 Editing the minimal Buildroot OS Configuring the access point part of the target system With the options above all set, the Raspberry Pi 4 should boot the target system without any issues.</description>
     </item>

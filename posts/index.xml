@@ -6,8 +6,102 @@
         <generator>Hugo -- gohugo.io</generator>
         <language>en-us</language>
         <copyright>&lt;a href=&#34;https://creativecommons.org/licenses/by-nc/4.0/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;CC BY-NC 4.0&lt;/a&gt;</copyright>
-        <lastBuildDate>Sun, 09 Apr 2023 13:28:55 +0200</lastBuildDate>
+        <lastBuildDate>Fri, 28 Apr 2023 13:28:55 +0200</lastBuildDate>
         <atom:link href="https://tomniesse.github.io/posts/index.xml" rel="self" type="application/rss+xml" />
+        
+        <item>
+            <title>Hosting a lokinet SNApp from inside a docker container</title>
+            <link>https://tomniesse.github.io/posts/lokinet-inside-docker/</link>
+            <pubDate>Fri, 28 Apr 2023 13:28:55 +0200</pubDate>
+            
+            <guid>https://tomniesse.github.io/posts/lokinet-inside-docker/</guid>
+            <description>What is lokinet? Like the tor project, lokinet is a decentralized onion router that routes (all) traffic through multiple other servers. The nice thing about it is, that it runs on a lower network layer than tor. This makes lokinet able to route traffic using any network protocol, instead of sending everything over TCP. A good example of this is SSH. If a lokinet server is hosting an SSH or VPN service, it can be accessed without the need for port forwarding.</description>
+            <content type="html"><![CDATA[<h1 id="what-is-lokinet">What is lokinet?</h1>
+<p>Like the tor project, lokinet is a decentralized onion router that routes (all) traffic through multiple other servers. The nice thing about it is, that it runs on a lower network layer than tor. This makes lokinet able to route traffic using any network protocol, instead of sending everything over TCP. A good example of this is SSH. If a lokinet server is hosting an SSH or VPN service, it can be accessed without the need for port forwarding.</p>
+<h1 id="goal">Goal</h1>
+<p>The goal of this project is to host a website (SNApp) on lokinet using a docker image. This project keeps it simple, using only a webserver. However, anything that can be hosted, can be hosted on lokinet.</p>
+<h1 id="previous-work">Previous work</h1>
+<p>This blogpost is based on <a href="/posts/docker">another post</a> in which docker and docker-compose are explained.</p>
+<h1 id="building-a-lokinet-server-container">Building a lokinet server container</h1>
+<p>Below is a <code>Dockerfile</code> that creates a container with lokinet inside.<br>
+The goal of this container is to provide a lokinet service with a permanent <code>.loki</code> address.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-Dockerfile" data-lang="Dockerfile"><span style="color:#66d9ef">FROM</span><span style="color:#e6db74"> ubuntu:latest</span><span style="color:#960050;background-color:#1e0010">
+</span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">RUN</span> apt update<span style="color:#960050;background-color:#1e0010">
+</span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">RUN</span> apt upgrade<span style="color:#960050;background-color:#1e0010">
+</span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">RUN</span> echo <span style="color:#e6db74">&#34;resolvconf resolvconf/linkify-resolvconf boolean false&#34;</span> | debconf-set-selections<span style="color:#960050;background-color:#1e0010">
+</span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">RUN</span> apt install curl lsb-release resolvconf dnsutils --yes<span style="color:#960050;background-color:#1e0010">
+</span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">RUN</span> curl -so /etc/apt/trusted.gpg.d/oxen.gpg https://deb.oxen.io/pub.gpg<span style="color:#960050;background-color:#1e0010">
+</span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">RUN</span> echo <span style="color:#e6db74">&#34;deb https://deb.oxen.io `lsb_release -sc` main&#34;</span> &gt; /etc/apt/sources.list.d/oxen.list<span style="color:#960050;background-color:#1e0010">
+</span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">RUN</span> apt update<span style="color:#960050;background-color:#1e0010">
+</span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">RUN</span> apt install lokinet --yes<span style="color:#960050;background-color:#1e0010">
+</span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">RUN</span> chown _lokinet:_loki /etc/loki -R<span style="color:#960050;background-color:#1e0010">
+</span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">RUN</span> /usr/bin/lokinet -g<span style="color:#960050;background-color:#1e0010">
+</span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">RUN</span> lokinet-bootstrap<span style="color:#960050;background-color:#1e0010">
+</span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">RUN</span> chown _lokinet:_loki /etc/loki -R<span style="color:#960050;background-color:#1e0010">
+</span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">RUN</span> echo <span style="color:#e6db74">&#34;#!/bin/bash&#34;</span> &gt; /get_loki_address.sh<span style="color:#960050;background-color:#1e0010">
+</span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">RUN</span> echo <span style="color:#e6db74">&#34;host -t cname localhost.loki 127.3.2.1&#34;</span> &gt;&gt; /get_loki_address.sh<span style="color:#960050;background-color:#1e0010">
+</span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">RUN</span> chmod +x /get_loki_address.sh<span style="color:#960050;background-color:#1e0010">
+</span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">RUN</span> cp /etc/loki/lokinet.ini /<span style="color:#960050;background-color:#1e0010">
+</span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">RUN</span> echo <span style="color:#e6db74">&#34;#!/bin/bash&#34;</span> &gt; /start.sh<span style="color:#960050;background-color:#1e0010">
+</span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">RUN</span> echo <span style="color:#e6db74">&#34;cp -n /lokinet.ini /etc/loki/&#34;</span> &gt;&gt; /start.sh<span style="color:#960050;background-color:#1e0010">
+</span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">RUN</span> echo <span style="color:#e6db74">&#34;cp -n /lokinet.ini /var/lib/lokinet/&#34;</span> &gt;&gt; /start.sh<span style="color:#960050;background-color:#1e0010">
+</span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">RUN</span> echo <span style="color:#e6db74">&#34;/usr/bin/lokinet -g&#34;</span> &gt;&gt; /start.sh<span style="color:#960050;background-color:#1e0010">
+</span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">RUN</span> echo <span style="color:#e6db74">&#34;sed -ie &#39;s|#keyfile=|keyfile=/var/lib/lokinet/snappkey.private|g&#39; /etc/loki/lokinet.ini&#34;</span> &gt;&gt; /start.sh<span style="color:#960050;background-color:#1e0010">
+</span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">RUN</span> echo <span style="color:#e6db74">&#34;sed -ie &#39;s|#keyfile=|keyfile=/var/lib/lokinet/snappkey.private|g&#39; /var/lib/lokinet/lokinet.ini&#34;</span> &gt;&gt; /start.sh<span style="color:#960050;background-color:#1e0010">
+</span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">RUN</span> echo <span style="color:#e6db74">&#34;/usr/bin/lokinet&#34;</span> &gt;&gt; /start.sh<span style="color:#960050;background-color:#1e0010">
+</span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">RUN</span> chmod +x /start.sh<span style="color:#960050;background-color:#1e0010">
+</span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">ENTRYPOINT</span> [<span style="color:#e6db74">&#34;/start.sh&#34;</span>]<span style="color:#960050;background-color:#1e0010">
+</span></code></pre></div><h1 id="configuring-docker-compose">Configuring docker-compose</h1>
+<p>Below is a <code>docker-compose.yml</code> file that configures 3 services:</p>
+<ul>
+<li><code>lokinet</code>: Using the above <code>Dockerfile</code>, a lokinet service will allow access to the <code>.loki</code> address.</li>
+<li><code>tiredofit/nginx-php-fpm</code>: to run a webserver, which can host a simple website.</li>
+<li><code>containrrr/watchtower</code>: to automatically keep all containers up to date.</li>
+</ul>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yml" data-lang="yml"><span style="color:#f92672">version</span>: <span style="color:#e6db74">&#34;3.3&#34;</span>
+<span style="color:#f92672">services</span>:
+  <span style="color:#f92672">lokinet</span>:
+    <span style="color:#f92672">build</span>: <span style="color:#ae81ff">lokinet</span>
+    <span style="color:#f92672">restart</span>: <span style="color:#ae81ff">always</span>
+    <span style="color:#f92672">privileged</span>: <span style="color:#66d9ef">true</span>
+    <span style="color:#f92672">tty</span>: <span style="color:#66d9ef">true</span>
+    <span style="color:#f92672">network_mode</span>: <span style="color:#ae81ff">host</span>
+    <span style="color:#f92672">tmpfs</span>:
+      - <span style="color:#ae81ff">/run</span>
+      - <span style="color:#ae81ff">/tmp</span>
+    <span style="color:#f92672">volumes</span>:
+      - <span style="color:#e6db74">&#34;./lokinet/var_lib_lokinet:/var/lib/lokinet&#34;</span>
+      - <span style="color:#e6db74">&#34;./lokinet/etc_loki:/etc/loki&#34;</span>
+  <span style="color:#f92672">php-nginx</span>:
+    <span style="color:#f92672">container_name</span>: <span style="color:#ae81ff">php-nginx</span>
+    <span style="color:#f92672">image</span>: <span style="color:#ae81ff">tiredofit/nginx-php-fpm</span>
+    <span style="color:#f92672">restart</span>: <span style="color:#ae81ff">always</span>
+    <span style="color:#f92672">ports</span>:
+      - <span style="color:#e6db74">&#34;80:80&#34;</span>
+    <span style="color:#f92672">volumes</span>:
+      - <span style="color:#e6db74">&#34;./webroot:/www/html&#34;</span>
+  <span style="color:#f92672">watchtower</span>:
+    <span style="color:#f92672">image</span>: <span style="color:#ae81ff">containrrr/watchtower</span>
+    <span style="color:#f92672">container_name</span>: <span style="color:#ae81ff">watchtower</span>
+    <span style="color:#f92672">restart</span>: <span style="color:#ae81ff">always</span>
+    <span style="color:#f92672">volumes</span>:
+      - <span style="color:#ae81ff">/var/run/docker.sock:/var/run/docker.sock</span>
+    <span style="color:#f92672">command</span>: <span style="color:#ae81ff">lokinet php-nginx</span>
+</code></pre></div><p>In the <code>docker-compose.yml</code> file, the <code>network_mode</code> for the lokinet container is set to <code>host</code>. This will cause lokinet to have direct access to the host OS&rsquo;s network. Now lokinet can talk to all other containers, as if it was running directly on the host OS.</p>
+<h1 id="running-the-containers">Running the containers</h1>
+<p>When running the command <code>docker-compose up --build</code>, all the configured containers will start running.</p>
+<h1 id="getting-the-loki-address">Getting the loki address</h1>
+<p>The <code>lokinet</code> container contains a script that can give the current <code>.loki</code> address. First, access the container using the following command:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">docker exec -it &lt;container id&gt; /bin/bash
+</code></pre></div><p>Then, from inside the container, execute the script:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh">/get_loki_address.sh
+</code></pre></div><p>Now the <code>.loki</code> address will be shown. If a client connects to this <code>.loki</code> address, the website will be shown.</p>
+<h1 id="debugging">Debugging</h1>
+<p>If the <code>.loki</code> address cannot be reached after a few minutes, try removing the <code>./lokinet/var_lib_lokinet/nodedb</code> directory and the <code>./lokinet/var_lib_lokinet/profiles.dat</code> and restart the container(s).</p>
+<h1 id="conclusion">Conclusion</h1>
+<p>It is possible to host a website on lokinet using docker. A <code>Dockerfile</code> and <code>docker-compose.yml</code> were the only configuration files needed. To host other kinds of services on lokinet, just add another container in the <code>docker-compose.yml</code> file and it will be hosted on lokinet.</p>
+]]></content>
+        </item>
         
         <item>
             <title>Printing ABS using an Ender 3 (v1), without an enclosure</title>
@@ -45,12 +139,11 @@ Just like with small PLA prints though, a brim may be required.</li>
 </ul>
 <h4 id="cons">Cons</h4>
 <ul>
-<li>When printing very fast, ABS doesn&rsquo;t always hold it&rsquo;s shape. Due to it cooling down, walls can &ldquo;move inwards&rdquo;. This then creates a &ldquo;)(&quot;-shape instead of a &ldquo;||&quot;-shape.<br>
+<li>The &ldquo;small perimeter speed&rdquo; and &ldquo;overhang speed&rdquo; need some tuning before prints start to look well.</li>
+<li>When printing very fast, ABS doesn&rsquo;t always hold it&rsquo;s shape.<br>
+Sometimes, walls will &ldquo;move inwards&rdquo;. This then creates a &ldquo;)(&quot;-shape instead of a &ldquo;||&quot;-shape.<br>
 The only solution I have found so far is to print more slowly.</li>
-<li>Overhangs are not always well-shaped. A benchy comes out just fine, but smaller prints don&rsquo;t always look good.<br>
-I have yet to test if this also happens when printing slowly.<br>
-Normally, the cooling fan would fix everything, but the air cover blocks almost all air.</li>
-<li>When printing large ABS print, warping and delamination may occur.</li>
+<li>When printing large ABS prints, warping and delamination may occur.</li>
 </ul>
 <h1 id="printing-a-benchy-using-abs">Printing a benchy using ABS</h1>
 <p>To test how well the airflow cover would work, I printed a benchy. It came out looking very well, but the roof was a little weak due to slight delamination.<br>
@@ -107,10 +200,10 @@ Not very interesting.</p>
 <p><em>If <code>~/x-tools/</code> already contains a toolchain with the same name; move, rename or delete that toolchain. If it is not dealt with, the wrong linux headers might still be present and the target OS will fail to run. crosstool-NG will not build a shiny new toolchain automatically.</em></p>
 <p>To then build the new toolchain, execute the build command:</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">./ct-ng build -j<span style="color:#e6db74">`</span>nproc<span style="color:#e6db74">`</span>
-</code></pre></div><h1 id="creating-the-new-buildroot-os">Creating the new Buildroot OS</h1>
-<p>The previous post describes how to make a Buildroot OS using uClibc. Because this does not apply here anymore, many changes will have to be made to the buildroot configuration.</p>
-<h2 id="editing-build-options">Editing build options</h2>
-<p>Within Buildroot, using <code>make menuconfig</code>, the following options are changed:</p>
+</code></pre></div><h1 id="creating-a-new-buildroot-os">Creating a new Buildroot OS</h1>
+<p>The previous post describes how to make a Buildroot OS using uClibc. Because this does not apply here anymore, a completely new Buildroot OS will be created.</p>
+<h2 id="creating-a-new-configuration">Creating a new configuration</h2>
+<p>Within Buildroot, using <code>make menuconfig</code>, the following options are changed to create a new OS:</p>
 <ul>
 <li>Under <code>Build options</code>, the option <code>Enable compiler cache</code> is enabled</li>
 <li>Under <code>Build options</code>, the option <code>RELR0 protection</code> is set to <code>Partial</code></li>
@@ -331,7 +424,7 @@ make -j<span style="color:#e6db74">`</span>nproc<span style="color:#e6db74">`</s
 DESTDIR<span style="color:#f92672">=</span><span style="color:#e6db74">${</span>TARGET_DIR<span style="color:#e6db74">}</span> make install <span style="color:#75715e"># install to target system</span>
 
 cd ../../../
-</code></pre></div><h2 id="creating-a-new-buildroot-os">Creating a new Buildroot OS</h2>
+</code></pre></div><h2 id="creating-a-new-buildroot-os-1">Creating a new Buildroot OS</h2>
 <p>To then create a new OS, the make command is executed within Buildroot:</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">make clean
 make
@@ -507,7 +600,7 @@ tar -xvf allegro-5.2.7.0.tar.gz
 rm -rf allegro-5.2.7.0.tar.gz
 cd allegro-5.2.7.0/
 </code></pre></div><h3 id="configuring-cmake">Configuring CMake</h3>
-<p>In the folder <code>allegro-5.2.7.0/cmake</code> are a bunch of files related to CMake. Within the list of files there is a file called <a href="https://github.com/liballeg/allegro5/blob/master/cmake/Toolchain-raspberrypi.cmake">Toolchain-raspberrypi.cmake</a>. This file contains configuration that tells CMake how to build the library for the first Raspberry Pi. The first Raspberry Pi is 32 bit and the toolchain does <em>not</em> have multilib support enabled. Therefore, a new toolchain must be created.</p>
+<p>In the folder <code>allegro-5.2.7.0/cmake</code> are a bunch of files related to CMake. Within the list of files there is a file called <a href="https://github.com/liballeg/allegro5/blob/master/cmake/Toolchain-raspberrypi.cmake">Toolchain-raspberrypi.cmake</a>. This file contains configuration that tells CMake how to build the library for the first Raspberry Pi. The first Raspberry Pi is 32 bit and the toolchain does <em>not</em> have multilib support enabled. Therefor, a new toolchain must be created.</p>
 <p>A custom file called <code>Toolchain-raspberrypi4_64.cmake</code> will be created and placed inside the <code>allegro-5.2.7.0/cmake</code> directory. The file will contain the following contents:</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#75715e">#############</span>
 <span style="color:#75715e"># Set target OS</span>
@@ -641,20 +734,20 @@ make -j<span style="color:#e6db74">`</span>nproc<span style="color:#e6db74">`</s
             <pubDate>Mon, 20 Dec 2021 13:28:55 +0200</pubDate>
             
             <guid>https://tomniesse.github.io/posts/buildroot-ap/</guid>
-            <description>Introduction This page describes how a minimal access point can be created using buildroot.
+            <description>Introduction This page describes how a minimal router OS can be created using buildroot.
 All configurations and build commands are documented on this page.
-The resulting OS will boot, connect to the first LAN-network it can find (using DHCP) and then start an access point.
+The resulting OS will boot, connect to the first LAN-network it can find and then start an access point.
 Previous work This post is based on another post in which a basic embedded OS is created.
 Editing the minimal Buildroot OS Configuring the access point part of the target system With the options above all set, the Raspberry Pi 4 should boot the target system without any issues.</description>
             <content type="html"><![CDATA[<h1 id="introduction">Introduction</h1>
-<p>This page describes how a minimal access point can be created using <a href="https://buildroot.org">buildroot</a>.<br>
+<p>This page describes how a minimal router OS can be created using <a href="https://buildroot.org">buildroot</a>.<br>
 All configurations and build commands are documented on this page.</p>
-<p>The resulting OS will boot, connect to the first LAN-network it can find (using DHCP) and then start an access point.</p>
+<p>The resulting OS will boot, connect to the first LAN-network it can find and then start an access point.</p>
 <h1 id="previous-work">Previous work</h1>
 <p>This post is based on <a href="/posts/buildroot">another post</a> in which a basic embedded OS is created.</p>
 <h1 id="editing-the-minimal-buildroot-os">Editing the minimal Buildroot OS</h1>
 <h2 id="configuring-the-access-point-part-of-the-target-system">Configuring the access point part of the target system</h2>
-<p>With the options above all set, the Raspberry Pi 4 should boot the target system without any issues. But, because the goal is to turn a Raspberry Pi 4 into a wireless access point, some extra configuration is needed.</p>
+<p>With the options above all set, the Raspberry Pi 4 should boot the target system without any issues. But, because the goal is to create a router out of the Raspberry Pi 4, some extra configuration is needed.</p>
 <p>In the <code>menuconfig</code> of buildroot, make the following extra changes:</p>
 <ul>
 <li>Under <code>Build options</code>, the option <code>RELRO Protection</code> is set to partial</li>
@@ -712,7 +805,7 @@ All configurations and build commands are documented on this page.</p>
 <li>For a 2.4GHz access point: <code>2412</code>, <code>2417</code>, <code>2422</code>, <code>2427</code>, <code>2432</code>, <code>2437</code>, <code>2442</code>, <code>2447</code>, <code>2452</code>, <code>2457</code>, <code>2462</code>, <code>2467</code> or <code>2472</code></li>
 <li>For a 5GHz access point: <code>5170</code>, <code>5180</code>, <code>5190</code>, <code>5200</code>, <code>5210</code>, <code>5220</code>, <code>5230</code>, <code>5240</code>, <code>5260</code>, <code>5280</code>, <code>5300</code>, <code>5320</code>, <code>5500</code>, <code>5520</code>, <code>5540</code>, <code>5560</code>, <code>5580</code>, <code>5600</code>, <code>5620</code>, <code>5640</code>, <code>5660</code>, <code>5680</code> or <code>5700</code></li>
 </ul>
-<p>On 5GHz, if the frequency is set too high, the signal will probably not travel through walls very well. A higher frequency results in a faster internet speed, but the signal will be weaker. Not all frequencies may be supported by the wireless interface of the Raspberry Pi 4. If the network SSID does not appear after the Raspberry Pi 4 has started, change the frequency to another value.</p>
+<p>On 5GHz, if the frequency is set too high, the signal will probably not travel through walls very well. A higher frequency does result in a faster internet speed. Not all frequencies may be supported by the wireless interface of the Raspberry Pi 4. If the network SSID does not appear after the Raspberry Pi 4 has started, change the frequency to another value.</p>
 <h3 id="interfaces">interfaces</h3>
 <p>Another common file found in Linux-based operating systems is a file called <code>interfaces</code>. This file often contains configurations regarding IP addressing of certain interfaces.</p>
 <p>To create interface configuration for the target system, create a file called <code>interfaces</code> and place it in <code>buildroot-&lt;VERSION_GOES_HERE&gt;/board/raspberrypi/</code>. The file is to contain the following configuration:</p>
@@ -734,7 +827,7 @@ iface wlan0 inet static
     wait-delay <span style="color:#ae81ff">15</span>
 iface default inet dhcp
 </code></pre></div><h3 id="dhcpdconf">dhcpd.conf</h3>
-<p>Almost every modern access point has a DHCP server built in. So, the target system should also have one.</p>
+<p>Almost every modern router has a DHCP server built in. So, the target system should also have one.</p>
 <p>To configure the DHCP server on the target system, create a file called <code>dhcpd.conf</code> and place it in <code>buildroot-&lt;VERSION_GOES_HERE&gt;/board/raspberrypi/</code>. The file is to have the following contents:</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">ddns-update-style none;
 default-lease-time 600;
@@ -983,10 +1076,9 @@ What is Buildroot? Buildroot, just like the yocto project, is a set of tools to 
 <li>Creating an OS that serves as an access point.</li>
 <li>Cross-compiling <a href="https://liballeg.org">Allegro5</a> and <a href="https://dunedynasty.sourceforge.net">Dune Dynasty</a> and adding it to the minimal OS.</li>
 </ul>
-<p>The host PC has to run the latest version of Ubuntu.</p>
 <h1 id="setting-up-a-cross-compiling-toolchain">Setting up a cross-compiling toolchain</h1>
 <p>If the kernel is compiled using <code>arm-none-eabi-gcc</code> and the rest of the system is compiled using <code>aarch64-linux-gnu-gcc</code>, the system will not run. To ensure that the system runs (well) on the target board, a cross-compiling toolchain will be set up. This toolchain contains a cross-compiling <code>gcc</code>, <code>ld</code> and other tools that would normally be used to (cross-)compile a program or OS. The tools in the toolchain will be used to compile the whole system.</p>
-<p>In this post, <a href="https://crosstool-ng.github.io">crosstool-NG</a> is used as a cross-compiling toolchain.</p>
+<p>In this post, <a href="https://crosstool-ng.github.io">crosstool-NG</a> is used.</p>
 <h2 id="downloading">Downloading</h2>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">git clone https://github.com/crosstool-ng/crosstool-ng
 </code></pre></div><h2 id="compiling">Compiling</h2>
@@ -1052,8 +1144,8 @@ aarch64-rpi4-linux-uclibc-gcc -v
 <li>Under <code>Toolchain</code>, the option <code>Toolchain origin</code> is set to <code>Pre-installed toolchain</code></li>
 <li>Under <code>Toolchain</code>, the option <code>Toolchain path</code> is set to <code>/home/&lt;YOUR_USERNAME_GOES_HERE&gt;/x-tools/aarch64-rpi4-linux-uclibc</code> (the path has to be absolute and may not contain <code>~/</code> or <code>/home/$USER/</code>!).</li>
 <li>Under <code>Toolchain</code>, the option <code>Toolchain prefix</code> is set to <code>aarch64-rpi4-linux-uclibc</code></li>
-<li>Under <code>Toolchain</code>, the option <code>External toolchain gcc version</code> is set to <code>10.x</code> (this version has to match the version from the cross-compiling toolchain)</li>
-<li>Under <code>Toolchain</code>, the option <code>External toolchain kernel headers series</code> is set to <code>5.15.x or later</code> (this version has to match the version from the cross-compiling toolchain)</li>
+<li>Under <code>Toolchain</code>, the option <code>External toolchain gcc version</code> is set to <code>10.x</code> (this version has to match the version of the cross-compiling toolchain)</li>
+<li>Under <code>Toolchain</code>, the option <code>External toolchain kernel headers series</code> is set to <code>5.15.x or later</code> (this version has to match the version of the cross-compiling toolchain)</li>
 <li>Under <code>Toolchain</code>, the option <code>Toolchain has locale support?</code> is enabled</li>
 <li>Under <code>Toolchain</code>, the option <code>Toolchain has C++ support?</code> is enabled</li>
 <li>Under <code>Toolchain</code>, the option <code>Toolchain has SSP support?</code> is enabled</li>
@@ -1062,7 +1154,7 @@ aarch64-rpi4-linux-uclibc-gcc -v
 <li>Under <code>System configuration</code>, the option <code>Root password</code> is set to <code>root</code> (for testing test builds)</li>
 <li>Under <code>System configuration</code>, the option <code>/dev management</code> is set to <code>Dynamic using devtmpfs + mdev</code> (to load drivers automatically when the target device boots)</li>
 </ul>
-<p>Most linux desktops use <code>udev</code> to manage device drivers, but because this system uses <code>BusyBox</code> as init system, <code>mdev</code> is used. To enable <code>mdev</code> at boot, the file <code>buildroot-&lt;VERSION_GOES_HERE&gt;/board/raspberrypi/post-build.sh</code> needs the following extra lines at the bottom, leaving the rest of the file as is:</p>
+<p>Most linux desktops use <code>udev</code> to manage device drivers, but because this system uses <code>BusyBox</code> as init system, so <code>mdev</code> is used. To enable <code>mdev</code> at boot, the file <code>buildroot-&lt;VERSION_GOES_HERE&gt;/board/raspberrypi/post-build.sh</code> needs the following extra lines at the bottom, leaving the rest of the file as is:</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">cp package/busybox/S10mdev <span style="color:#e6db74">${</span>TARGET_DIR<span style="color:#e6db74">}</span>/etc/init.d/S10mdev
 chmod <span style="color:#ae81ff">755</span> <span style="color:#e6db74">${</span>TARGET_DIR<span style="color:#e6db74">}</span>/etc/init.d/S10mdev
 cp package/busybox/mdev.conf <span style="color:#e6db74">${</span>TARGET_DIR<span style="color:#e6db74">}</span>/etc/mdev.conf
@@ -1076,12 +1168,12 @@ cp package/busybox/mdev.conf <span style="color:#e6db74">${</span>TARGET_DIR<spa
 <p>In addition to the <code>rootfs.tar.gz</code> file being present, the folder <code>output/images</code> will also contain a folder called <code>rpi-firmware</code>.<br>
 The files, <code>start4.elf</code> and <code>fixup4.dat</code> are needed later. These firmware files are files needed to boot the Raspberry Pi 4.</p>
 <h2 id="converting-the-linux-image-into-a-uimage">Converting the linux Image into a uImage</h2>
-<p>Buildroot created a file called <code>Image</code>. To make integrity checks at boot time possible, the image file will be converted to a U-boot image (<code>uImage</code>). This makes sure there are no memory errors before Linux starts booting.</p>
-<p>To convert the linux image into a uImage, the package <code>u-boot-tools</code> is required. Then the <code>Image</code> file can be converted using the following command:</p>
+<p>Buildroot created a file called <code>Image</code>. However, the U-boot bootloader (which wil be built in the next chapter) cannot boot this image file as it is. In order for U-boot to boot the kernel, the image file has to be converted to a U-boot image (<code>uImage</code>).</p>
+<p>To convert the linux image into a uImage, the package <code>u-boot-tools</code> (or <code>uboot-tools</code>) is required. Then the <code>Image</code> file can be converted using the following command:</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">mkimage -n <span style="color:#e6db74">&#39;Linux kernel&#39;</span> -A arm64 -O linux -C none -T kernel -a 0x00080000 -e 0x00080000 -d arch/arm64/boot/Image uImage
-</code></pre></div><p>A file called <code>uImage</code> will now be created. This file contains the entire linux kernel binary, including some extra header stuff that <code>u-boot-tools</code> added. This file is the kernel which runs on the target system.</p>
+</code></pre></div><p>A file called <code>uImage</code> will now be created. This file contains the entire linux kernel binary, including some extra header stuff that <code>u-boot-tools</code> added. This file is the kernel which runs the system.</p>
 <h1 id="adding-a-bootloader-u-boot">Adding a bootloader (U-boot)</h1>
-<p>Although Buildroot can include the U-boot bootloader (among others) by enabling some settings, it will be compiled manually. The reason U-boot is added to this buildroot OS, is that many embedded devices run U-boot as bootloader.</p>
+<p>Although Buildroot can include the U-boot bootloader (among others) by enabling some settings, it might be nice to go a little more in depth to learn how U-boot actually works.</p>
 <h2 id="downloading-u-boot">Downloading U-boot</h2>
 <p>The U-boot bootloader can be downloaded from <a href="https://github.com/u-boot/u-boot">github</a>.</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">git clone https://github.com/u-boot/u-boot
@@ -1095,7 +1187,7 @@ ls configs | grep rpi
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">ARCH<span style="color:#f92672">=</span>arm64 CROSS_COMPILE<span style="color:#f92672">=</span>~/x-tools/aarch64-rpi4-linux-uclibc/bin/aarch64-rpi4-linux-uclibc- make rpi_4_defconfig
 </code></pre></div><p>To then further configure the source, the <code>make menuconfig</code> command can be given:</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">ARCH<span style="color:#f92672">=</span>arm64 CROSS_COMPILE<span style="color:#f92672">=</span>~/x-tools/aarch64-rpi4-linux-uclibc/bin/aarch64-rpi4-linux-uclibc- make menuconfig
-</code></pre></div><p>In this post, the autoboot timer is changed from <code>2</code> to <code>0</code> for production builds. This option can be changed in the following region:</p>
+</code></pre></div><p>In this post, the autoboot timer is changed from <code>2</code> to <code>0</code> for production-builds. This option can be changed in the following region:</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">Boot options -&gt;
     Autoboot options -&gt;
         delay in seconds before automatically booting
@@ -1111,7 +1203,7 @@ enable_uart<span style="color:#f92672">=</span><span style="color:#ae81ff">1</sp
 <span style="color:#75715e"># Enable 64 bit mode</span>
 arm_64bit<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span>
 
-<span style="color:#75715e"># Make the raspberry Pi 4 starts U-boot (u-boot.bin) instead of the default kernel (kernel8.img)</span>
+<span style="color:#75715e"># Make the raspberry Pi 4 start U-boot (u-boot.bin) instead of the default kernel8.img</span>
 kernel<span style="color:#f92672">=</span>u-boot.bin
 
 <span style="color:#75715e"># If the bluetooth device interferes with any uart/serial messages, uncomment this</span>
@@ -1195,10 +1287,10 @@ sudo cp ./buildroot-&lt;VERSION_GOES_HERE&gt;/output/images/rpi-firmware/fixup4.
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#75715e"># Copy the bootloader</span>
 sudo cp ./u-boot/u-boot.bin ./target_mnt/boot/
 
-<span style="color:#75715e"># Copy config.txt, so the Raspberry Pi boots U-boot instead of &#34;kernel.img&#34;</span>
+<span style="color:#75715e"># Copy config.txt, to the Raspberry Pi boots U-boot</span>
 sudo cp ./u-boot/config.txt ./target_mnt/boot/
 
-<span style="color:#75715e"># Copy boot.scr, this bootscript tells U-boot to start the embedded OS</span>
+<span style="color:#75715e"># Copy boot.scr, this bootscript starts the embedded OS</span>
 sudo cp ./u-boot/boot.scr ./target_mnt/boot/
 </code></pre></div><h2 id="extracting-the-root-filesystem-to-the-rootfs-partition">Extracting the root filesystem to the <code>ROOTFS</code> partition</h2>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">cd ./target_mnt
