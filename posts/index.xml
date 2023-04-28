@@ -890,7 +890,7 @@ chmod +x <span style="color:#e6db74">${</span>TARGET_DIR<span style="color:#e6db
 If a monitor is connected to the <code>HDMI0</code> port of the Raspberry Pi 4, the following logs can be seen:</p>
 <p><a href="images/started.jpg"><img src="images/started.jpg" alt="Startup logs"></a></p>
 <p>The Raspberry Pi successfully connected to a lan network and then started it&rsquo;s wireless access point. The network SSID should now be visible to client devices and connections can now be made.</p>
-<p>The OS will fail to start the access point if it cannot connect to another LAN network via DHCP. If <code>udhcpc</code> fails after trying 99 times, the OS will not start a wireless network.</p>
+<p>The OS will fail to start the access point if it cannot connect to a LAN network using DHCP. If <code>udhcpc</code> fails after trying 99 times, the OS will not start a wireless network.</p>
 <h1 id="sources">Sources</h1>
 <ul>
 <li><a href="https://bootlin.com/doc/training/buildroot/buildroot-slides.pdf">https://bootlin.com/doc/training/buildroot/buildroot-slides.pdf</a></li>
