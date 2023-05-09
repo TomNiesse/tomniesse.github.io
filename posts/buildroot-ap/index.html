@@ -76,6 +76,7 @@ Editing the minimal Buildroot OS Configuring the access point part of the target
 
 
 
+
     <meta property="article:published_time" content="2021-12-20 13:28:55 &#43;0200 &#43;0200" />
 
 
@@ -210,17 +211,17 @@ All configurations and build commands are documented on this page.</p>
 <h3 id="wpa_supplicantconf">wpa_supplicant.conf</h3>
 <p>The tool <code>wpa_supplicant</code> is often used to connect to networks, but it can also be configured to act as an access point. In order to do this, it needs a configuration file called <code>wpa_supplicant.conf</code>.</p>
 <p>To create a wireless access point on the target system, create a file called <code>wpa_supplicant.conf</code> and place it in <code>buildroot-&lt;VERSION_GOES_HERE&gt;/board/raspberrypi/</code>. The file has the following contents:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>network<span style="color:#f92672">={</span>
-</span></span><span style="display:flex;"><span>    ssid<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;buildrootAP&#34;</span>  <span style="color:#75715e"># network name</span>
-</span></span><span style="display:flex;"><span>    psk<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;welcome01&#34;</span>     <span style="color:#75715e"># network password</span>
-</span></span><span style="display:flex;"><span>    mode<span style="color:#f92672">=</span><span style="color:#ae81ff">2</span>              <span style="color:#75715e"># act as an access point</span>
-</span></span><span style="display:flex;"><span>    proto<span style="color:#f92672">=</span>RSN
-</span></span><span style="display:flex;"><span>    key_mgmt<span style="color:#f92672">=</span>WPA-PSK
-</span></span><span style="display:flex;"><span>    pairwise<span style="color:#f92672">=</span>CCMP
-</span></span><span style="display:flex;"><span>    group<span style="color:#f92672">=</span>CCMP          <span style="color:#75715e"># allow only AES, not TKIP</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#75715e">#frequency=5200     # uncomment to run access point on 5GHz</span>
-</span></span><span style="display:flex;"><span><span style="color:#f92672">}</span>
-</span></span></code></pre></div><p>This configuration will create a WPA2 network with the name <code>buildrootAP</code> and password <code>welcome01</code>.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">network<span style="color:#f92672">={</span>
+    ssid<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;buildrootAP&#34;</span>  <span style="color:#75715e"># network name</span>
+    psk<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;welcome01&#34;</span>     <span style="color:#75715e"># network password</span>
+    mode<span style="color:#f92672">=</span><span style="color:#ae81ff">2</span>              <span style="color:#75715e"># act as an access point</span>
+    proto<span style="color:#f92672">=</span>RSN
+    key_mgmt<span style="color:#f92672">=</span>WPA-PSK
+    pairwise<span style="color:#f92672">=</span>CCMP
+    group<span style="color:#f92672">=</span>CCMP          <span style="color:#75715e"># allow only AES, not TKIP</span>
+    <span style="color:#75715e">#frequency=5200     # uncomment to run access point on 5GHz</span>
+<span style="color:#f92672">}</span>
+</code></pre></div><p>This configuration will create a WPA2 network with the name <code>buildrootAP</code> and password <code>welcome01</code>.</p>
 <p>Frequency options are as follows:</p>
 <ul>
 <li>For a 2.4GHz access point: <code>2412</code>, <code>2417</code>, <code>2422</code>, <code>2427</code>, <code>2432</code>, <code>2437</code>, <code>2442</code>, <code>2447</code>, <code>2452</code>, <code>2457</code>, <code>2462</code>, <code>2467</code> or <code>2472</code></li>
@@ -230,81 +231,81 @@ All configurations and build commands are documented on this page.</p>
 <h3 id="interfaces">interfaces</h3>
 <p>Another common file found in Linux-based operating systems is a file called <code>interfaces</code>. This file often contains configurations regarding IP addressing of certain interfaces.</p>
 <p>To create interface configuration for the target system, create a file called <code>interfaces</code> and place it in <code>buildroot-&lt;VERSION_GOES_HERE&gt;/board/raspberrypi/</code>. The file is to contain the following configuration:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>auto lo
-</span></span><span style="display:flex;"><span>iface lo inet loopback
-</span></span><span style="display:flex;"><span>auto eth0
-</span></span><span style="display:flex;"><span>iface eth0 inet dhcp
-</span></span><span style="display:flex;"><span>    udhcpc_opts -t <span style="color:#ae81ff">99</span> <span style="color:#75715e"># try 99 times before giving up</span>
-</span></span><span style="display:flex;"><span>    pre-up /etc/network/nfs_check
-</span></span><span style="display:flex;"><span>    wait-delay <span style="color:#ae81ff">15</span>
-</span></span><span style="display:flex;"><span>auto wlan0
-</span></span><span style="display:flex;"><span>iface wlan0 inet static
-</span></span><span style="display:flex;"><span>    address 192.168.200.1
-</span></span><span style="display:flex;"><span>    netmask 255.255.255.0
-</span></span><span style="display:flex;"><span>    network 192.168.200.0
-</span></span><span style="display:flex;"><span>    gateway 192.168.200.1
-</span></span><span style="display:flex;"><span>    pre-up wpa_supplicant -B -Dnl80211 -iwlan0 -c/etc/wpa_supplicant.conf
-</span></span><span style="display:flex;"><span>    post-down killall -q wpa_supplicant
-</span></span><span style="display:flex;"><span>    wait-delay <span style="color:#ae81ff">15</span>
-</span></span><span style="display:flex;"><span>iface default inet dhcp
-</span></span></code></pre></div><h3 id="dhcpdconf">dhcpd.conf</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">auto lo
+iface lo inet loopback
+auto eth0
+iface eth0 inet dhcp
+    udhcpc_opts -t <span style="color:#ae81ff">99</span> <span style="color:#75715e"># try 99 times before giving up</span>
+    pre-up /etc/network/nfs_check
+    wait-delay <span style="color:#ae81ff">15</span>
+auto wlan0
+iface wlan0 inet static
+    address 192.168.200.1
+    netmask 255.255.255.0
+    network 192.168.200.0
+    gateway 192.168.200.1
+    pre-up wpa_supplicant -B -Dnl80211 -iwlan0 -c/etc/wpa_supplicant.conf
+    post-down killall -q wpa_supplicant
+    wait-delay <span style="color:#ae81ff">15</span>
+iface default inet dhcp
+</code></pre></div><h3 id="dhcpdconf">dhcpd.conf</h3>
 <p>Almost every modern router has a DHCP server built in. So, the target system should also have one.</p>
 <p>To configure the DHCP server on the target system, create a file called <code>dhcpd.conf</code> and place it in <code>buildroot-&lt;VERSION_GOES_HERE&gt;/board/raspberrypi/</code>. The file is to have the following contents:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>ddns-update-style none;
-</span></span><span style="display:flex;"><span>default-lease-time 600;
-</span></span><span style="display:flex;"><span>max-lease-time 7200;
-</span></span><span style="display:flex;"><span>authoritative;
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>subnet 192.168.200.0 netmask 255.255.255.0 <span style="color:#f92672">{</span>
-</span></span><span style="display:flex;"><span>  range 192.168.200.10 192.168.200.50;
-</span></span><span style="display:flex;"><span>  option broadcast-address 192.168.200.255;
-</span></span><span style="display:flex;"><span>  option routers 192.168.200.1;
-</span></span><span style="display:flex;"><span>  default-lease-time 600;
-</span></span><span style="display:flex;"><span>  max-lease-time 7200;
-</span></span><span style="display:flex;"><span>  option domain-name <span style="color:#e6db74">&#34;local&#34;</span>;
-</span></span><span style="display:flex;"><span>  option domain-name-servers 9.9.9.9, 1.1.1.1;
-</span></span><span style="display:flex;"><span><span style="color:#f92672">}</span>
-</span></span></code></pre></div><h3 id="sysctlconf">sysctl.conf</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">ddns-update-style none;
+default-lease-time 600;
+max-lease-time 7200;
+authoritative;
+
+subnet 192.168.200.0 netmask 255.255.255.0 <span style="color:#f92672">{</span>
+  range 192.168.200.10 192.168.200.50;
+  option broadcast-address 192.168.200.255;
+  option routers 192.168.200.1;
+  default-lease-time 600;
+  max-lease-time 7200;
+  option domain-name <span style="color:#e6db74">&#34;local&#34;</span>;
+  option domain-name-servers 9.9.9.9, 1.1.1.1;
+<span style="color:#f92672">}</span>
+</code></pre></div><h3 id="sysctlconf">sysctl.conf</h3>
 <p>To allow packages to flow from one linux network interface to another, a file called <code>sysctl.conf</code> has to be created and placed in <code>buildroot-&lt;VERSION_GOES_HERE&gt;/board/raspberrypi/</code>. The file is to have the following contents:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>net.ipv4.ip_forward <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>
-</span></span></code></pre></div><h3 id="s02procps">S02procps</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">net.ipv4.ip_forward <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>
+</code></pre></div><h3 id="s02procps">S02procps</h3>
 <p>To activate the above configuration file (<code>sysctl.conf</code>) when the target OS boots, a startup/service file called <code>S02procps</code> is created and placed in <code>buildroot-&lt;VERSION_GOES_HERE&gt;/board/raspberrypi/</code>. The file will have the following contents:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span><span style="color:#75715e">#! /bin/sh
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">if</span> <span style="color:#f92672">[</span> <span style="color:#e6db74">&#34;</span>$1<span style="color:#e6db74">&#34;</span> <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;start&#34;</span> <span style="color:#f92672">]</span>; <span style="color:#66d9ef">then</span>
-</span></span><span style="display:flex;"><span>    sysctl -p
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">fi</span>
-</span></span></code></pre></div><h3 id="s99firewall">S99firewall</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh"><span style="color:#75715e">#! /bin/sh
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">if</span> <span style="color:#f92672">[</span> <span style="color:#e6db74">&#34;</span>$1<span style="color:#e6db74">&#34;</span> <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;start&#34;</span> <span style="color:#f92672">]</span>; <span style="color:#66d9ef">then</span>
+    sysctl -p
+<span style="color:#66d9ef">fi</span>
+</code></pre></div><h3 id="s99firewall">S99firewall</h3>
 <p>To configure firewall settings when the target OS boots, a service will be created. The file will be called <code>s99firewall</code> and placed in <code>buildroot-&lt;VERSION_GOES_HERE&gt;/board/raspberrypi/</code>. The file will have the following contents:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span><span style="color:#75715e">#! /bin/sh
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">if</span> <span style="color:#f92672">[</span> <span style="color:#e6db74">&#34;</span>$1<span style="color:#e6db74">&#34;</span> <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;start&#34;</span> <span style="color:#f92672">]</span>; <span style="color:#66d9ef">then</span>
-</span></span><span style="display:flex;"><span>    iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
-</span></span><span style="display:flex;"><span>    iptables -P FORWARD DROP
-</span></span><span style="display:flex;"><span>    iptables -A FORWARD -i eth0 -o wlan0 -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
-</span></span><span style="display:flex;"><span>    iptables -A FORWARD -i wlan0 -o eth0 -j ACCEPT
-</span></span><span style="display:flex;"><span>    iptables -P INPUT DROP
-</span></span><span style="display:flex;"><span>    iptables -A INPUT -i eth0 -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
-</span></span><span style="display:flex;"><span>    iptables -A INPUT -i wlan0 -j ACCEPT
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">fi</span>
-</span></span></code></pre></div><h2 id="copying-all-files-to-the-target-system">Copying all files to the target system</h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh"><span style="color:#75715e">#! /bin/sh
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">if</span> <span style="color:#f92672">[</span> <span style="color:#e6db74">&#34;</span>$1<span style="color:#e6db74">&#34;</span> <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;start&#34;</span> <span style="color:#f92672">]</span>; <span style="color:#66d9ef">then</span>
+    iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
+    iptables -P FORWARD DROP
+    iptables -A FORWARD -i eth0 -o wlan0 -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
+    iptables -A FORWARD -i wlan0 -o eth0 -j ACCEPT
+    iptables -P INPUT DROP
+    iptables -A INPUT -i eth0 -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
+    iptables -A INPUT -i wlan0 -j ACCEPT
+<span style="color:#66d9ef">fi</span>
+</code></pre></div><h2 id="copying-all-files-to-the-target-system">Copying all files to the target system</h2>
 <p>To automatically copy all configuration files and services into the target system after it has been built, the following lines will be appended to <code>buildroot-&lt;VERSION_GOES_HERE&gt;/board/raspberrypi/post-build.sh</code>:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># copy configuration files</span>
-</span></span><span style="display:flex;"><span>cp board/raspberrypi/interfaces <span style="color:#e6db74">${</span>TARGET_DIR<span style="color:#e6db74">}</span>/etc/network/interfaces
-</span></span><span style="display:flex;"><span>cp board/raspberrypi/wpa_supplicant.conf <span style="color:#e6db74">${</span>TARGET_DIR<span style="color:#e6db74">}</span>/etc/wpa_supplicant.conf
-</span></span><span style="display:flex;"><span>cp board/raspberrypi/dhcpd.conf <span style="color:#e6db74">${</span>TARGET_DIR<span style="color:#e6db74">}</span>/etc/dhcp/dhcpd.conf
-</span></span><span style="display:flex;"><span>cp board/raspberrypi/sysctl.conf <span style="color:#e6db74">${</span>TARGET_DIR<span style="color:#e6db74">}</span>/etc/sysctl.conf
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#75715e"># copy init scripts</span>
-</span></span><span style="display:flex;"><span>cp board/raspberrypi/S02procps <span style="color:#e6db74">${</span>TARGET_DIR<span style="color:#e6db74">}</span>/etc/init.d/S02procps
-</span></span><span style="display:flex;"><span>cp board/raspberrypi/S99firewall <span style="color:#e6db74">${</span>TARGET_DIR<span style="color:#e6db74">}</span>/etc/init.d/S99firewall
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#75715e"># set permissions on the new init scripts</span>
-</span></span><span style="display:flex;"><span>chmod <span style="color:#ae81ff">755</span> <span style="color:#e6db74">${</span>TARGET_DIR<span style="color:#e6db74">}</span>/etc/init.d/S02procps
-</span></span><span style="display:flex;"><span>chmod <span style="color:#ae81ff">755</span> <span style="color:#e6db74">${</span>TARGET_DIR<span style="color:#e6db74">}</span>/etc/init.d/S99firewall
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#75715e"># make the init scripts executable</span>
-</span></span><span style="display:flex;"><span>chmod +x <span style="color:#e6db74">${</span>TARGET_DIR<span style="color:#e6db74">}</span>/etc/init.d/S02procps
-</span></span><span style="display:flex;"><span>chmod +x <span style="color:#e6db74">${</span>TARGET_DIR<span style="color:#e6db74">}</span>/etc/init.d/S99firewall
-</span></span></code></pre></div><h2 id="rebuilding-the-os">Rebuilding the OS</h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#75715e"># copy configuration files</span>
+cp board/raspberrypi/interfaces <span style="color:#e6db74">${</span>TARGET_DIR<span style="color:#e6db74">}</span>/etc/network/interfaces
+cp board/raspberrypi/wpa_supplicant.conf <span style="color:#e6db74">${</span>TARGET_DIR<span style="color:#e6db74">}</span>/etc/wpa_supplicant.conf
+cp board/raspberrypi/dhcpd.conf <span style="color:#e6db74">${</span>TARGET_DIR<span style="color:#e6db74">}</span>/etc/dhcp/dhcpd.conf
+cp board/raspberrypi/sysctl.conf <span style="color:#e6db74">${</span>TARGET_DIR<span style="color:#e6db74">}</span>/etc/sysctl.conf
+
+<span style="color:#75715e"># copy init scripts</span>
+cp board/raspberrypi/S02procps <span style="color:#e6db74">${</span>TARGET_DIR<span style="color:#e6db74">}</span>/etc/init.d/S02procps
+cp board/raspberrypi/S99firewall <span style="color:#e6db74">${</span>TARGET_DIR<span style="color:#e6db74">}</span>/etc/init.d/S99firewall
+
+<span style="color:#75715e"># set permissions on the new init scripts</span>
+chmod <span style="color:#ae81ff">755</span> <span style="color:#e6db74">${</span>TARGET_DIR<span style="color:#e6db74">}</span>/etc/init.d/S02procps
+chmod <span style="color:#ae81ff">755</span> <span style="color:#e6db74">${</span>TARGET_DIR<span style="color:#e6db74">}</span>/etc/init.d/S99firewall
+
+<span style="color:#75715e"># make the init scripts executable</span>
+chmod +x <span style="color:#e6db74">${</span>TARGET_DIR<span style="color:#e6db74">}</span>/etc/init.d/S02procps
+chmod +x <span style="color:#e6db74">${</span>TARGET_DIR<span style="color:#e6db74">}</span>/etc/init.d/S99firewall
+</code></pre></div><h2 id="rebuilding-the-os">Rebuilding the OS</h2>
 <p>After all configurations are done, rebuild the system as explained in the previous post.</p>
 <h1 id="testing">Testing</h1>
 <p>After the <code>system.img</code> file is flashed to an SD card, the SD card can be plugged into any Raspberry Pi 4.<br>
@@ -510,7 +511,7 @@ If a monitor is connected to the <code>HDMI0</code> port of the Raspberry Pi 4, 
 
 
 
-<script type="text/javascript" src="/bundle.min.205d491810c28f95aa953fae884e1c27abe13fdf93ec63b882d0036b248d4a6282eb2d134e4e7225c6ad6e86db87b08488a361ca4a7383d01fcff43f3d57b9c3.js" integrity="sha512-IF1JGBDCj5WqlT&#43;uiE4cJ6vhP9&#43;T7GO4gtADaySNSmKC6y0TTk5yJcatbobbh7CEiKNhykpzg9Afz/Q/PVe5ww=="></script>
+<script type="text/javascript" src="/bundle.min.644292943ae47eef02fcd64b11757aeb8caeeaebf473a823b62099edccac808e8d82689359f285e5d95994e5ad5ae3b9c1ccc281eb1828e67d0ba6630f95b832.js" integrity="sha512-ZEKSlDrkfu8C/NZLEXV664yu6uv0c6gjtiCZ7cysgI6NgmiTWfKF5dlZlOWtWuO5wczCgesYKOZ9C6ZjD5W4Mg=="></script>
 
 
 

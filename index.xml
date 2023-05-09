@@ -37,6 +37,7 @@ And if someone else can do it, it must be possible.</description>
       <description>Introduction This page explains how the game &amp;ldquo;Dune Dynasty II&amp;rdquo; can be ran on an embedded linux OS. The OS is created using buildroot.
 All required configurations and compile-commands are documented on this page.
 The below image shows the game (and embedded OS) running.
+
 Previous work This post is based on another post in which a basic embedded OS is created. However, the toolchain used uClibc as C library, which will not work here.</description>
     </item>
     

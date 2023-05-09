@@ -42,7 +42,7 @@ What is a kernel module? A kernel is a piece of software that handles all the co
 Using the user manual of the phone&rsquo;s processor (Allwinner A64), a kernel module will be written that can control the RGB-LED of the phone.
 What is a kernel module? A kernel is a piece of software that handles all the communications between hardware and software. The linux kernel uses modules for this."><meta itemprop="datePublished" content="2021-11-03T13:28:55+02:00" />
 <meta itemprop="dateModified" content="2021-11-03T13:28:55+02:00" />
-<meta itemprop="wordCount" content="2230"><meta itemprop="image" content="https://tomniesse.github.io/"/>
+<meta itemprop="wordCount" content="2217"><meta itemprop="image" content="https://tomniesse.github.io/"/>
 <meta itemprop="keywords" content="untagged," />
 <meta name="twitter:card" content="summary_large_image"/>
 <meta name="twitter:image" content="https://tomniesse.github.io/"/>
@@ -62,6 +62,7 @@ What is a kernel module? A kernel is a piece of software that handles all the co
 <meta property="og:url" content="https://tomniesse.github.io/posts/pinephone-linux-kernel-programming/" /><meta property="og:image" content="https://tomniesse.github.io/"/><meta property="article:section" content="posts" />
 <meta property="article:published_time" content="2021-11-03T13:28:55+02:00" />
 <meta property="article:modified_time" content="2021-11-03T13:28:55+02:00" /><meta property="og:site_name" content="Welcome!" />
+
 
 
 
@@ -176,15 +177,15 @@ Using the user manual of the phone&rsquo;s processor (Allwinner A64), a kernel m
 <p>For this project, only the user manual will be used, as it contains all the required information.</p>
 <h2 id="finding-the-right-registers">Finding the right registers</h2>
 <p>Chapter 3.21 (page 376) of the <a href="https://linux-sunxi.org/images/b/b4/Allwinner_A64_User_Manual_V1.1.pdf">user manual</a> contains information about some of the registers in the A64 SoC. At the top of the page, the following text can be read:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>The chip has 7 ports for multi-functional input/out pins. They are shown below:
-</span></span><span style="display:flex;"><span>- Port B(PB): 10 input/output port
-</span></span><span style="display:flex;"><span>- Port C(PC): 17 input/output port
-</span></span><span style="display:flex;"><span>- Port D(PD): 25 input/output port
-</span></span><span style="display:flex;"><span>- Port E(PE): 18 input/output port
-</span></span><span style="display:flex;"><span>- Port F(PF): 7 input/output port
-</span></span><span style="display:flex;"><span>- Port G(PG): 14 input/output port
-</span></span><span style="display:flex;"><span>- Port H(PH): 12 input/output port
-</span></span></code></pre></div><p>Port D is the one that will be controlled (<code>PD18</code>, <code>PD19</code> and <code>PD20</code>).</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">The chip has 7 ports for multi-functional input/out pins. They are shown below:
+- Port B(PB): 10 input/output port
+- Port C(PC): 17 input/output port
+- Port D(PD): 25 input/output port
+- Port E(PE): 18 input/output port
+- Port F(PF): 7 input/output port
+- Port G(PG): 14 input/output port
+- Port H(PH): 12 input/output port
+</code></pre></div><p>Port D is the one that will be controlled (<code>PD18</code>, <code>PD19</code> and <code>PD20</code>).</p>
 <p>Further down the same page, some memory offsets are shown. This is because the RGB led is connected using MMIO (Memory Mapped IO). When a certain part of memory is altered, the corresponding IO port will turn on or off. There are a few configure registers (which set pin modes), a data register (which turns the IO port on or off), a multi-driving register (to control voltage levels?) and a fell pull registers (for pull-down and pull-up purposes).</p>
 <p>For this project, only the configure register <code>PD_CFG2</code> and the data register <code>PD_DAT</code> will be used. All the other registers can be set if so desired, but it is not needed.</p>
 <h2 id="creating-code-to-handle-pin-modes">Creating code to handle pin modes</h2>
@@ -254,38 +255,38 @@ Using the user manual of the phone&rsquo;s processor (Allwinner A64), a kernel m
 </table>
 <p>A 3 bit value controls pin modes in register <code>PD_CFG2_REG</code>. Let&rsquo;s set some pin modes using the C language</p>
 <p>The C language has a datatype called <code>struct</code>, which can be used to &ldquo;convert&rdquo; the table into the following code:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#66d9ef">typedef</span> <span style="color:#66d9ef">struct</span> {
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">uint32_t</span> PD_16    : <span style="color:#ae81ff">3</span>;
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">uint32_t</span> reserved : <span style="color:#ae81ff">1</span>;
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">uint32_t</span> PD_17    : <span style="color:#ae81ff">3</span>;
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">uint32_t</span> reserved : <span style="color:#ae81ff">1</span>;
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">uint32_t</span> PD_18    : <span style="color:#ae81ff">3</span>;
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">uint32_t</span> reserved : <span style="color:#ae81ff">1</span>;
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">uint32_t</span> PD_19    : <span style="color:#ae81ff">3</span>;
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">uint32_t</span> reserved : <span style="color:#ae81ff">1</span>;
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">uint32_t</span> PD_20    : <span style="color:#ae81ff">3</span>;
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">uint32_t</span> reserved : <span style="color:#ae81ff">1</span>;
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">uint32_t</span> PD_21    : <span style="color:#ae81ff">3</span>;
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">uint32_t</span> reserved : <span style="color:#ae81ff">1</span>;
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">uint32_t</span> PD_22    : <span style="color:#ae81ff">3</span>;
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">uint32_t</span> reserved : <span style="color:#ae81ff">1</span>;
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">uint32_t</span> PD_23    : <span style="color:#ae81ff">3</span>;
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">uint32_t</span> reserved : <span style="color:#ae81ff">1</span>;
-</span></span><span style="display:flex;"><span>} PD_CFG2_REG_t;
-</span></span></code></pre></div><p>The <code>struct</code> will ensure that the right bits are set in memory, without having to set individual bits.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#66d9ef">typedef</span> <span style="color:#66d9ef">struct</span> {
+    <span style="color:#66d9ef">uint32_t</span> PD_16    : <span style="color:#ae81ff">3</span>;
+    <span style="color:#66d9ef">uint32_t</span> reserved : <span style="color:#ae81ff">1</span>;
+    <span style="color:#66d9ef">uint32_t</span> PD_17    : <span style="color:#ae81ff">3</span>;
+    <span style="color:#66d9ef">uint32_t</span> reserved : <span style="color:#ae81ff">1</span>;
+    <span style="color:#66d9ef">uint32_t</span> PD_18    : <span style="color:#ae81ff">3</span>;
+    <span style="color:#66d9ef">uint32_t</span> reserved : <span style="color:#ae81ff">1</span>;
+    <span style="color:#66d9ef">uint32_t</span> PD_19    : <span style="color:#ae81ff">3</span>;
+    <span style="color:#66d9ef">uint32_t</span> reserved : <span style="color:#ae81ff">1</span>;
+    <span style="color:#66d9ef">uint32_t</span> PD_20    : <span style="color:#ae81ff">3</span>;
+    <span style="color:#66d9ef">uint32_t</span> reserved : <span style="color:#ae81ff">1</span>;
+    <span style="color:#66d9ef">uint32_t</span> PD_21    : <span style="color:#ae81ff">3</span>;
+    <span style="color:#66d9ef">uint32_t</span> reserved : <span style="color:#ae81ff">1</span>;
+    <span style="color:#66d9ef">uint32_t</span> PD_22    : <span style="color:#ae81ff">3</span>;
+    <span style="color:#66d9ef">uint32_t</span> reserved : <span style="color:#ae81ff">1</span>;
+    <span style="color:#66d9ef">uint32_t</span> PD_23    : <span style="color:#ae81ff">3</span>;
+    <span style="color:#66d9ef">uint32_t</span> reserved : <span style="color:#ae81ff">1</span>;
+} PD_CFG2_REG_t;
+</code></pre></div><p>The <code>struct</code> will ensure that the right bits are set in memory, without having to set individual bits.</p>
 <h3 id="memory-location">Memory location</h3>
 <p>In the above table, an offset of <code>0x74</code> can be seen. The memory address of this MMIO register will be <code>PIO</code> (<code>0x01C20800</code>) + <code>0x74</code>. In code, this could look as follows:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#75715e">#define PIO 0x01C20800
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e">#define PD_CFG2_REG_ADDRESS (PIO + 0x74)
-</span></span></span></code></pre></div><h2 id="altering-the-memory">Altering the memory</h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#75715e">#define PIO 0x01C20800
+</span><span style="color:#75715e">#define PD_CFG2_REG_ADDRESS (PIO + 0x74)
+</span></code></pre></div><h2 id="altering-the-memory">Altering the memory</h2>
 <p>The code to alter a piece of memory looks a bit magical, but it works quite well:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#75715e">#define MODE_OUTPUT   0x1
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e">#define MODE_DISABLED 0x7 </span><span style="color:#75715e">// default
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
-</span></span><span style="display:flex;"><span>((<span style="color:#66d9ef">volatile</span> PD_CFG2_REG_t<span style="color:#f92672">*</span>)PD_CFG2_REG_ADDRESS)<span style="color:#f92672">-&gt;</span>PD18 <span style="color:#f92672">=</span> MODE_OUTPUT;
-</span></span><span style="display:flex;"><span>((<span style="color:#66d9ef">volatile</span> PD_CFG2_REG_t<span style="color:#f92672">*</span>)PD_CFG2_REG_ADDRESS)<span style="color:#f92672">-&gt;</span>PD19 <span style="color:#f92672">=</span> MODE_OUTPUT;
-</span></span><span style="display:flex;"><span>((<span style="color:#66d9ef">volatile</span> PD_CFG2_REG_t<span style="color:#f92672">*</span>)PD_CFG2_REG_ADDRESS)<span style="color:#f92672">-&gt;</span>PD20 <span style="color:#f92672">=</span> MODE_OUTPUT;
-</span></span></code></pre></div><ul>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#75715e">#define MODE_OUTPUT   0x1
+</span><span style="color:#75715e">#define MODE_DISABLED 0x7 </span><span style="color:#75715e">// default
+</span><span style="color:#75715e"></span>
+((<span style="color:#66d9ef">volatile</span> PD_CFG2_REG_t<span style="color:#f92672">*</span>)PD_CFG2_REG_ADDRESS)<span style="color:#f92672">-&gt;</span>PD18 <span style="color:#f92672">=</span> MODE_OUTPUT;
+((<span style="color:#66d9ef">volatile</span> PD_CFG2_REG_t<span style="color:#f92672">*</span>)PD_CFG2_REG_ADDRESS)<span style="color:#f92672">-&gt;</span>PD19 <span style="color:#f92672">=</span> MODE_OUTPUT;
+((<span style="color:#66d9ef">volatile</span> PD_CFG2_REG_t<span style="color:#f92672">*</span>)PD_CFG2_REG_ADDRESS)<span style="color:#f92672">-&gt;</span>PD20 <span style="color:#f92672">=</span> MODE_OUTPUT;
+</code></pre></div><ul>
 <li>The values <code>0x1</code> and <code>0x7</code> are copied from the user manual in hexadacimal form and set the right pin mode. The user manual includes many more pin modes, but those are not used here.</li>
 <li>The <code>volatile</code> keyword tells C that it should trust the programmer and just set the bits, as requested. Not including <code>volatile</code> will result in unpredictable behaviour.</li>
 <li>The <code>PD_CFG2_REG_t*</code> part is part of a cast. C is told that whatever resides at the memory location of <code>PD_CFG2_REG_ADDRESS</code> is of type <code>PD_CFG2_REG_t*</code>.</li>
@@ -293,302 +294,302 @@ Using the user manual of the phone&rsquo;s processor (Allwinner A64), a kernel m
 </ul>
 <h2 id="turning-the-io-pins-on-or-off">Turning the IO pins on or off</h2>
 <p>The method that is used to set the pin modes will be used to turn the IO pins on or off as well. The required table is found in chapter 3.21.2.23 (page 388) of the <a href="https://linux-sunxi.org/images/b/b4/Allwinner_A64_User_Manual_V1.1.pdf">user manual</a> and the <code>struct</code> and <code>address</code> will be as follows:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#75715e">#define PIO 0x01C20800                      </span><span style="color:#75715e">// same PIO address as the configure code uses
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#75715e">#define PD_DATA_REG_ADDRESS (PIO + 0x7C)    </span><span style="color:#75715e">// this time the offset is 0x7C
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">typedef</span> <span style="color:#66d9ef">struct</span> {
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">uint32_t</span>  PD_0      : <span style="color:#ae81ff">1</span>;
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">uint32_t</span>  PD_1      : <span style="color:#ae81ff">1</span>;
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">uint32_t</span>  PD_2      : <span style="color:#ae81ff">1</span>;
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">uint32_t</span>  PD_3      : <span style="color:#ae81ff">1</span>;
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">uint32_t</span>  PD_4      : <span style="color:#ae81ff">1</span>;
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">uint32_t</span>  PD_5      : <span style="color:#ae81ff">1</span>;
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">uint32_t</span>  PD_6      : <span style="color:#ae81ff">1</span>;
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">uint32_t</span>  PD_7      : <span style="color:#ae81ff">1</span>;
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">uint32_t</span>  PD_8      : <span style="color:#ae81ff">1</span>;
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">uint32_t</span>  PD_9      : <span style="color:#ae81ff">1</span>;
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">uint32_t</span>  PD_10     : <span style="color:#ae81ff">1</span>;
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">uint32_t</span>  PD_11     : <span style="color:#ae81ff">1</span>;
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">uint32_t</span>  PD_12     : <span style="color:#ae81ff">1</span>;
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">uint32_t</span>  PD_13     : <span style="color:#ae81ff">1</span>;
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">uint32_t</span>  PD_14     : <span style="color:#ae81ff">1</span>;
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">uint32_t</span>  PD_15     : <span style="color:#ae81ff">1</span>;
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">uint32_t</span>  PD_16     : <span style="color:#ae81ff">1</span>;
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">uint32_t</span>  PD_17     : <span style="color:#ae81ff">1</span>;
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">uint32_t</span>  PD_18     : <span style="color:#ae81ff">1</span>;
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">uint32_t</span>  PD_19     : <span style="color:#ae81ff">1</span>;
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">uint32_t</span>  PD_20     : <span style="color:#ae81ff">1</span>;
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">uint32_t</span>  PD_21     : <span style="color:#ae81ff">1</span>;
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">uint32_t</span>  PD_22     : <span style="color:#ae81ff">1</span>;
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">uint32_t</span>  PD_23     : <span style="color:#ae81ff">1</span>;
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">uint32_t</span>  PD_24     : <span style="color:#ae81ff">1</span>;
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">uint32_t</span>  reserved  : <span style="color:#ae81ff">7</span>;
-</span></span><span style="display:flex;"><span>} PD_DATA_REG_t;
-</span></span></code></pre></div><p>And to then turn the IO pins on or off, very similar pointer-magic will be used:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span>((<span style="color:#66d9ef">volatile</span> PD_DATA_REG_t<span style="color:#f92672">*</span>)PD_DATA_REG_ADDRESS)<span style="color:#f92672">-&gt;</span>PD18 <span style="color:#f92672">=</span> true; <span style="color:#75715e">// or false
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>((<span style="color:#66d9ef">volatile</span> PD_DATA_REG_t<span style="color:#f92672">*</span>)PD_DATA_REG_ADDRESS)<span style="color:#f92672">-&gt;</span>PD19 <span style="color:#f92672">=</span> true; <span style="color:#75715e">// or false
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>((<span style="color:#66d9ef">volatile</span> PD_DATA_REG_t<span style="color:#f92672">*</span>)PD_DATA_REG_ADDRESS)<span style="color:#f92672">-&gt;</span>PD20 <span style="color:#f92672">=</span> true; <span style="color:#75715e">// or false;
-</span></span></span></code></pre></div><h1 id="creating-a-linux-kernel-module">Creating a linux kernel module</h1>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#75715e">#define PIO 0x01C20800                      </span><span style="color:#75715e">// same PIO address as the configure code uses
+</span><span style="color:#75715e"></span><span style="color:#75715e">#define PD_DATA_REG_ADDRESS (PIO + 0x7C)    </span><span style="color:#75715e">// this time the offset is 0x7C
+</span><span style="color:#75715e"></span>
+<span style="color:#66d9ef">typedef</span> <span style="color:#66d9ef">struct</span> {
+    <span style="color:#66d9ef">uint32_t</span>  PD_0      : <span style="color:#ae81ff">1</span>;
+    <span style="color:#66d9ef">uint32_t</span>  PD_1      : <span style="color:#ae81ff">1</span>;
+    <span style="color:#66d9ef">uint32_t</span>  PD_2      : <span style="color:#ae81ff">1</span>;
+    <span style="color:#66d9ef">uint32_t</span>  PD_3      : <span style="color:#ae81ff">1</span>;
+    <span style="color:#66d9ef">uint32_t</span>  PD_4      : <span style="color:#ae81ff">1</span>;
+    <span style="color:#66d9ef">uint32_t</span>  PD_5      : <span style="color:#ae81ff">1</span>;
+    <span style="color:#66d9ef">uint32_t</span>  PD_6      : <span style="color:#ae81ff">1</span>;
+    <span style="color:#66d9ef">uint32_t</span>  PD_7      : <span style="color:#ae81ff">1</span>;
+    <span style="color:#66d9ef">uint32_t</span>  PD_8      : <span style="color:#ae81ff">1</span>;
+    <span style="color:#66d9ef">uint32_t</span>  PD_9      : <span style="color:#ae81ff">1</span>;
+    <span style="color:#66d9ef">uint32_t</span>  PD_10     : <span style="color:#ae81ff">1</span>;
+    <span style="color:#66d9ef">uint32_t</span>  PD_11     : <span style="color:#ae81ff">1</span>;
+    <span style="color:#66d9ef">uint32_t</span>  PD_12     : <span style="color:#ae81ff">1</span>;
+    <span style="color:#66d9ef">uint32_t</span>  PD_13     : <span style="color:#ae81ff">1</span>;
+    <span style="color:#66d9ef">uint32_t</span>  PD_14     : <span style="color:#ae81ff">1</span>;
+    <span style="color:#66d9ef">uint32_t</span>  PD_15     : <span style="color:#ae81ff">1</span>;
+    <span style="color:#66d9ef">uint32_t</span>  PD_16     : <span style="color:#ae81ff">1</span>;
+    <span style="color:#66d9ef">uint32_t</span>  PD_17     : <span style="color:#ae81ff">1</span>;
+    <span style="color:#66d9ef">uint32_t</span>  PD_18     : <span style="color:#ae81ff">1</span>;
+    <span style="color:#66d9ef">uint32_t</span>  PD_19     : <span style="color:#ae81ff">1</span>;
+    <span style="color:#66d9ef">uint32_t</span>  PD_20     : <span style="color:#ae81ff">1</span>;
+    <span style="color:#66d9ef">uint32_t</span>  PD_21     : <span style="color:#ae81ff">1</span>;
+    <span style="color:#66d9ef">uint32_t</span>  PD_22     : <span style="color:#ae81ff">1</span>;
+    <span style="color:#66d9ef">uint32_t</span>  PD_23     : <span style="color:#ae81ff">1</span>;
+    <span style="color:#66d9ef">uint32_t</span>  PD_24     : <span style="color:#ae81ff">1</span>;
+    <span style="color:#66d9ef">uint32_t</span>  reserved  : <span style="color:#ae81ff">7</span>;
+} PD_DATA_REG_t;
+</code></pre></div><p>And to then turn the IO pins on or off, very similar pointer-magic will be used:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c">((<span style="color:#66d9ef">volatile</span> PD_DATA_REG_t<span style="color:#f92672">*</span>)PD_DATA_REG_ADDRESS)<span style="color:#f92672">-&gt;</span>PD18 <span style="color:#f92672">=</span> true; <span style="color:#75715e">// or false
+</span><span style="color:#75715e"></span>((<span style="color:#66d9ef">volatile</span> PD_DATA_REG_t<span style="color:#f92672">*</span>)PD_DATA_REG_ADDRESS)<span style="color:#f92672">-&gt;</span>PD19 <span style="color:#f92672">=</span> true; <span style="color:#75715e">// or false
+</span><span style="color:#75715e"></span>((<span style="color:#66d9ef">volatile</span> PD_DATA_REG_t<span style="color:#f92672">*</span>)PD_DATA_REG_ADDRESS)<span style="color:#f92672">-&gt;</span>PD20 <span style="color:#f92672">=</span> true; <span style="color:#75715e">// or false;
+</span></code></pre></div><h1 id="creating-a-linux-kernel-module">Creating a linux kernel module</h1>
 <h2 id="a-bare-bones-linux-kernel-module">A bare bones linux kernel module</h2>
 <p>All the code that is required to set pinmodes is present, but if it&rsquo;s ran in userspace (even as superuser), it will result in a <code>segfault</code>. This is because the Linux kernel does not allow memory to be altered directly. To get around this, a kernel module will be written.</p>
 <p>A bare bones kernel module looks like this:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#75715e">// filename: mymodule.c (do not name it &#39;module.c&#39;!)
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
-</span></span><span style="display:flex;"><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;linux/module.h&gt;</span><span style="color:#75715e">
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;linux/kernel.h&gt;</span><span style="color:#75715e">
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">static</span> <span style="color:#66d9ef">int</span> <span style="color:#a6e22e">mymodule_init</span>(<span style="color:#66d9ef">void</span>) {
-</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// do initializing here
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#a6e22e">printk</span>(KERN_INFO <span style="color:#e6db74">&#34;mymodule: Hello from kernel module!&#34;</span>);
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">0</span>;
-</span></span><span style="display:flex;"><span>}
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">mymodule_exit</span>(<span style="color:#66d9ef">void</span>) {
-</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// do exit stuff here
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#a6e22e">printk</span>(KERN_INFO <span style="color:#e6db74">&#34;mymodule: Goodbye from kernel module!&#34;</span>);
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span>;
-</span></span><span style="display:flex;"><span>}
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#a6e22e">module_init</span>(mymodule_init);
-</span></span><span style="display:flex;"><span><span style="color:#a6e22e">module_exit</span>(mymodule_exit);
-</span></span></code></pre></div><p>Make sure to not name anything <code>module</code>. Use a custom name like <code>mymodule</code>, or it might not compile.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#75715e">// filename: mymodule.c (do not name it &#39;module.c&#39;!)
+</span><span style="color:#75715e"></span>
+<span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;linux/module.h&gt;</span><span style="color:#75715e">
+</span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;linux/kernel.h&gt;</span><span style="color:#75715e">
+</span><span style="color:#75715e"></span>
+<span style="color:#66d9ef">static</span> <span style="color:#66d9ef">int</span> <span style="color:#a6e22e">mymodule_init</span>(<span style="color:#66d9ef">void</span>) {
+    <span style="color:#75715e">// do initializing here
+</span><span style="color:#75715e"></span>    printk(KERN_INFO <span style="color:#e6db74">&#34;mymodule: Hello from kernel module!&#34;</span>);
+    <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">0</span>;
+}
+
+<span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">mymodule_exit</span>(<span style="color:#66d9ef">void</span>) {
+    <span style="color:#75715e">// do exit stuff here
+</span><span style="color:#75715e"></span>    printk(KERN_INFO <span style="color:#e6db74">&#34;mymodule: Goodbye from kernel module!&#34;</span>);
+    <span style="color:#66d9ef">return</span>;
+}
+
+module_init(mymodule_init);
+module_exit(mymodule_exit);
+</code></pre></div><p>Make sure to not name anything <code>module</code>. Use a custom name like <code>mymodule</code>, or it might not compile.</p>
 <p>The following <code>Makefile</code> will compile the kernel module:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-Makefile" data-lang="Makefile"><span style="display:flex;"><span>obj-m <span style="color:#f92672">:=</span> mymodule.o
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>KERNEL_VERSION <span style="color:#f92672">=</span> <span style="color:#66d9ef">$(</span>shell uname -r<span style="color:#66d9ef">)</span>
-</span></span><span style="display:flex;"><span>KERNEL_DIR     <span style="color:#f92672">=</span> /usr/lib/modules/<span style="color:#66d9ef">$(</span>KERNEL_VERSION<span style="color:#66d9ef">)</span>/build/
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#a6e22e">all</span><span style="color:#f92672">:</span>
-</span></span><span style="display:flex;"><span>	<span style="color:#75715e"># Create the kernel module</span>
-</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">$(</span>MAKE<span style="color:#66d9ef">)</span> -C <span style="color:#66d9ef">$(</span>KERNEL_DIR<span style="color:#66d9ef">)</span> M<span style="color:#f92672">=</span><span style="color:#66d9ef">$(</span>PWD<span style="color:#66d9ef">)</span> modules
-</span></span><span style="display:flex;"><span>	<span style="color:#75715e"># Delete every other temporary file, leaving only the .ko file in place</span>
-</span></span><span style="display:flex;"><span>	<span style="color:#e6db74">`</span>rm mymodule.mo* mymodule.o modules.order Module.symvers ./.*.cmd<span style="color:#e6db74">`</span>
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#a6e22e">clean</span><span style="color:#f92672">:</span>
-</span></span><span style="display:flex;"><span>	<span style="color:#75715e"># Delete all build files</span>
-</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">$(</span>MAKE<span style="color:#66d9ef">)</span> -C <span style="color:#66d9ef">$(</span>KERNEL_DIR<span style="color:#66d9ef">)</span> M<span style="color:#f92672">=</span><span style="color:#66d9ef">$(</span>PWD<span style="color:#66d9ef">)</span> clean
-</span></span></code></pre></div><p>To then add the kernel module to the kernel, the command</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>sudo insmod mymodule.ko
-</span></span></code></pre></div><p>can be issued.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-Makefile" data-lang="Makefile">obj-m <span style="color:#f92672">:=</span> mymodule.o
+
+KERNEL_VERSION <span style="color:#f92672">=</span> <span style="color:#66d9ef">$(</span>shell uname -r<span style="color:#66d9ef">)</span>
+KERNEL_DIR     <span style="color:#f92672">=</span> /usr/lib/modules/<span style="color:#66d9ef">$(</span>KERNEL_VERSION<span style="color:#66d9ef">)</span>/build/
+
+<span style="color:#a6e22e">all</span><span style="color:#f92672">:</span>
+	<span style="color:#75715e"># Create the kernel module</span>
+	<span style="color:#66d9ef">$(</span>MAKE<span style="color:#66d9ef">)</span> -C <span style="color:#66d9ef">$(</span>KERNEL_DIR<span style="color:#66d9ef">)</span> M<span style="color:#f92672">=</span><span style="color:#66d9ef">$(</span>PWD<span style="color:#66d9ef">)</span> modules
+	<span style="color:#75715e"># Delete every other temporary file, leaving only the .ko file in place</span>
+	<span style="color:#e6db74">`</span>rm mymodule.mo* mymodule.o modules.order Module.symvers ./.*.cmd<span style="color:#e6db74">`</span>
+
+<span style="color:#a6e22e">clean</span><span style="color:#f92672">:</span>
+	<span style="color:#75715e"># Delete all build files</span>
+	<span style="color:#66d9ef">$(</span>MAKE<span style="color:#66d9ef">)</span> -C <span style="color:#66d9ef">$(</span>KERNEL_DIR<span style="color:#66d9ef">)</span> M<span style="color:#f92672">=</span><span style="color:#66d9ef">$(</span>PWD<span style="color:#66d9ef">)</span> clean
+</code></pre></div><p>To then add the kernel module to the kernel, the command</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">sudo insmod mymodule.ko
+</code></pre></div><p>can be issued.</p>
 <p>After that, when the command</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>sudo dmesg
-</span></span></code></pre></div><p>can be executed to see the kernel logs. The new linux module should have logged a greeting. To see it happening in realtime, the <code>-w</code> option can de added to the dmesg command.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">sudo dmesg
+</code></pre></div><p>can be executed to see the kernel logs. The new linux module should have logged a greeting. To see it happening in realtime, the <code>-w</code> option can de added to the dmesg command.</p>
 <p>To remove the kernel module from the linux kernel, the command</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>sudo rmmod mymodule
-</span></span></code></pre></div><p>can be used.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">sudo rmmod mymodule
+</code></pre></div><p>can be used.</p>
 <h2 id="a-kernel-module-that-alters-memory">A kernel module that alters memory</h2>
 <p>To alter the MMIO registers of the PinePhone, a <code>character device</code> kernel module will be written. It will take an array of 3 characters and turn the right bits on and off using the values of the array. It will also be able to read the current state of the memory and return it in the form of a 3 character long array. All communication will happen through <code>/dev/mymodule</code>, a virtual device.</p>
 <p>All the used memory locations and structures will be put in a separate file called <code>mmio.h</code>. The new kernel module looks like this:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;linux/module.h&gt;</span><span style="color:#75715e">
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;linux/kernel.h&gt;</span><span style="color:#75715e">
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;linux/fs.h&gt;</span><span style="color:#75715e">
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;linux/cdev.h&gt;</span><span style="color:#75715e">
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;linux/semaphore.h&gt;</span><span style="color:#75715e">
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;asm/io.h&gt;</span><span style="color:#75715e">
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;asm/uaccess.h&gt;</span><span style="color:#75715e">
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;stdbool.h&gt;</span><span style="color:#75715e">
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;stdbool.h&gt;</span><span style="color:#75715e">
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
-</span></span><span style="display:flex;"><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&#34;mmio.h&#34;   // contains all the structs and addresses</span><span style="color:#75715e">
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
-</span></span><span style="display:flex;"><span><span style="color:#75715e">#define DEVICE_NAME &#34;mymodule&#34;
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e">#define MAX_BUFFER_SIZE 3
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
-</span></span><span style="display:flex;"><span><span style="color:#a6e22e">MODULE_DESCRIPTION</span>(DEVICE_NAME);
-</span></span><span style="display:flex;"><span><span style="color:#a6e22e">MODULE_AUTHOR</span>(<span style="color:#e6db74">&#34;Tom Niesse&#34;</span>);
-</span></span><span style="display:flex;"><span><span style="color:#a6e22e">MODULE_LICENSE</span>(<span style="color:#e6db74">&#34;GPLv3&#34;</span>);
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#75715e">// Create variables that have to do with registering a cdev object
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">struct</span> cdev<span style="color:#f92672">*</span> mcdev;
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">int</span> major_number;
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">int</span> return_value;
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">dev_t</span> dev_num;
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#75715e">// Create a structure for a virtual device
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">struct</span> virtual_device {
-</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">char</span> data[MAX_BUFFER_SIZE];
-</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">struct</span> semaphore sem;
-</span></span><span style="display:flex;"><span>} virtual_device;
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#75715e">// Create file operations structure using define because it&#39;s position
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e">// in the module is a bit un-intuitive (in-between functions)
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#75715e">#define FILE_OPERATIONS_CALLBACKS \
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e">struct file_operations fops = {\
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e">    .owner = THIS_MODULE,\
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e">    .open = device_open,\
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e">    .release = device_close,\
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e">    .write = device_write,\
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e">    .read = device_read\
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e">};
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
-</span></span><span style="display:flex;"><span><span style="color:#75715e">// Create variables that have to do with MMIO
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">volatile</span> PD_CFG2_REG_t<span style="color:#f92672">*</span> pd_cfg2_virtual_address <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">volatile</span> PD_DATA_REG_t<span style="color:#f92672">*</span> pd_data_virtual_address <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#75715e">// A user wants to read to or write from /dev/mymodule
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e">// and opens the file
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">int</span> <span style="color:#a6e22e">device_open</span>(<span style="color:#66d9ef">struct</span> inode <span style="color:#f92672">*</span> inode, <span style="color:#66d9ef">struct</span> file <span style="color:#f92672">*</span>filp) {
-</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">if</span>(<span style="color:#a6e22e">down_interruptible</span>(<span style="color:#f92672">&amp;</span>virtual_device.sem) <span style="color:#f92672">!=</span> <span style="color:#ae81ff">0</span>) {
-</span></span><span style="display:flex;"><span>		<span style="color:#a6e22e">printk</span>(KERN_INFO <span style="color:#e6db74">&#34;mymodule: could not lock device for reading or writing.&#34;</span>);
-</span></span><span style="display:flex;"><span>		<span style="color:#66d9ef">return</span> <span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>;
-</span></span><span style="display:flex;"><span>	}
-</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">printk</span>(KERN_INFO <span style="color:#e6db74">&#34;mymodule: device </span><span style="color:#ae81ff">\&#34;</span><span style="color:#e6db74">/dev/%s</span><span style="color:#ae81ff">\&#34;</span><span style="color:#e6db74"> is opened for reading or writing&#34;</span>, DEVICE_NAME);
-</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">return</span> <span style="color:#ae81ff">0</span>;
-</span></span><span style="display:flex;"><span>}
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#75715e">// A user is reading from /dev/mymodule
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">ssize_t</span> <span style="color:#a6e22e">device_read</span>(<span style="color:#66d9ef">struct</span> file<span style="color:#f92672">*</span> filp, <span style="color:#66d9ef">char</span><span style="color:#f92672">*</span> buffer, <span style="color:#66d9ef">size_t</span> buffer_size, <span style="color:#66d9ef">loff_t</span><span style="color:#f92672">*</span> current_offset) {
-</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">printk</span>(KERN_INFO <span style="color:#e6db74">&#34;mymodule: A user is reading from </span><span style="color:#ae81ff">\&#34;</span><span style="color:#e6db74">/dev/%s</span><span style="color:#ae81ff">\&#34;</span><span style="color:#e6db74">, writing information...&#34;</span>, DEVICE_NAME);
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>	<span style="color:#75715e">// Convert the booleans to characters for all colors (red and green switched)
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>	<span style="color:#66d9ef">if</span>(pd_data_virtual_address<span style="color:#f92672">-&gt;</span>PD19_DATA) {
-</span></span><span style="display:flex;"><span>		virtual_device.data[<span style="color:#ae81ff">0</span>] <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;1&#39;</span>;
-</span></span><span style="display:flex;"><span>	} <span style="color:#66d9ef">else</span> {
-</span></span><span style="display:flex;"><span>		virtual_device.data[<span style="color:#ae81ff">0</span>] <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;0&#39;</span>;
-</span></span><span style="display:flex;"><span>	}
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">if</span>(pd_data_virtual_address<span style="color:#f92672">-&gt;</span>PD18_DATA) {
-</span></span><span style="display:flex;"><span>            virtual_device.data[<span style="color:#ae81ff">1</span>] <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;1&#39;</span>;
-</span></span><span style="display:flex;"><span>    } <span style="color:#66d9ef">else</span> {
-</span></span><span style="display:flex;"><span>            virtual_device.data[<span style="color:#ae81ff">1</span>] <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;0&#39;</span>;
-</span></span><span style="display:flex;"><span>    }
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span>(pd_data_virtual_address<span style="color:#f92672">-&gt;</span>PD20_DATA) {
-</span></span><span style="display:flex;"><span>            virtual_device.data[<span style="color:#ae81ff">2</span>] <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;1&#39;</span>;
-</span></span><span style="display:flex;"><span>    } <span style="color:#66d9ef">else</span> {
-</span></span><span style="display:flex;"><span>            virtual_device.data[<span style="color:#ae81ff">2</span>] <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;0&#39;</span>;
-</span></span><span style="display:flex;"><span>    }
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>	return_value <span style="color:#f92672">=</span> <span style="color:#a6e22e">copy_to_user</span>(buffer, virtual_device.data, buffer_size);
-</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">return</span> return_value;
-</span></span><span style="display:flex;"><span>}
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#75715e">// A user is writing to /dev/mymodule
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">ssize_t</span> <span style="color:#a6e22e">device_write</span>(<span style="color:#66d9ef">struct</span> file<span style="color:#f92672">*</span> filp, <span style="color:#66d9ef">const</span> <span style="color:#66d9ef">char</span><span style="color:#f92672">*</span> buffer, <span style="color:#66d9ef">size_t</span> buffer_size, <span style="color:#66d9ef">loff_t</span><span style="color:#f92672">*</span> current_offset) {
-</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">int</span> pos;
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>	<span style="color:#75715e">// Make sure the buffer is exactly 3 in length
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>	<span style="color:#66d9ef">if</span>(buffer_size <span style="color:#f92672">!=</span> <span style="color:#ae81ff">3</span>) {
-</span></span><span style="display:flex;"><span>		<span style="color:#66d9ef">return</span> <span style="color:#ae81ff">1</span>;
-</span></span><span style="display:flex;"><span>	}
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">printk</span>(KERN_INFO <span style="color:#e6db74">&#34;mymodule: A user is writing to </span><span style="color:#ae81ff">\&#34;</span><span style="color:#e6db74">/dev/%s</span><span style="color:#ae81ff">\&#34;</span><span style="color:#e6db74">, reading information...&#34;</span>, DEVICE_NAME);
-</span></span><span style="display:flex;"><span>	return_value <span style="color:#f92672">=</span> <span style="color:#a6e22e">copy_from_user</span>(virtual_device.data, buffer, buffer_size);
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>	<span style="color:#75715e">// Set color red
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">if</span>(virtual_device.data[<span style="color:#ae81ff">0</span>] <span style="color:#f92672">==</span> <span style="color:#e6db74">&#39;1&#39;</span>) {
-</span></span><span style="display:flex;"><span>        pd_data_virtual_address<span style="color:#f92672">-&gt;</span>PD19_DATA <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>;
-</span></span><span style="display:flex;"><span>    } <span style="color:#66d9ef">else</span> {
-</span></span><span style="display:flex;"><span>        pd_data_virtual_address<span style="color:#f92672">-&gt;</span>PD19_DATA <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
-</span></span><span style="display:flex;"><span>    }
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>	<span style="color:#75715e">// Set color green
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">if</span>(virtual_device.data[<span style="color:#ae81ff">1</span>] <span style="color:#f92672">==</span> <span style="color:#e6db74">&#39;1&#39;</span>) {
-</span></span><span style="display:flex;"><span>        pd_data_virtual_address<span style="color:#f92672">-&gt;</span>PD18_DATA <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>;
-</span></span><span style="display:flex;"><span>    } <span style="color:#66d9ef">else</span> {
-</span></span><span style="display:flex;"><span>        pd_data_virtual_address<span style="color:#f92672">-&gt;</span>PD18_DATA <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
-</span></span><span style="display:flex;"><span>    }
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>	<span style="color:#75715e">// Set color blue
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">if</span>(virtual_device.data[<span style="color:#ae81ff">2</span>] <span style="color:#f92672">==</span> <span style="color:#e6db74">&#39;1&#39;</span>) {
-</span></span><span style="display:flex;"><span>        pd_data_virtual_address<span style="color:#f92672">-&gt;</span>PD20_DATA <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>;
-</span></span><span style="display:flex;"><span>    } <span style="color:#66d9ef">else</span> {
-</span></span><span style="display:flex;"><span>        pd_data_virtual_address<span style="color:#f92672">-&gt;</span>PD20_DATA <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
-</span></span><span style="display:flex;"><span>    }
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Log for debugging purposes
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>	<span style="color:#66d9ef">for</span>(pos <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>; pos <span style="color:#f92672">&lt;</span> MAX_BUFFER_SIZE; pos<span style="color:#f92672">++</span>) {
-</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">printk</span>(KERN_INFO <span style="color:#e6db74">&#34;Setting POS = %d to value %c&#34;</span>, pos, virtual_device.data[pos]);
-</span></span><span style="display:flex;"><span>	}
-</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">return</span> return_value;
-</span></span><span style="display:flex;"><span>}
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#75715e">// A user is done with /dev/mymodule,
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e">// the file can be closed
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">int</span> <span style="color:#a6e22e">device_close</span>(<span style="color:#66d9ef">struct</span> inode<span style="color:#f92672">*</span> inode, <span style="color:#66d9ef">struct</span> file<span style="color:#f92672">*</span> filp) {
-</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">up</span>(<span style="color:#f92672">&amp;</span>virtual_device.sem);
-</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">printk</span>(KERN_INFO <span style="color:#e6db74">&#34;mymodule: closed device </span><span style="color:#ae81ff">\&#34;</span><span style="color:#e6db74">/dev/%s</span><span style="color:#ae81ff">\&#34;</span><span style="color:#e6db74">.&#34;</span>, DEVICE_NAME);
-</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">return</span> <span style="color:#ae81ff">0</span>;
-</span></span><span style="display:flex;"><span>}
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#75715e">// Place file operations callback structure here
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>FILE_OPERATIONS_CALLBACKS
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">static</span> <span style="color:#66d9ef">int</span> <span style="color:#a6e22e">mymodule_init</span>(<span style="color:#66d9ef">void</span>) {
-</span></span><span style="display:flex;"><span>	<span style="color:#75715e">// Ask for virtual addresses to control MMIO
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>	pd_cfg2_virtual_address <span style="color:#f92672">=</span> <span style="color:#a6e22e">ioremap</span>((<span style="color:#66d9ef">long</span> <span style="color:#66d9ef">long</span> <span style="color:#66d9ef">unsigned</span> <span style="color:#66d9ef">int</span>)PD_CFG2_REG_ADDRESS, <span style="color:#66d9ef">sizeof</span>(PD_CFG2_REG_t));
-</span></span><span style="display:flex;"><span>	pd_data_virtual_address <span style="color:#f92672">=</span> <span style="color:#a6e22e">ioremap</span>((<span style="color:#66d9ef">long</span> <span style="color:#66d9ef">long</span> <span style="color:#66d9ef">unsigned</span> <span style="color:#66d9ef">int</span>)PD_DATA_REG_ADDRESS, <span style="color:#66d9ef">sizeof</span>(PD_DATA_REG_t));
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>	<span style="color:#75715e">// Register the /dev/mymodule connection
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>	return_value <span style="color:#f92672">=</span> <span style="color:#a6e22e">alloc_chrdev_region</span>(<span style="color:#f92672">&amp;</span>dev_num, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">1</span>, DEVICE_NAME);
-</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">if</span>(return_value <span style="color:#f92672">&lt;</span> <span style="color:#ae81ff">0</span>) {
-</span></span><span style="display:flex;"><span>		<span style="color:#a6e22e">printk</span>(KERN_INFO <span style="color:#e6db74">&#34;mymodule: failed to allocate a major number. virtual device will NOT work!&#34;</span>);
-</span></span><span style="display:flex;"><span>		<span style="color:#66d9ef">return</span> return_value;
-</span></span><span style="display:flex;"><span>	}
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>	major_number <span style="color:#f92672">=</span> <span style="color:#a6e22e">MAJOR</span>(dev_num);
-</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">printk</span>(KERN_INFO <span style="color:#e6db74">&#34;mymodule: major number is %d&#34;</span>, major_number);
-</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">printk</span>(KERN_INFO <span style="color:#e6db74">&#34;use </span><span style="color:#ae81ff">\&#34;</span><span style="color:#e6db74">mknod /dev/%s c %d 0</span><span style="color:#ae81ff">\&#34;</span><span style="color:#e6db74"> to create a virtual device for this module.&#34;</span>, DEVICE_NAME, major_number);
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>	mcdev <span style="color:#f92672">=</span> <span style="color:#a6e22e">cdev_alloc</span>();
-</span></span><span style="display:flex;"><span>	mcdev<span style="color:#f92672">-&gt;</span>ops <span style="color:#f92672">=</span> <span style="color:#f92672">&amp;</span>fops;
-</span></span><span style="display:flex;"><span>	mcdev<span style="color:#f92672">-&gt;</span>owner <span style="color:#f92672">=</span> THIS_MODULE;
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>	return_value <span style="color:#f92672">=</span> <span style="color:#a6e22e">cdev_add</span>(mcdev, dev_num, <span style="color:#ae81ff">1</span>);
-</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">if</span>(return_value <span style="color:#f92672">&lt;</span> <span style="color:#ae81ff">0</span>) {
-</span></span><span style="display:flex;"><span>		<span style="color:#a6e22e">printk</span>(KERN_INFO <span style="color:#e6db74">&#34;mymodule: could not add cdev to kernel. virtual device will NOT work!&#34;</span>);
-</span></span><span style="display:flex;"><span>		<span style="color:#66d9ef">return</span> return_value;
-</span></span><span style="display:flex;"><span>	}
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">sema_init</span>(<span style="color:#f92672">&amp;</span>virtual_device.sem, <span style="color:#ae81ff">1</span>);
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">return</span> <span style="color:#ae81ff">0</span>;
-</span></span><span style="display:flex;"><span>}
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">mymodule_exit</span>(<span style="color:#66d9ef">void</span>) {
-</span></span><span style="display:flex;"><span>	<span style="color:#75715e">// Free the MMIO virtual addresses
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>	<span style="color:#a6e22e">iounmap</span>((<span style="color:#66d9ef">void</span><span style="color:#f92672">*</span>)pd_cfg2_virtual_address);
-</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">iounmap</span>((<span style="color:#66d9ef">void</span><span style="color:#f92672">*</span>)pd_data_virtual_address);
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>	<span style="color:#75715e">// Unregister the module
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>	<span style="color:#a6e22e">cdev_del</span>(mcdev);
-</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">unregister_chrdev_region</span>(dev_num, <span style="color:#ae81ff">1</span>);
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">printk</span>(KERN_INFO <span style="color:#e6db74">&#34;mymodule: module has exited. make sure to delete </span><span style="color:#ae81ff">\&#34;</span><span style="color:#e6db74">/dev/%s</span><span style="color:#ae81ff">\&#34;</span><span style="color:#e6db74">&#34;</span>, DEVICE_NAME);
-</span></span><span style="display:flex;"><span>}
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#a6e22e">module_init</span>(mymodule_init);
-</span></span><span style="display:flex;"><span><span style="color:#a6e22e">module_exit</span>(mymodule_exit);
-</span></span></code></pre></div><p>When this module is loaded in using</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>sudo insmod mymodule.ko
-</span></span></code></pre></div><p>it will log how to make a virtual device. After executing that command as superuser, a virtual device called <code>/dev/mymodule</code> will have been created.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;linux/module.h&gt;</span><span style="color:#75715e">
+</span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;linux/kernel.h&gt;</span><span style="color:#75715e">
+</span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;linux/fs.h&gt;</span><span style="color:#75715e">
+</span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;linux/cdev.h&gt;</span><span style="color:#75715e">
+</span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;linux/semaphore.h&gt;</span><span style="color:#75715e">
+</span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;asm/io.h&gt;</span><span style="color:#75715e">
+</span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;asm/uaccess.h&gt;</span><span style="color:#75715e">
+</span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;stdbool.h&gt;</span><span style="color:#75715e">
+</span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;stdbool.h&gt;</span><span style="color:#75715e">
+</span><span style="color:#75715e"></span>
+<span style="color:#75715e">#include</span> <span style="color:#75715e">&#34;mmio.h&#34;   // contains all the structs and addresses</span><span style="color:#75715e">
+</span><span style="color:#75715e"></span>
+<span style="color:#75715e">#define DEVICE_NAME &#34;mymodule&#34;
+</span><span style="color:#75715e">#define MAX_BUFFER_SIZE 3
+</span><span style="color:#75715e"></span>
+MODULE_DESCRIPTION(DEVICE_NAME);
+MODULE_AUTHOR(<span style="color:#e6db74">&#34;Tom Niesse&#34;</span>);
+MODULE_LICENSE(<span style="color:#e6db74">&#34;GPLv3&#34;</span>);
+
+<span style="color:#75715e">// Create variables that have to do with registering a cdev object
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">struct</span> cdev<span style="color:#f92672">*</span> mcdev;
+<span style="color:#66d9ef">int</span> major_number;
+<span style="color:#66d9ef">int</span> return_value;
+dev_t dev_num;
+
+<span style="color:#75715e">// Create a structure for a virtual device
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">struct</span> virtual_device {
+	<span style="color:#66d9ef">char</span> data[MAX_BUFFER_SIZE];
+	<span style="color:#66d9ef">struct</span> semaphore sem;
+} virtual_device;
+
+<span style="color:#75715e">// Create file operations structure using define because it&#39;s position
+</span><span style="color:#75715e">// in the module is a bit un-intuitive (in-between functions)
+</span><span style="color:#75715e"></span><span style="color:#75715e">#define FILE_OPERATIONS_CALLBACKS \
+</span><span style="color:#75715e">struct file_operations fops = {\
+</span><span style="color:#75715e">    .owner = THIS_MODULE,\
+</span><span style="color:#75715e">    .open = device_open,\
+</span><span style="color:#75715e">    .release = device_close,\
+</span><span style="color:#75715e">    .write = device_write,\
+</span><span style="color:#75715e">    .read = device_read\
+</span><span style="color:#75715e">};
+</span><span style="color:#75715e"></span>
+<span style="color:#75715e">// Create variables that have to do with MMIO
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">volatile</span> PD_CFG2_REG_t<span style="color:#f92672">*</span> pd_cfg2_virtual_address <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
+<span style="color:#66d9ef">volatile</span> PD_DATA_REG_t<span style="color:#f92672">*</span> pd_data_virtual_address <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
+
+<span style="color:#75715e">// A user wants to read to or write from /dev/mymodule
+</span><span style="color:#75715e">// and opens the file
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">int</span> <span style="color:#a6e22e">device_open</span>(<span style="color:#66d9ef">struct</span> inode <span style="color:#f92672">*</span> inode, <span style="color:#66d9ef">struct</span> file <span style="color:#f92672">*</span>filp) {
+	<span style="color:#66d9ef">if</span>(down_interruptible(<span style="color:#f92672">&amp;</span>virtual_device.sem) <span style="color:#f92672">!=</span> <span style="color:#ae81ff">0</span>) {
+		printk(KERN_INFO <span style="color:#e6db74">&#34;mymodule: could not lock device for reading or writing.&#34;</span>);
+		<span style="color:#66d9ef">return</span> <span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>;
+	}
+	printk(KERN_INFO <span style="color:#e6db74">&#34;mymodule: device </span><span style="color:#ae81ff">\&#34;</span><span style="color:#e6db74">/dev/%s</span><span style="color:#ae81ff">\&#34;</span><span style="color:#e6db74"> is opened for reading or writing&#34;</span>, DEVICE_NAME);
+	<span style="color:#66d9ef">return</span> <span style="color:#ae81ff">0</span>;
+}
+
+<span style="color:#75715e">// A user is reading from /dev/mymodule
+</span><span style="color:#75715e"></span>ssize_t <span style="color:#a6e22e">device_read</span>(<span style="color:#66d9ef">struct</span> file<span style="color:#f92672">*</span> filp, <span style="color:#66d9ef">char</span><span style="color:#f92672">*</span> buffer, size_t buffer_size, loff_t<span style="color:#f92672">*</span> current_offset) {
+	printk(KERN_INFO <span style="color:#e6db74">&#34;mymodule: A user is reading from </span><span style="color:#ae81ff">\&#34;</span><span style="color:#e6db74">/dev/%s</span><span style="color:#ae81ff">\&#34;</span><span style="color:#e6db74">, writing information...&#34;</span>, DEVICE_NAME);
+
+	<span style="color:#75715e">// Convert the booleans to characters for all colors (red and green switched)
+</span><span style="color:#75715e"></span>	<span style="color:#66d9ef">if</span>(pd_data_virtual_address<span style="color:#f92672">-&gt;</span>PD19_DATA) {
+		virtual_device.data[<span style="color:#ae81ff">0</span>] <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;1&#39;</span>;
+	} <span style="color:#66d9ef">else</span> {
+		virtual_device.data[<span style="color:#ae81ff">0</span>] <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;0&#39;</span>;
+	}
+
+	<span style="color:#66d9ef">if</span>(pd_data_virtual_address<span style="color:#f92672">-&gt;</span>PD18_DATA) {
+            virtual_device.data[<span style="color:#ae81ff">1</span>] <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;1&#39;</span>;
+    } <span style="color:#66d9ef">else</span> {
+            virtual_device.data[<span style="color:#ae81ff">1</span>] <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;0&#39;</span>;
+    }
+
+    <span style="color:#66d9ef">if</span>(pd_data_virtual_address<span style="color:#f92672">-&gt;</span>PD20_DATA) {
+            virtual_device.data[<span style="color:#ae81ff">2</span>] <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;1&#39;</span>;
+    } <span style="color:#66d9ef">else</span> {
+            virtual_device.data[<span style="color:#ae81ff">2</span>] <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;0&#39;</span>;
+    }
+
+	return_value <span style="color:#f92672">=</span> copy_to_user(buffer, virtual_device.data, buffer_size);
+	<span style="color:#66d9ef">return</span> return_value;
+}
+
+<span style="color:#75715e">// A user is writing to /dev/mymodule
+</span><span style="color:#75715e"></span>ssize_t <span style="color:#a6e22e">device_write</span>(<span style="color:#66d9ef">struct</span> file<span style="color:#f92672">*</span> filp, <span style="color:#66d9ef">const</span> <span style="color:#66d9ef">char</span><span style="color:#f92672">*</span> buffer, size_t buffer_size, loff_t<span style="color:#f92672">*</span> current_offset) {
+	<span style="color:#66d9ef">int</span> pos;
+
+	<span style="color:#75715e">// Make sure the buffer is exactly 3 in length
+</span><span style="color:#75715e"></span>	<span style="color:#66d9ef">if</span>(buffer_size <span style="color:#f92672">!=</span> <span style="color:#ae81ff">3</span>) {
+		<span style="color:#66d9ef">return</span> <span style="color:#ae81ff">1</span>;
+	}
+
+	printk(KERN_INFO <span style="color:#e6db74">&#34;mymodule: A user is writing to </span><span style="color:#ae81ff">\&#34;</span><span style="color:#e6db74">/dev/%s</span><span style="color:#ae81ff">\&#34;</span><span style="color:#e6db74">, reading information...&#34;</span>, DEVICE_NAME);
+	return_value <span style="color:#f92672">=</span> copy_from_user(virtual_device.data, buffer, buffer_size);
+
+	<span style="color:#75715e">// Set color red
+</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">if</span>(virtual_device.data[<span style="color:#ae81ff">0</span>] <span style="color:#f92672">==</span> <span style="color:#e6db74">&#39;1&#39;</span>) {
+        pd_data_virtual_address<span style="color:#f92672">-&gt;</span>PD19_DATA <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>;
+    } <span style="color:#66d9ef">else</span> {
+        pd_data_virtual_address<span style="color:#f92672">-&gt;</span>PD19_DATA <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
+    }
+
+	<span style="color:#75715e">// Set color green
+</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">if</span>(virtual_device.data[<span style="color:#ae81ff">1</span>] <span style="color:#f92672">==</span> <span style="color:#e6db74">&#39;1&#39;</span>) {
+        pd_data_virtual_address<span style="color:#f92672">-&gt;</span>PD18_DATA <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>;
+    } <span style="color:#66d9ef">else</span> {
+        pd_data_virtual_address<span style="color:#f92672">-&gt;</span>PD18_DATA <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
+    }
+
+	<span style="color:#75715e">// Set color blue
+</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">if</span>(virtual_device.data[<span style="color:#ae81ff">2</span>] <span style="color:#f92672">==</span> <span style="color:#e6db74">&#39;1&#39;</span>) {
+        pd_data_virtual_address<span style="color:#f92672">-&gt;</span>PD20_DATA <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>;
+    } <span style="color:#66d9ef">else</span> {
+        pd_data_virtual_address<span style="color:#f92672">-&gt;</span>PD20_DATA <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
+    }
+
+    <span style="color:#75715e">// Log for debugging purposes
+</span><span style="color:#75715e"></span>	<span style="color:#66d9ef">for</span>(pos <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>; pos <span style="color:#f92672">&lt;</span> MAX_BUFFER_SIZE; pos<span style="color:#f92672">++</span>) {
+        printk(KERN_INFO <span style="color:#e6db74">&#34;Setting POS = %d to value %c&#34;</span>, pos, virtual_device.data[pos]);
+	}
+	<span style="color:#66d9ef">return</span> return_value;
+}
+
+<span style="color:#75715e">// A user is done with /dev/mymodule,
+</span><span style="color:#75715e">// the file can be closed
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">int</span> <span style="color:#a6e22e">device_close</span>(<span style="color:#66d9ef">struct</span> inode<span style="color:#f92672">*</span> inode, <span style="color:#66d9ef">struct</span> file<span style="color:#f92672">*</span> filp) {
+	up(<span style="color:#f92672">&amp;</span>virtual_device.sem);
+	printk(KERN_INFO <span style="color:#e6db74">&#34;mymodule: closed device </span><span style="color:#ae81ff">\&#34;</span><span style="color:#e6db74">/dev/%s</span><span style="color:#ae81ff">\&#34;</span><span style="color:#e6db74">.&#34;</span>, DEVICE_NAME);
+	<span style="color:#66d9ef">return</span> <span style="color:#ae81ff">0</span>;
+}
+
+<span style="color:#75715e">// Place file operations callback structure here
+</span><span style="color:#75715e"></span>FILE_OPERATIONS_CALLBACKS
+
+<span style="color:#66d9ef">static</span> <span style="color:#66d9ef">int</span> <span style="color:#a6e22e">mymodule_init</span>(<span style="color:#66d9ef">void</span>) {
+	<span style="color:#75715e">// Ask for virtual addresses to control MMIO
+</span><span style="color:#75715e"></span>	pd_cfg2_virtual_address <span style="color:#f92672">=</span> ioremap((<span style="color:#66d9ef">long</span> <span style="color:#66d9ef">long</span> <span style="color:#66d9ef">unsigned</span> <span style="color:#66d9ef">int</span>)PD_CFG2_REG_ADDRESS, <span style="color:#66d9ef">sizeof</span>(PD_CFG2_REG_t));
+	pd_data_virtual_address <span style="color:#f92672">=</span> ioremap((<span style="color:#66d9ef">long</span> <span style="color:#66d9ef">long</span> <span style="color:#66d9ef">unsigned</span> <span style="color:#66d9ef">int</span>)PD_DATA_REG_ADDRESS, <span style="color:#66d9ef">sizeof</span>(PD_DATA_REG_t));
+
+	<span style="color:#75715e">// Register the /dev/mymodule connection
+</span><span style="color:#75715e"></span>	return_value <span style="color:#f92672">=</span> alloc_chrdev_region(<span style="color:#f92672">&amp;</span>dev_num, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">1</span>, DEVICE_NAME);
+	<span style="color:#66d9ef">if</span>(return_value <span style="color:#f92672">&lt;</span> <span style="color:#ae81ff">0</span>) {
+		printk(KERN_INFO <span style="color:#e6db74">&#34;mymodule: failed to allocate a major number. virtual device will NOT work!&#34;</span>);
+		<span style="color:#66d9ef">return</span> return_value;
+	}
+
+	major_number <span style="color:#f92672">=</span> MAJOR(dev_num);
+	printk(KERN_INFO <span style="color:#e6db74">&#34;mymodule: major number is %d&#34;</span>, major_number);
+	printk(KERN_INFO <span style="color:#e6db74">&#34;use </span><span style="color:#ae81ff">\&#34;</span><span style="color:#e6db74">mknod /dev/%s c %d 0</span><span style="color:#ae81ff">\&#34;</span><span style="color:#e6db74"> to create a virtual device for this module.&#34;</span>, DEVICE_NAME, major_number);
+
+	mcdev <span style="color:#f92672">=</span> cdev_alloc();
+	mcdev<span style="color:#f92672">-&gt;</span>ops <span style="color:#f92672">=</span> <span style="color:#f92672">&amp;</span>fops;
+	mcdev<span style="color:#f92672">-&gt;</span>owner <span style="color:#f92672">=</span> THIS_MODULE;
+
+	return_value <span style="color:#f92672">=</span> cdev_add(mcdev, dev_num, <span style="color:#ae81ff">1</span>);
+	<span style="color:#66d9ef">if</span>(return_value <span style="color:#f92672">&lt;</span> <span style="color:#ae81ff">0</span>) {
+		printk(KERN_INFO <span style="color:#e6db74">&#34;mymodule: could not add cdev to kernel. virtual device will NOT work!&#34;</span>);
+		<span style="color:#66d9ef">return</span> return_value;
+	}
+
+	sema_init(<span style="color:#f92672">&amp;</span>virtual_device.sem, <span style="color:#ae81ff">1</span>);
+
+	<span style="color:#66d9ef">return</span> <span style="color:#ae81ff">0</span>;
+}
+
+<span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">mymodule_exit</span>(<span style="color:#66d9ef">void</span>) {
+	<span style="color:#75715e">// Free the MMIO virtual addresses
+</span><span style="color:#75715e"></span>	iounmap((<span style="color:#66d9ef">void</span><span style="color:#f92672">*</span>)pd_cfg2_virtual_address);
+	iounmap((<span style="color:#66d9ef">void</span><span style="color:#f92672">*</span>)pd_data_virtual_address);
+
+	<span style="color:#75715e">// Unregister the module
+</span><span style="color:#75715e"></span>	cdev_del(mcdev);
+	unregister_chrdev_region(dev_num, <span style="color:#ae81ff">1</span>);
+
+	printk(KERN_INFO <span style="color:#e6db74">&#34;mymodule: module has exited. make sure to delete </span><span style="color:#ae81ff">\&#34;</span><span style="color:#e6db74">/dev/%s</span><span style="color:#ae81ff">\&#34;</span><span style="color:#e6db74">&#34;</span>, DEVICE_NAME);
+}
+
+module_init(mymodule_init);
+module_exit(mymodule_exit);
+</code></pre></div><p>When this module is loaded in using</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">sudo insmod mymodule.ko
+</code></pre></div><p>it will log how to make a virtual device. After executing that command as superuser, a virtual device called <code>/dev/mymodule</code> will have been created.</p>
 <h1 id="communicating-with-the-kernel-module">Communicating with the kernel module</h1>
 <p>Communication can be done using a C or C++ program that runs in userland (as superuser):</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#75715e">// main.c
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
-</span></span><span style="display:flex;"><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;stdio.h&gt;</span><span style="color:#75715e">
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;fcntl.h&gt;</span><span style="color:#75715e">
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;unistd.h&gt;</span><span style="color:#75715e">
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
-</span></span><span style="display:flex;"><span><span style="color:#75715e">#define MAX_BUFFER_SIZE 3
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e">#define DEVICE          &#34;/dev/mymodule&#34;
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">char</span> buffer[MAX_BUFFER_SIZE];
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">int</span> <span style="color:#a6e22e">main</span>() {
-</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Perform a read operation
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">int</span> fd <span style="color:#f92672">=</span> <span style="color:#a6e22e">open</span>(DEVICE, O_RDWR);
-</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">read</span>(fd, this<span style="color:#f92672">-&gt;</span>buffer, MAX_BUFFER_SIZE);
-</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">close</span>(fd);
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Perform a write operation
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">int</span> fd <span style="color:#f92672">=</span> <span style="color:#a6e22e">open</span>(DEVICE, O_RDWR);
-</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">write</span>(fd, this<span style="color:#f92672">-&gt;</span>buffer, MAX_BUFFER_SIZE);
-</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">close</span>(fd);
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">0</span>;
-</span></span><span style="display:flex;"><span>}
-</span></span></code></pre></div><h1 id="controlling-other-peripherals">Controlling other peripherals</h1>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#75715e">// main.c
+</span><span style="color:#75715e"></span>
+<span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;stdio.h&gt;</span><span style="color:#75715e">
+</span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;fcntl.h&gt;</span><span style="color:#75715e">
+</span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;unistd.h&gt;</span><span style="color:#75715e">
+</span><span style="color:#75715e"></span>
+<span style="color:#75715e">#define MAX_BUFFER_SIZE 3
+</span><span style="color:#75715e">#define DEVICE          &#34;/dev/mymodule&#34;
+</span><span style="color:#75715e"></span>
+<span style="color:#66d9ef">char</span> buffer[MAX_BUFFER_SIZE];
+
+<span style="color:#66d9ef">int</span> <span style="color:#a6e22e">main</span>() {
+    <span style="color:#75715e">// Perform a read operation
+</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">int</span> fd <span style="color:#f92672">=</span> open(DEVICE, O_RDWR);
+    read(fd, this<span style="color:#f92672">-&gt;</span>buffer, MAX_BUFFER_SIZE);
+    close(fd);
+
+    <span style="color:#75715e">// Perform a write operation
+</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">int</span> fd <span style="color:#f92672">=</span> open(DEVICE, O_RDWR);
+    write(fd, this<span style="color:#f92672">-&gt;</span>buffer, MAX_BUFFER_SIZE);
+    close(fd);
+
+    <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">0</span>;
+}
+</code></pre></div><h1 id="controlling-other-peripherals">Controlling other peripherals</h1>
 <p>The built-in motor, which makes the phone vibrate when a message arrives, is also directly controlled by a MMIO register of the A64 SoC. Another kernel module can be written to enable, disable and control that motor.</p>
 
       </div>
@@ -615,7 +616,7 @@ Using the user manual of the phone&rsquo;s processor (Allwinner A64), a kernel m
           <line x1="16" y1="17" x2="8" y2="17"></line>
           <polyline points="10 9 9 9 8 9"></polyline>
         </svg>
-        2230 Words
+        2217 Words
       </p>
 
       <p>
@@ -773,7 +774,7 @@ Using the user manual of the phone&rsquo;s processor (Allwinner A64), a kernel m
 
 
 
-<script type="text/javascript" src="/bundle.min.205d491810c28f95aa953fae884e1c27abe13fdf93ec63b882d0036b248d4a6282eb2d134e4e7225c6ad6e86db87b08488a361ca4a7383d01fcff43f3d57b9c3.js" integrity="sha512-IF1JGBDCj5WqlT&#43;uiE4cJ6vhP9&#43;T7GO4gtADaySNSmKC6y0TTk5yJcatbobbh7CEiKNhykpzg9Afz/Q/PVe5ww=="></script>
+<script type="text/javascript" src="/bundle.min.644292943ae47eef02fcd64b11757aeb8caeeaebf473a823b62099edccac808e8d82689359f285e5d95994e5ad5ae3b9c1ccc281eb1828e67d0ba6630f95b832.js" integrity="sha512-ZEKSlDrkfu8C/NZLEXV664yu6uv0c6gjtiCZ7cysgI6NgmiTWfKF5dlZlOWtWuO5wczCgesYKOZ9C6ZjD5W4Mg=="></script>
 
 
 

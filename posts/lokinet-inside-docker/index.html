@@ -38,7 +38,7 @@
 <meta itemprop="name" content="Hosting a lokinet SNApp from inside a docker container">
 <meta itemprop="description" content="What is lokinet? Like the tor project, lokinet is a decentralized onion router that routes (all) traffic through multiple other servers. The nice thing about it is, that it runs on a lower network layer than tor. This makes lokinet able to route traffic using any network protocol, instead of sending everything over TCP. A good example of this is SSH. If a lokinet server is hosting an SSH or VPN service, it can be accessed without the need for port forwarding."><meta itemprop="datePublished" content="2023-04-28T13:28:55+02:00" />
 <meta itemprop="dateModified" content="2023-04-28T13:28:55+02:00" />
-<meta itemprop="wordCount" content="592"><meta itemprop="image" content="https://tomniesse.github.io/"/>
+<meta itemprop="wordCount" content="565"><meta itemprop="image" content="https://tomniesse.github.io/"/>
 <meta itemprop="keywords" content="untagged," />
 <meta name="twitter:card" content="summary_large_image"/>
 <meta name="twitter:image" content="https://tomniesse.github.io/"/>
@@ -54,6 +54,7 @@
 <meta property="og:url" content="https://tomniesse.github.io/posts/lokinet-inside-docker/" /><meta property="og:image" content="https://tomniesse.github.io/"/><meta property="article:section" content="posts" />
 <meta property="article:published_time" content="2023-04-28T13:28:55+02:00" />
 <meta property="article:modified_time" content="2023-04-28T13:28:55+02:00" /><meta property="og:site_name" content="Welcome!" />
+
 
 
 
@@ -153,77 +154,77 @@
 <h1 id="building-a-lokinet-server-container">Building a lokinet server container</h1>
 <p>Below is a <code>Dockerfile</code> that creates a container with lokinet inside.<br>
 The goal of this container is to provide a lokinet service with a permanent <code>.loki</code> address.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-Dockerfile" data-lang="Dockerfile"><span style="display:flex;"><span><span style="color:#66d9ef">FROM</span><span style="color:#e6db74"> ubuntu:latest</span><span style="color:#960050;background-color:#1e0010">
-</span></span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">RUN</span> apt update<span style="color:#960050;background-color:#1e0010">
-</span></span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">RUN</span> apt upgrade<span style="color:#960050;background-color:#1e0010">
-</span></span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">RUN</span> echo <span style="color:#e6db74">&#34;resolvconf resolvconf/linkify-resolvconf boolean false&#34;</span> | debconf-set-selections<span style="color:#960050;background-color:#1e0010">
-</span></span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">RUN</span> apt install curl lsb-release resolvconf dnsutils --yes<span style="color:#960050;background-color:#1e0010">
-</span></span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">RUN</span> curl -so /etc/apt/trusted.gpg.d/oxen.gpg https://deb.oxen.io/pub.gpg<span style="color:#960050;background-color:#1e0010">
-</span></span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">RUN</span> echo <span style="color:#e6db74">&#34;deb https://deb.oxen.io `lsb_release -sc` main&#34;</span> &gt; /etc/apt/sources.list.d/oxen.list<span style="color:#960050;background-color:#1e0010">
-</span></span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">RUN</span> apt update<span style="color:#960050;background-color:#1e0010">
-</span></span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">RUN</span> apt install lokinet --yes<span style="color:#960050;background-color:#1e0010">
-</span></span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">RUN</span> chown _lokinet:_loki /etc/loki -R<span style="color:#960050;background-color:#1e0010">
-</span></span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">RUN</span> /usr/bin/lokinet -g<span style="color:#960050;background-color:#1e0010">
-</span></span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">RUN</span> lokinet-bootstrap<span style="color:#960050;background-color:#1e0010">
-</span></span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">RUN</span> chown _lokinet:_loki /etc/loki -R<span style="color:#960050;background-color:#1e0010">
-</span></span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">RUN</span> echo <span style="color:#e6db74">&#34;#!/bin/bash&#34;</span> &gt; /get_loki_address.sh<span style="color:#960050;background-color:#1e0010">
-</span></span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">RUN</span> echo <span style="color:#e6db74">&#34;host -t cname localhost.loki 127.3.2.1&#34;</span> &gt;&gt; /get_loki_address.sh<span style="color:#960050;background-color:#1e0010">
-</span></span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">RUN</span> chmod +x /get_loki_address.sh<span style="color:#960050;background-color:#1e0010">
-</span></span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">RUN</span> cp /etc/loki/lokinet.ini /<span style="color:#960050;background-color:#1e0010">
-</span></span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">RUN</span> echo <span style="color:#e6db74">&#34;#!/bin/bash&#34;</span> &gt; /start.sh<span style="color:#960050;background-color:#1e0010">
-</span></span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">RUN</span> echo <span style="color:#e6db74">&#34;cp -n /lokinet.ini /etc/loki/&#34;</span> &gt;&gt; /start.sh<span style="color:#960050;background-color:#1e0010">
-</span></span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">RUN</span> echo <span style="color:#e6db74">&#34;cp -n /lokinet.ini /var/lib/lokinet/&#34;</span> &gt;&gt; /start.sh<span style="color:#960050;background-color:#1e0010">
-</span></span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">RUN</span> echo <span style="color:#e6db74">&#34;/usr/bin/lokinet -g&#34;</span> &gt;&gt; /start.sh<span style="color:#960050;background-color:#1e0010">
-</span></span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">RUN</span> echo <span style="color:#e6db74">&#34;sed -ie &#39;s|#keyfile=|keyfile=/var/lib/lokinet/snappkey.private|g&#39; /etc/loki/lokinet.ini&#34;</span> &gt;&gt; /start.sh<span style="color:#960050;background-color:#1e0010">
-</span></span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">RUN</span> echo <span style="color:#e6db74">&#34;sed -ie &#39;s|#keyfile=|keyfile=/var/lib/lokinet/snappkey.private|g&#39; /var/lib/lokinet/lokinet.ini&#34;</span> &gt;&gt; /start.sh<span style="color:#960050;background-color:#1e0010">
-</span></span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">RUN</span> echo <span style="color:#e6db74">&#34;/usr/bin/lokinet&#34;</span> &gt;&gt; /start.sh<span style="color:#960050;background-color:#1e0010">
-</span></span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">RUN</span> chmod +x /start.sh<span style="color:#960050;background-color:#1e0010">
-</span></span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">ENTRYPOINT</span> [<span style="color:#e6db74">&#34;/start.sh&#34;</span>]<span style="color:#960050;background-color:#1e0010">
-</span></span></span></code></pre></div><h1 id="configuring-docker-compose">Configuring docker-compose</h1>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-Dockerfile" data-lang="Dockerfile"><span style="color:#66d9ef">FROM</span><span style="color:#e6db74"> ubuntu:latest</span><span style="color:#960050;background-color:#1e0010">
+</span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">RUN</span> apt update<span style="color:#960050;background-color:#1e0010">
+</span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">RUN</span> apt upgrade<span style="color:#960050;background-color:#1e0010">
+</span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">RUN</span> echo <span style="color:#e6db74">&#34;resolvconf resolvconf/linkify-resolvconf boolean false&#34;</span> | debconf-set-selections<span style="color:#960050;background-color:#1e0010">
+</span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">RUN</span> apt install curl lsb-release resolvconf dnsutils --yes<span style="color:#960050;background-color:#1e0010">
+</span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">RUN</span> curl -so /etc/apt/trusted.gpg.d/oxen.gpg https://deb.oxen.io/pub.gpg<span style="color:#960050;background-color:#1e0010">
+</span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">RUN</span> echo <span style="color:#e6db74">&#34;deb https://deb.oxen.io `lsb_release -sc` main&#34;</span> &gt; /etc/apt/sources.list.d/oxen.list<span style="color:#960050;background-color:#1e0010">
+</span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">RUN</span> apt update<span style="color:#960050;background-color:#1e0010">
+</span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">RUN</span> apt install lokinet --yes<span style="color:#960050;background-color:#1e0010">
+</span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">RUN</span> chown _lokinet:_loki /etc/loki -R<span style="color:#960050;background-color:#1e0010">
+</span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">RUN</span> /usr/bin/lokinet -g<span style="color:#960050;background-color:#1e0010">
+</span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">RUN</span> lokinet-bootstrap<span style="color:#960050;background-color:#1e0010">
+</span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">RUN</span> chown _lokinet:_loki /etc/loki -R<span style="color:#960050;background-color:#1e0010">
+</span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">RUN</span> echo <span style="color:#e6db74">&#34;#!/bin/bash&#34;</span> &gt; /get_loki_address.sh<span style="color:#960050;background-color:#1e0010">
+</span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">RUN</span> echo <span style="color:#e6db74">&#34;host -t cname localhost.loki 127.3.2.1&#34;</span> &gt;&gt; /get_loki_address.sh<span style="color:#960050;background-color:#1e0010">
+</span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">RUN</span> chmod +x /get_loki_address.sh<span style="color:#960050;background-color:#1e0010">
+</span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">RUN</span> cp /etc/loki/lokinet.ini /<span style="color:#960050;background-color:#1e0010">
+</span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">RUN</span> echo <span style="color:#e6db74">&#34;#!/bin/bash&#34;</span> &gt; /start.sh<span style="color:#960050;background-color:#1e0010">
+</span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">RUN</span> echo <span style="color:#e6db74">&#34;cp -n /lokinet.ini /etc/loki/&#34;</span> &gt;&gt; /start.sh<span style="color:#960050;background-color:#1e0010">
+</span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">RUN</span> echo <span style="color:#e6db74">&#34;cp -n /lokinet.ini /var/lib/lokinet/&#34;</span> &gt;&gt; /start.sh<span style="color:#960050;background-color:#1e0010">
+</span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">RUN</span> echo <span style="color:#e6db74">&#34;/usr/bin/lokinet -g&#34;</span> &gt;&gt; /start.sh<span style="color:#960050;background-color:#1e0010">
+</span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">RUN</span> echo <span style="color:#e6db74">&#34;sed -ie &#39;s|#keyfile=|keyfile=/var/lib/lokinet/snappkey.private|g&#39; /etc/loki/lokinet.ini&#34;</span> &gt;&gt; /start.sh<span style="color:#960050;background-color:#1e0010">
+</span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">RUN</span> echo <span style="color:#e6db74">&#34;sed -ie &#39;s|#keyfile=|keyfile=/var/lib/lokinet/snappkey.private|g&#39; /var/lib/lokinet/lokinet.ini&#34;</span> &gt;&gt; /start.sh<span style="color:#960050;background-color:#1e0010">
+</span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">RUN</span> echo <span style="color:#e6db74">&#34;/usr/bin/lokinet&#34;</span> &gt;&gt; /start.sh<span style="color:#960050;background-color:#1e0010">
+</span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">RUN</span> chmod +x /start.sh<span style="color:#960050;background-color:#1e0010">
+</span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">ENTRYPOINT</span> [<span style="color:#e6db74">&#34;/start.sh&#34;</span>]<span style="color:#960050;background-color:#1e0010">
+</span></code></pre></div><h1 id="configuring-docker-compose">Configuring docker-compose</h1>
 <p>Below is a <code>docker-compose.yml</code> file that configures 3 services:</p>
 <ul>
 <li><code>lokinet</code>: Using the above <code>Dockerfile</code>, a lokinet service will allow access to the <code>.loki</code> address.</li>
 <li><code>tiredofit/nginx-php-fpm</code>: to run a webserver, which can host a simple website.</li>
 <li><code>containrrr/watchtower</code>: to automatically keep all containers up to date.</li>
 </ul>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yml" data-lang="yml"><span style="display:flex;"><span><span style="color:#f92672">version</span>: <span style="color:#e6db74">&#34;3.3&#34;</span>
-</span></span><span style="display:flex;"><span><span style="color:#f92672">services</span>:
-</span></span><span style="display:flex;"><span>  <span style="color:#f92672">lokinet</span>:
-</span></span><span style="display:flex;"><span>    <span style="color:#f92672">build</span>: <span style="color:#ae81ff">lokinet</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#f92672">restart</span>: <span style="color:#ae81ff">always</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#f92672">privileged</span>: <span style="color:#66d9ef">true</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#f92672">tty</span>: <span style="color:#66d9ef">true</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#f92672">network_mode</span>: <span style="color:#ae81ff">host</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#f92672">tmpfs</span>:
-</span></span><span style="display:flex;"><span>      - <span style="color:#ae81ff">/run</span>
-</span></span><span style="display:flex;"><span>      - <span style="color:#ae81ff">/tmp</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#f92672">volumes</span>:
-</span></span><span style="display:flex;"><span>      - <span style="color:#e6db74">&#34;./lokinet/var_lib_lokinet:/var/lib/lokinet&#34;</span>
-</span></span><span style="display:flex;"><span>      - <span style="color:#e6db74">&#34;./lokinet/etc_loki:/etc/loki&#34;</span>
-</span></span><span style="display:flex;"><span>  <span style="color:#f92672">php-nginx</span>:
-</span></span><span style="display:flex;"><span>    <span style="color:#f92672">container_name</span>: <span style="color:#ae81ff">php-nginx</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#f92672">image</span>: <span style="color:#ae81ff">tiredofit/nginx-php-fpm</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#f92672">restart</span>: <span style="color:#ae81ff">always</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#f92672">ports</span>:
-</span></span><span style="display:flex;"><span>      - <span style="color:#e6db74">&#34;80:80&#34;</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#f92672">volumes</span>:
-</span></span><span style="display:flex;"><span>      - <span style="color:#e6db74">&#34;./webroot:/www/html&#34;</span>
-</span></span><span style="display:flex;"><span>  <span style="color:#f92672">watchtower</span>:
-</span></span><span style="display:flex;"><span>    <span style="color:#f92672">image</span>: <span style="color:#ae81ff">containrrr/watchtower</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#f92672">container_name</span>: <span style="color:#ae81ff">watchtower</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#f92672">restart</span>: <span style="color:#ae81ff">always</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#f92672">volumes</span>:
-</span></span><span style="display:flex;"><span>      - <span style="color:#ae81ff">/var/run/docker.sock:/var/run/docker.sock</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#f92672">command</span>: <span style="color:#ae81ff">lokinet php-nginx</span>
-</span></span></code></pre></div><p>In the <code>docker-compose.yml</code> file, the <code>network_mode</code> for the lokinet container is set to <code>host</code>. This will cause lokinet to have direct access to the host OS&rsquo;s network. Now lokinet can talk to all other containers, as if it was running directly on the host OS.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yml" data-lang="yml"><span style="color:#f92672">version</span>: <span style="color:#e6db74">&#34;3.3&#34;</span>
+<span style="color:#f92672">services</span>:
+  <span style="color:#f92672">lokinet</span>:
+    <span style="color:#f92672">build</span>: <span style="color:#ae81ff">lokinet</span>
+    <span style="color:#f92672">restart</span>: <span style="color:#ae81ff">always</span>
+    <span style="color:#f92672">privileged</span>: <span style="color:#66d9ef">true</span>
+    <span style="color:#f92672">tty</span>: <span style="color:#66d9ef">true</span>
+    <span style="color:#f92672">network_mode</span>: <span style="color:#ae81ff">host</span>
+    <span style="color:#f92672">tmpfs</span>:
+      - <span style="color:#ae81ff">/run</span>
+      - <span style="color:#ae81ff">/tmp</span>
+    <span style="color:#f92672">volumes</span>:
+      - <span style="color:#e6db74">&#34;./lokinet/var_lib_lokinet:/var/lib/lokinet&#34;</span>
+      - <span style="color:#e6db74">&#34;./lokinet/etc_loki:/etc/loki&#34;</span>
+  <span style="color:#f92672">php-nginx</span>:
+    <span style="color:#f92672">container_name</span>: <span style="color:#ae81ff">php-nginx</span>
+    <span style="color:#f92672">image</span>: <span style="color:#ae81ff">tiredofit/nginx-php-fpm</span>
+    <span style="color:#f92672">restart</span>: <span style="color:#ae81ff">always</span>
+    <span style="color:#f92672">ports</span>:
+      - <span style="color:#e6db74">&#34;80:80&#34;</span>
+    <span style="color:#f92672">volumes</span>:
+      - <span style="color:#e6db74">&#34;./webroot:/www/html&#34;</span>
+  <span style="color:#f92672">watchtower</span>:
+    <span style="color:#f92672">image</span>: <span style="color:#ae81ff">containrrr/watchtower</span>
+    <span style="color:#f92672">container_name</span>: <span style="color:#ae81ff">watchtower</span>
+    <span style="color:#f92672">restart</span>: <span style="color:#ae81ff">always</span>
+    <span style="color:#f92672">volumes</span>:
+      - <span style="color:#ae81ff">/var/run/docker.sock:/var/run/docker.sock</span>
+    <span style="color:#f92672">command</span>: <span style="color:#ae81ff">lokinet php-nginx</span>
+</code></pre></div><p>In the <code>docker-compose.yml</code> file, the <code>network_mode</code> for the lokinet container is set to <code>host</code>. This will cause lokinet to have direct access to the host OS&rsquo;s network. Now lokinet can talk to all other containers, as if it was running directly on the host OS.</p>
 <h1 id="running-the-containers">Running the containers</h1>
 <p>When running the command <code>docker-compose up --build</code>, all the configured containers will start running.</p>
 <h1 id="getting-the-loki-address">Getting the loki address</h1>
 <p>The <code>lokinet</code> container contains a script that can give the current <code>.loki</code> address. First, access the container using the following command:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>docker exec -it &lt;container id&gt; /bin/bash
-</span></span></code></pre></div><p>Then, from inside the container, execute the script:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>/get_loki_address.sh
-</span></span></code></pre></div><p>Now the <code>.loki</code> address will be shown. If a client connects to this <code>.loki</code> address, the website will be shown.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">docker exec -it &lt;container id&gt; /bin/bash
+</code></pre></div><p>Then, from inside the container, execute the script:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh">/get_loki_address.sh
+</code></pre></div><p>Now the <code>.loki</code> address will be shown. If a client connects to this <code>.loki</code> address, the website will be shown.</p>
 <h1 id="debugging">Debugging</h1>
 <p>If the <code>.loki</code> address cannot be reached after a few minutes, try removing the <code>./lokinet/var_lib_lokinet/nodedb</code> directory and the <code>./lokinet/var_lib_lokinet/profiles.dat</code> and restart the container(s).</p>
 <h1 id="conclusion">Conclusion</h1>
@@ -253,7 +254,7 @@ The goal of this container is to provide a lokinet service with a permanent <cod
           <line x1="16" y1="17" x2="8" y2="17"></line>
           <polyline points="10 9 9 9 8 9"></polyline>
         </svg>
-        592 Words
+        565 Words
       </p>
 
       <p>
@@ -411,7 +412,7 @@ The goal of this container is to provide a lokinet service with a permanent <cod
 
 
 
-<script type="text/javascript" src="/bundle.min.205d491810c28f95aa953fae884e1c27abe13fdf93ec63b882d0036b248d4a6282eb2d134e4e7225c6ad6e86db87b08488a361ca4a7383d01fcff43f3d57b9c3.js" integrity="sha512-IF1JGBDCj5WqlT&#43;uiE4cJ6vhP9&#43;T7GO4gtADaySNSmKC6y0TTk5yJcatbobbh7CEiKNhykpzg9Afz/Q/PVe5ww=="></script>
+<script type="text/javascript" src="/bundle.min.644292943ae47eef02fcd64b11757aeb8caeeaebf473a823b62099edccac808e8d82689359f285e5d95994e5ad5ae3b9c1ccc281eb1828e67d0ba6630f95b832.js" integrity="sha512-ZEKSlDrkfu8C/NZLEXV664yu6uv0c6gjtiCZ7cysgI6NgmiTWfKF5dlZlOWtWuO5wczCgesYKOZ9C6ZjD5W4Mg=="></script>
 
 
 

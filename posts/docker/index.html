@@ -38,7 +38,7 @@
 <meta itemprop="name" content="Introduction to docker(-compose)">
 <meta itemprop="description" content="What is Docker? Docker is software that allows other programs and OS&rsquo;es to run inside a container. There are other virtualization programs that can do the same (VMWare, VirtualBox, QEMU, etc.), but Docker allows building a container using a script. This script is called a Dockerfile. In addition to this, the package docker-compose allows running multiple dockerfiles at once. This way, multiple containers can run simultaneously and work together to get a certain task done."><meta itemprop="datePublished" content="2021-12-05T13:28:55+02:00" />
 <meta itemprop="dateModified" content="2021-12-05T13:28:55+02:00" />
-<meta itemprop="wordCount" content="1446"><meta itemprop="image" content="https://tomniesse.github.io/"/>
+<meta itemprop="wordCount" content="1427"><meta itemprop="image" content="https://tomniesse.github.io/"/>
 <meta itemprop="keywords" content="untagged," />
 <meta name="twitter:card" content="summary_large_image"/>
 <meta name="twitter:image" content="https://tomniesse.github.io/"/>
@@ -54,6 +54,7 @@
 <meta property="og:url" content="https://tomniesse.github.io/posts/docker/" /><meta property="og:image" content="https://tomniesse.github.io/"/><meta property="article:section" content="posts" />
 <meta property="article:published_time" content="2021-12-05T13:28:55+02:00" />
 <meta property="article:modified_time" content="2021-12-05T13:28:55+02:00" /><meta property="og:site_name" content="Welcome!" />
+
 
 
 
@@ -150,108 +151,108 @@
 <p>A Dockerfile is a configuration script for any given container. The Dockerfile contains all the commands needed to configure an entire container (virtual machine). This chapter explains how a Dockerfile is made. All commands one would normally insert into a system are now stored in a Dockerfile.</p>
 <h2 id="the-syntax">The syntax</h2>
 <p>Dockerfiles have the following syntax (where everything including and between the <code>&lt;</code> and <code>&gt;</code> is to be replaced):</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-Dockerfile" data-lang="Dockerfile"><span style="display:flex;"><span><span style="color:#75715e"># this is a comment</span><span style="color:#960050;background-color:#1e0010">
-</span></span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">FROM</span><span style="color:#e6db74"> &lt;existing container&gt;      # use someone else&#39;s already existing container to get started more quickly</span><span style="color:#960050;background-color:#1e0010">
-</span></span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">
-</span></span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">RUN</span> &lt;command&gt;                  <span style="color:#75715e"># run a command inside the container (configure phase)</span><span style="color:#960050;background-color:#1e0010">
-</span></span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">
-</span></span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#75715e"># when the container starts, run the following command, where the two dashes (--) allow arguments from the host</span><span style="color:#960050;background-color:#1e0010">
-</span></span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">ENTRYPOINT</span> [<span style="color:#e6db74">&#34;&lt;/path/to/binary&gt;&#34;</span>, <span style="color:#960050;background-color:#1e0010">&lt;optional</span> <span style="color:#960050;background-color:#1e0010">argument</span> <span style="color:#ae81ff">1</span><span style="color:#960050;background-color:#1e0010">&gt;</span>, <span style="color:#960050;background-color:#1e0010">--</span>, <span style="color:#960050;background-color:#1e0010">&lt;optional</span> <span style="color:#960050;background-color:#1e0010">argument</span> <span style="color:#ae81ff">3</span><span style="color:#960050;background-color:#1e0010">&gt;</span>, <span style="color:#960050;background-color:#1e0010">...</span>]<span style="color:#960050;background-color:#1e0010">
-</span></span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">
-</span></span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#75715e"># when the container starts, run the following command (in case no arguments were given, this is the default)</span><span style="color:#960050;background-color:#1e0010">
-</span></span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">CMD</span> [<span style="color:#e6db74">&#34;&lt;/path/to/binary&gt;&#34;</span>, <span style="color:#960050;background-color:#1e0010">&lt;optional</span> <span style="color:#960050;background-color:#1e0010">argument</span> <span style="color:#ae81ff">1</span><span style="color:#960050;background-color:#1e0010">&gt;</span>, <span style="color:#960050;background-color:#1e0010">&lt;optional</span> <span style="color:#960050;background-color:#1e0010">argument</span> <span style="color:#ae81ff">2</span><span style="color:#960050;background-color:#1e0010">&gt;</span>]<span style="color:#960050;background-color:#1e0010">
-</span></span></span></code></pre></div><h2 id="a-real-world-example">A real world example</h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-Dockerfile" data-lang="Dockerfile"><span style="color:#75715e"># this is a comment</span><span style="color:#960050;background-color:#1e0010">
+</span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">FROM</span><span style="color:#e6db74"> &lt;existing container&gt;      # use someone else&#39;s already existing container to get started more quickly</span><span style="color:#960050;background-color:#1e0010">
+</span><span style="color:#960050;background-color:#1e0010">
+</span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">RUN</span> &lt;command&gt;                  <span style="color:#75715e"># run a command inside the container (configure phase)</span><span style="color:#960050;background-color:#1e0010">
+</span><span style="color:#960050;background-color:#1e0010">
+</span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#75715e"># when the container starts, run the following command, where the two dashes (--) allow arguments from the host</span><span style="color:#960050;background-color:#1e0010">
+</span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">ENTRYPOINT</span> [<span style="color:#e6db74">&#34;&lt;/path/to/binary&gt;&#34;</span>, <span style="color:#960050;background-color:#1e0010">&lt;optional</span> <span style="color:#960050;background-color:#1e0010">argument</span> <span style="color:#ae81ff">1</span><span style="color:#960050;background-color:#1e0010">&gt;</span>, <span style="color:#960050;background-color:#1e0010">--</span>, <span style="color:#960050;background-color:#1e0010">&lt;optional</span> <span style="color:#960050;background-color:#1e0010">argument</span> <span style="color:#ae81ff">3</span><span style="color:#960050;background-color:#1e0010">&gt;</span>, <span style="color:#960050;background-color:#1e0010">...</span>]<span style="color:#960050;background-color:#1e0010">
+</span><span style="color:#960050;background-color:#1e0010">
+</span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#75715e"># when the container starts, run the following command (in case no arguments were given, this is the default)</span><span style="color:#960050;background-color:#1e0010">
+</span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">CMD</span> [<span style="color:#e6db74">&#34;&lt;/path/to/binary&gt;&#34;</span>, <span style="color:#960050;background-color:#1e0010">&lt;optional</span> <span style="color:#960050;background-color:#1e0010">argument</span> <span style="color:#ae81ff">1</span><span style="color:#960050;background-color:#1e0010">&gt;</span>, <span style="color:#960050;background-color:#1e0010">&lt;optional</span> <span style="color:#960050;background-color:#1e0010">argument</span> <span style="color:#ae81ff">2</span><span style="color:#960050;background-color:#1e0010">&gt;</span>]<span style="color:#960050;background-color:#1e0010">
+</span></code></pre></div><h2 id="a-real-world-example">A real world example</h2>
 <p>In real life, a Dockerfile contains many more calls to <code>RUN</code> before the container is configured. In the example below, a gitea server is created within a Dockerfile:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-Dockerfile" data-lang="Dockerfile"><span style="display:flex;"><span><span style="color:#75715e"># use alpine linux</span><span style="color:#960050;background-color:#1e0010">
-</span></span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">FROM</span><span style="color:#e6db74"> alpine:latest</span><span style="color:#960050;background-color:#1e0010">
-</span></span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">
-</span></span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#75715e"># install gitea</span><span style="color:#960050;background-color:#1e0010">
-</span></span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">RUN</span> apk update<span style="color:#960050;background-color:#1e0010">
-</span></span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">RUN</span> apk add gitea<span style="color:#960050;background-color:#1e0010">
-</span></span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">
-</span></span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#75715e"># run gitea</span><span style="color:#960050;background-color:#1e0010">
-</span></span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">CMD</span> /usr/bin/gitea<span style="color:#960050;background-color:#1e0010">
-</span></span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">
-</span></span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#75715e"># expose port 3000 to the host</span><span style="color:#960050;background-color:#1e0010">
-</span></span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">EXPOSE</span><span style="color:#e6db74"> 3000</span><span style="color:#960050;background-color:#1e0010">
-</span></span></span></code></pre></div><p>Before this Dockerfile is used to create a container, another file called <code>docker-compose.yml</code> is created to manage all containers.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-Dockerfile" data-lang="Dockerfile"><span style="color:#75715e"># use alpine linux</span><span style="color:#960050;background-color:#1e0010">
+</span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">FROM</span><span style="color:#e6db74"> alpine:latest</span><span style="color:#960050;background-color:#1e0010">
+</span><span style="color:#960050;background-color:#1e0010">
+</span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#75715e"># install gitea</span><span style="color:#960050;background-color:#1e0010">
+</span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">RUN</span> apk update<span style="color:#960050;background-color:#1e0010">
+</span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">RUN</span> apk add gitea<span style="color:#960050;background-color:#1e0010">
+</span><span style="color:#960050;background-color:#1e0010">
+</span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#75715e"># run gitea</span><span style="color:#960050;background-color:#1e0010">
+</span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">CMD</span> /usr/bin/gitea<span style="color:#960050;background-color:#1e0010">
+</span><span style="color:#960050;background-color:#1e0010">
+</span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#75715e"># expose port 3000 to the host</span><span style="color:#960050;background-color:#1e0010">
+</span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">EXPOSE</span><span style="color:#e6db74"> 3000</span><span style="color:#960050;background-color:#1e0010">
+</span></code></pre></div><p>Before this Dockerfile is used to create a container, another file called <code>docker-compose.yml</code> is created to manage all containers.</p>
 <h1 id="creating-a-docker-compose-configuration">Creating a docker-compose configuration</h1>
 <h2 id="the-syntax-1">The syntax</h2>
 <p>A configuration for docker-compose is to be called <code>docker-compose.yml</code> and it has the following syntax:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yml" data-lang="yml"><span style="display:flex;"><span><span style="color:#f92672">version</span>: <span style="color:#e6db74">&#39;3&#39;</span>
-</span></span><span style="display:flex;"><span><span style="color:#f92672">services</span>:
-</span></span><span style="display:flex;"><span>  <span style="color:#75715e"># a container which is built using a dockerfile</span>
-</span></span><span style="display:flex;"><span>  <span style="color:#f92672">a_service</span>:
-</span></span><span style="display:flex;"><span>    <span style="color:#f92672">build</span>: <span style="color:#ae81ff">&lt;directory where the Dockerfile is located&gt;</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#f92672">container_name</span>: <span style="color:#ae81ff">&lt;container name goes here&gt;</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#f92672">volumes</span>:
-</span></span><span style="display:flex;"><span>      - <span style="color:#e6db74">&#34;&lt;path/to/host/dir&gt;:&lt;path/to/guest/dir&gt;&#34;</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#f92672">ports</span>:
-</span></span><span style="display:flex;"><span>      - <span style="color:#e6db74">&#34;&lt;host port&gt;:&lt;guest port&gt;&#34;</span>
-</span></span><span style="display:flex;"><span>  <span style="color:#75715e"># create another service; uses a pre-built image from Docker Hub</span>
-</span></span><span style="display:flex;"><span>  <span style="color:#f92672">another_service</span>:
-</span></span><span style="display:flex;"><span>    <span style="color:#f92672">image</span>: <span style="color:#ae81ff">&lt;image name from Docker Hub goes here&gt;</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#f92672">container_name</span>: <span style="color:#ae81ff">&lt;container name goes here&gt;</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#f92672">volumes</span>:
-</span></span><span style="display:flex;"><span>      - <span style="color:#e6db74">&#34;&lt;path/to/host/dir&gt;:&lt;path/to/guest/dir&gt;&#34;</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#f92672">ports</span>:
-</span></span><span style="display:flex;"><span>      - <span style="color:#e6db74">&#34;&lt;host port&gt;:&lt;guest port&gt;&#34;</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#f92672">environment</span>:
-</span></span><span style="display:flex;"><span>      - <span style="color:#ae81ff">variable=value</span>
-</span></span></code></pre></div><h2 id="a-real-world-example-1">A real world example</h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yml" data-lang="yml"><span style="color:#f92672">version</span>: <span style="color:#e6db74">&#39;3&#39;</span>
+<span style="color:#f92672">services</span>:
+  <span style="color:#75715e"># a container which is built using a dockerfile</span>
+  <span style="color:#f92672">a_service</span>:
+    <span style="color:#f92672">build</span>: <span style="color:#ae81ff">&lt;directory where the Dockerfile is located&gt;</span>
+    <span style="color:#f92672">container_name</span>: <span style="color:#ae81ff">&lt;container name goes here&gt;</span>
+    <span style="color:#f92672">volumes</span>:
+      - <span style="color:#e6db74">&#34;&lt;path/to/host/dir&gt;:&lt;path/to/guest/dir&gt;&#34;</span>
+    <span style="color:#f92672">ports</span>:
+      - <span style="color:#e6db74">&#34;&lt;host port&gt;:&lt;guest port&gt;&#34;</span>
+  <span style="color:#75715e"># create another service; uses a pre-built image from Docker Hub</span>
+  <span style="color:#f92672">another_service</span>:
+    <span style="color:#f92672">image</span>: <span style="color:#ae81ff">&lt;image name from Docker Hub goes here&gt;</span>
+    <span style="color:#f92672">container_name</span>: <span style="color:#ae81ff">&lt;container name goes here&gt;</span>
+    <span style="color:#f92672">volumes</span>:
+      - <span style="color:#e6db74">&#34;&lt;path/to/host/dir&gt;:&lt;path/to/guest/dir&gt;&#34;</span>
+    <span style="color:#f92672">ports</span>:
+      - <span style="color:#e6db74">&#34;&lt;host port&gt;:&lt;guest port&gt;&#34;</span>
+    <span style="color:#f92672">environment</span>:
+      - <span style="color:#ae81ff">variable=value</span>
+</code></pre></div><h2 id="a-real-world-example-1">A real world example</h2>
 <p>First, the minimal configuration is created to create a gitea server:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yml" data-lang="yml"><span style="display:flex;"><span><span style="color:#f92672">version</span>: <span style="color:#e6db74">&#39;3&#39;</span>
-</span></span><span style="display:flex;"><span><span style="color:#f92672">services</span>:
-</span></span><span style="display:flex;"><span>  <span style="color:#f92672">gitea</span>:
-</span></span><span style="display:flex;"><span>    <span style="color:#f92672">build</span>: <span style="color:#ae81ff">./ </span> <span style="color:#75715e"># The Dockerfile is located in the same directory as this file</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#f92672">container_name</span>: <span style="color:#ae81ff">gitea</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#f92672">volumes</span>:
-</span></span><span style="display:flex;"><span>      - <span style="color:#e6db74">&#34;$PWD/gitea_files/var/lib/gitea:/var/lib/gitea&#34;</span>
-</span></span><span style="display:flex;"><span>      - <span style="color:#e6db74">&#34;$PWD/gitea_files/etc/gitea:/etc/gitea&#34;</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#f92672">ports</span>:
-</span></span><span style="display:flex;"><span>      - <span style="color:#e6db74">&#34;3000:3000&#34;</span>
-</span></span></code></pre></div><p>The <code>version</code> entry is often set to <code>3</code> or <code>3.x</code>. If the given version is too old, docker-compose will start complaining. This <code>docker-compose.yml</code> file contains one service called <code>gitea</code>, with container name <code>gitea</code>.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yml" data-lang="yml"><span style="color:#f92672">version</span>: <span style="color:#e6db74">&#39;3&#39;</span>
+<span style="color:#f92672">services</span>:
+  <span style="color:#f92672">gitea</span>:
+    <span style="color:#f92672">build</span>: <span style="color:#ae81ff">./ </span> <span style="color:#75715e"># The Dockerfile is located in the same directory as this file</span>
+    <span style="color:#f92672">container_name</span>: <span style="color:#ae81ff">gitea</span>
+    <span style="color:#f92672">volumes</span>:
+      - <span style="color:#e6db74">&#34;$PWD/gitea_files/var/lib/gitea:/var/lib/gitea&#34;</span>
+      - <span style="color:#e6db74">&#34;$PWD/gitea_files/etc/gitea:/etc/gitea&#34;</span>
+    <span style="color:#f92672">ports</span>:
+      - <span style="color:#e6db74">&#34;3000:3000&#34;</span>
+</code></pre></div><p>The <code>version</code> entry is often set to <code>3</code> or <code>3.x</code>. If the given version is too old, docker-compose will start complaining. This <code>docker-compose.yml</code> file contains one service called <code>gitea</code>, with container name <code>gitea</code>.</p>
 <p>Volumes are a mapped directory from guest to host, where <code>/var/lib/gitea</code> and <code>/etc/gitea</code> are folders inside the container. These two folders are mapped to <code>$PWD/gitea_files/var/lib/gitea</code> and <code>$PWD/gitea_files/etc/gitea</code> respectively. After the container has run at least one time, the container files can be viewed from the host OS by entering the <code>gitea_files</code> folder.</p>
 <p>Normally, when no volumes are created, each container forgets what it was doing when it stops running. This is not very desireable. When there is a power outage for example, each container would have to be re-configured. When volumes are present in <code>docker-compose.yml</code>, Docker will automatically restore all files in the volumes based on the files from the host OS. This would mean that the gitea server will restore the files for <code>/var/lib/gitea</code> (where the git repositories are located) as well as <code>/etc/gitea</code> (where the configuration files are stored). All the other files in the container (like the binaries in <code>/usr/bin</code>) do not have to be restored, and thus do not need a volume.</p>
 <h1 id="starting-the-container">Starting the container</h1>
 <p>To start the docker container, the following command is executed:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># build and start all containers</span>
-</span></span><span style="display:flex;"><span>docker-compose up --build
-</span></span></code></pre></div><p>The gitea Docker container will now be built and run. The build process will only happen once. Next time the container is run, it will start without having to be built. The <code>--build</code> option can therefore be left out if a container is already built.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#75715e"># build and start all containers</span>
+docker-compose up --build
+</code></pre></div><p>The gitea Docker container will now be built and run. The build process will only happen once. Next time the container is run, it will start without having to be built. The <code>--build</code> option can therefore be left out if a container is already built.</p>
 <h2 id="testing-the-container">Testing the container</h2>
 <p>If a browser is now opened and the url <code>http://localhost:3000</code> is visited, the gitea setup screen will appear. This means that the container is running as expected. An image of part of the setup screen is shown below:</p>
 <p><a href="images/gitea_setup.png"><img src="images/gitea_setup.png" alt="Gitea setup with default options"></a></p>
 <h2 id="adding-another-container">Adding another container</h2>
 <p>By default, gitea is set to use a <code>SQLite3</code> SQL server. This SQL server is very lightweight, but can only handle one connection at a time. This would mean that gitea would stop working if multiple users started using it. This is not very desireable.</p>
 <p>For this reason, another container will be created in the <code>docker-compose.yml</code>. This container will contain a complete MySQL server. The <code>docker-compose.yml</code> file will now look as follows:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yml" data-lang="yml"><span style="display:flex;"><span><span style="color:#f92672">version</span>: <span style="color:#e6db74">&#39;3&#39;</span>
-</span></span><span style="display:flex;"><span><span style="color:#f92672">services</span>:
-</span></span><span style="display:flex;"><span>  <span style="color:#75715e"># build gitea using a Dockerfile</span>
-</span></span><span style="display:flex;"><span>  <span style="color:#f92672">gitea</span>:
-</span></span><span style="display:flex;"><span>    <span style="color:#f92672">build</span>: <span style="color:#ae81ff">./</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#f92672">container_name</span>: <span style="color:#ae81ff">gitea</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#f92672">volumes</span>:
-</span></span><span style="display:flex;"><span>      - <span style="color:#e6db74">&#34;$PWD/gitea_files/var/lib/gitea:/var/lib/gitea&#34;</span>
-</span></span><span style="display:flex;"><span>      - <span style="color:#e6db74">&#34;$PWD/gitea_files/etc/gitea:/etc/gitea&#34;</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#f92672">ports</span>:
-</span></span><span style="display:flex;"><span>      - <span style="color:#e6db74">&#34;3000:3000&#34;</span>
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>  <span style="color:#75715e"># add another container, containing a mysql image from docker hub</span>
-</span></span><span style="display:flex;"><span>  <span style="color:#f92672">db</span>:
-</span></span><span style="display:flex;"><span>    <span style="color:#f92672">image</span>: <span style="color:#ae81ff">mariadb</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#f92672">container_name</span>: <span style="color:#ae81ff">mariadb</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#f92672">volumes</span>:
-</span></span><span style="display:flex;"><span>      - <span style="color:#e6db74">&#34;$PWD/mariadb_files/var/lib/mysql:/var/lib/mysql&#34;</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#f92672">environment</span>:
-</span></span><span style="display:flex;"><span>      <span style="color:#f92672">MYSQL_ROOT_PASSWORD</span>: <span style="color:#ae81ff">example_root_password</span>
-</span></span><span style="display:flex;"><span>      <span style="color:#f92672">MYSQL_USER</span>: <span style="color:#ae81ff">example_user</span>
-</span></span><span style="display:flex;"><span>      <span style="color:#f92672">MYSQL_PASSWORD</span>: <span style="color:#ae81ff">example_password</span>
-</span></span><span style="display:flex;"><span>      <span style="color:#f92672">MYSQL_DATABASE</span>: <span style="color:#ae81ff">example_database</span>
-</span></span></code></pre></div><p>A docker container containing a mariadb database server is now added to the list of containers. Another volume is created to make sure that all database related files are transferable to another computer at a later time.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yml" data-lang="yml"><span style="color:#f92672">version</span>: <span style="color:#e6db74">&#39;3&#39;</span>
+<span style="color:#f92672">services</span>:
+  <span style="color:#75715e"># build gitea using a Dockerfile</span>
+  <span style="color:#f92672">gitea</span>:
+    <span style="color:#f92672">build</span>: <span style="color:#ae81ff">./</span>
+    <span style="color:#f92672">container_name</span>: <span style="color:#ae81ff">gitea</span>
+    <span style="color:#f92672">volumes</span>:
+      - <span style="color:#e6db74">&#34;$PWD/gitea_files/var/lib/gitea:/var/lib/gitea&#34;</span>
+      - <span style="color:#e6db74">&#34;$PWD/gitea_files/etc/gitea:/etc/gitea&#34;</span>
+    <span style="color:#f92672">ports</span>:
+      - <span style="color:#e6db74">&#34;3000:3000&#34;</span>
+
+  <span style="color:#75715e"># add another container, containing a mysql image from docker hub</span>
+  <span style="color:#f92672">db</span>:
+    <span style="color:#f92672">image</span>: <span style="color:#ae81ff">mariadb</span>
+    <span style="color:#f92672">container_name</span>: <span style="color:#ae81ff">mariadb</span>
+    <span style="color:#f92672">volumes</span>:
+      - <span style="color:#e6db74">&#34;$PWD/mariadb_files/var/lib/mysql:/var/lib/mysql&#34;</span>
+    <span style="color:#f92672">environment</span>:
+      <span style="color:#f92672">MYSQL_ROOT_PASSWORD</span>: <span style="color:#ae81ff">example_root_password</span>
+      <span style="color:#f92672">MYSQL_USER</span>: <span style="color:#ae81ff">example_user</span>
+      <span style="color:#f92672">MYSQL_PASSWORD</span>: <span style="color:#ae81ff">example_password</span>
+      <span style="color:#f92672">MYSQL_DATABASE</span>: <span style="color:#ae81ff">example_database</span>
+</code></pre></div><p>A docker container containing a mariadb database server is now added to the list of containers. Another volume is created to make sure that all database related files are transferable to another computer at a later time.</p>
 <p>When the containers are now (re) started using the command</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># build and start all containers</span>
-</span></span><span style="display:flex;"><span>docker-compose up --build
-</span></span></code></pre></div><p>the gitea container as well as a mariadb server is started.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#75715e"># build and start all containers</span>
+docker-compose up --build
+</code></pre></div><p>the gitea container as well as a mariadb server is started.</p>
 <h2 id="communication-between-containers">Communication between containers</h2>
 <p>The cool thing about Docker containers is that they can talk to each other in a very nice way. How this works can be seen when configuring gitea. Normally, the IP address and port have to be inserted. Because the mariadb server is also a Docker container, gitea can be configured to talk to <code>mariadb:3306</code>. Docker will then automatically translate the <code>mariadb</code> part to the IP address of the mariadb container. This way, the two containers can always talk to each other. The database configuration for gitea now looks as follows:</p>
 <p><a href="images/gitea_db_setup.png"><img src="images/gitea_db_setup.png" alt="Gitea database settings"></a></p>
@@ -260,18 +261,18 @@
 <p>After all configurations are saved, the gitea server is operational and can be used to store projects.</p>
 <h1 id="docker-images">Docker images</h1>
 <p>For most containers on Docker Hub, the needed docker-compose configuration is given. For some images however, only a command to start a container is given. An example of this is an unofficial <a href="https://hub.docker.com/r/creativitykills/nginx-php-server">nginx and php image</a>. At the time of writing, the description contains the following command to start the container:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>docker run -d -p 4488:80 --name<span style="color:#f92672">=</span>testapp -v $PWD:/var/www creativitykills/nginx-php-server
-</span></span></code></pre></div><p>The options can be &ldquo;converted&rdquo; into a service and added to <code>docker-compose.yml</code> as follows:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yml" data-lang="yml"><span style="display:flex;"><span><span style="color:#f92672">version</span>: <span style="color:#e6db74">&#39;3&#39;</span>
-</span></span><span style="display:flex;"><span><span style="color:#f92672">services</span>:
-</span></span><span style="display:flex;"><span>  <span style="color:#f92672">nginx_php</span>:
-</span></span><span style="display:flex;"><span>    <span style="color:#f92672">image</span>: <span style="color:#ae81ff">creativitykills/nginx-php-server</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#f92672">container_name</span>: <span style="color:#ae81ff">testapp</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#f92672">volumes</span>:
-</span></span><span style="display:flex;"><span>      - <span style="color:#e6db74">&#34;$PWD:/var/www&#34;</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#f92672">ports</span>:
-</span></span><span style="display:flex;"><span>      - <span style="color:#e6db74">&#34;4488:80&#34;</span>
-</span></span></code></pre></div><p>The docker image can now be managed by docker-compose and works exactly the same as it would without docker-compose.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">docker run -d -p 4488:80 --name<span style="color:#f92672">=</span>testapp -v $PWD:/var/www creativitykills/nginx-php-server
+</code></pre></div><p>The options can be &ldquo;converted&rdquo; into a service and added to <code>docker-compose.yml</code> as follows:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yml" data-lang="yml"><span style="color:#f92672">version</span>: <span style="color:#e6db74">&#39;3&#39;</span>
+<span style="color:#f92672">services</span>:
+  <span style="color:#f92672">nginx_php</span>:
+    <span style="color:#f92672">image</span>: <span style="color:#ae81ff">creativitykills/nginx-php-server</span>
+    <span style="color:#f92672">container_name</span>: <span style="color:#ae81ff">testapp</span>
+    <span style="color:#f92672">volumes</span>:
+      - <span style="color:#e6db74">&#34;$PWD:/var/www&#34;</span>
+    <span style="color:#f92672">ports</span>:
+      - <span style="color:#e6db74">&#34;4488:80&#34;</span>
+</code></pre></div><p>The docker image can now be managed by docker-compose and works exactly the same as it would without docker-compose.</p>
 <h1 id="more-options">More options</h1>
 <p>There are more options to Dockerfiles and docker-compose configurations. One example is setting up an <a href="https://hub.docker.com/r/erichough/nfs-server">nfs server container</a>, where the container has (to have) access to some parts of the host OS. For most of these images, the needed configurations/options are given.</p>
 <h1 id="migrating-to-another-computer">Migrating to another computer</h1>
@@ -303,7 +304,7 @@
           <line x1="16" y1="17" x2="8" y2="17"></line>
           <polyline points="10 9 9 9 8 9"></polyline>
         </svg>
-        1446 Words
+        1427 Words
       </p>
 
       <p>
@@ -468,7 +469,7 @@
 
 
 
-<script type="text/javascript" src="/bundle.min.205d491810c28f95aa953fae884e1c27abe13fdf93ec63b882d0036b248d4a6282eb2d134e4e7225c6ad6e86db87b08488a361ca4a7383d01fcff43f3d57b9c3.js" integrity="sha512-IF1JGBDCj5WqlT&#43;uiE4cJ6vhP9&#43;T7GO4gtADaySNSmKC6y0TTk5yJcatbobbh7CEiKNhykpzg9Afz/Q/PVe5ww=="></script>
+<script type="text/javascript" src="/bundle.min.644292943ae47eef02fcd64b11757aeb8caeeaebf473a823b62099edccac808e8d82689359f285e5d95994e5ad5ae3b9c1ccc281eb1828e67d0ba6630f95b832.js" integrity="sha512-ZEKSlDrkfu8C/NZLEXV664yu6uv0c6gjtiCZ7cysgI6NgmiTWfKF5dlZlOWtWuO5wczCgesYKOZ9C6ZjD5W4Mg=="></script>
 
 
 
