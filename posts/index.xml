@@ -145,7 +145,7 @@ To combat this, the print&rsquo;s x and y lengths need to be scaled.</li>
 <p>To test how well the airflow cover would work, I printed a benchy. It came out looking very well, but the roof was a little weak due to slight delamination. This probably had to do with cooling, since the rest of the boat was just fine. The below image shows the Ender 3 printing a benchy out of ABS. No enclosure was used and the ambient temperature was around 17°C.</p>
 <p><a href="images/benchy.jpg"><img src="images/benchy.jpg" alt="3D printing a benchy without a brim"></a></p>
 <h1 id="summary">Summary</h1>
-<p>3D printing ABS is possible using an Ender 3 v1. It&rsquo;s not perfect, but still doable. The shrinking and delamination is still an issue, but I think it can be fixed.</p>
+<p>3D printing ABS is possible using an Ender 3 v1. It&rsquo;s not perfect, but still doable. The shrinking and delamination are still an issue, but I think it can be fixed.</p>
 ]]></content>
         </item>
         
