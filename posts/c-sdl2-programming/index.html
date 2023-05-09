@@ -38,7 +38,7 @@
 <meta itemprop="name" content="C and SDL2 programming">
 <meta itemprop="description" content="Working with SDL2 and C This post will show snippets of code that can be used to make an SDL2 application. This post serves mostly as a personal reminder of how the basics of SDL2 work. Much more advanced things can be done using SDL2, especially if it&rsquo;s combined with a language like C&#43;&#43;. C&#43;&#43; has classes, which make it much easier to create more advanced programs (like a basic game)."><meta itemprop="datePublished" content="2021-11-04T13:28:55+02:00" />
 <meta itemprop="dateModified" content="2021-11-04T13:28:55+02:00" />
-<meta itemprop="wordCount" content="1376"><meta itemprop="image" content="https://tomniesse.github.io/"/>
+<meta itemprop="wordCount" content="1384"><meta itemprop="image" content="https://tomniesse.github.io/"/>
 <meta itemprop="keywords" content="untagged," />
 <meta name="twitter:card" content="summary_large_image"/>
 <meta name="twitter:image" content="https://tomniesse.github.io/"/>
@@ -54,7 +54,6 @@
 <meta property="og:url" content="https://tomniesse.github.io/posts/c-sdl2-programming/" /><meta property="og:image" content="https://tomniesse.github.io/"/><meta property="article:section" content="posts" />
 <meta property="article:published_time" content="2021-11-04T13:28:55+02:00" />
 <meta property="article:modified_time" content="2021-11-04T13:28:55+02:00" /><meta property="og:site_name" content="Welcome!" />
-
 
 
 
@@ -157,251 +156,251 @@ audio, keyboard, mouse, joystick, and graphics hardware via OpenGL and Direct3D.
 <h2 id="creating-a-window-that-opens-and-closes">Creating a window that opens and closes</h2>
 <p>Before any drawing can begin, a window and renderer have to be created. After the program window opens and closes without errors, other elements can be created.</p>
 <p>Code:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;stddef.h&gt;</span><span style="color:#75715e">
-</span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;stdlib.h&gt;</span><span style="color:#75715e">
-</span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;stdio.h&gt;</span><span style="color:#75715e">
-</span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;stdbool.h&gt;</span><span style="color:#75715e">
-</span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;math.h&gt;</span><span style="color:#75715e">
-</span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;SDL2/SDL.h&gt;</span><span style="color:#75715e">
-</span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;SDL2/SDL_image.h&gt;</span><span style="color:#75715e">
-</span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;SDL2/SDL_ttf.h&gt;</span><span style="color:#75715e">
-</span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;SDL2/SDL_mixer.h&gt;</span><span style="color:#75715e">
-</span><span style="color:#75715e"></span>
-<span style="color:#75715e">#define WINDOW_WIDTH 640
-</span><span style="color:#75715e">#define WINDOW_HEIGHT 480
-</span><span style="color:#75715e"></span>
-<span style="color:#66d9ef">void</span> <span style="color:#a6e22e">sdl2_create_window</span>(SDL_Window<span style="color:#f92672">**</span> window, SDL_Renderer<span style="color:#f92672">**</span> renderer, <span style="color:#66d9ef">const</span> <span style="color:#66d9ef">char</span><span style="color:#f92672">*</span> window_title) {
-    <span style="color:#66d9ef">unsigned</span> <span style="color:#66d9ef">int</span> window_flags <span style="color:#f92672">=</span> SDL_WINDOW_RESIZABLE;
-    <span style="color:#66d9ef">unsigned</span> <span style="color:#66d9ef">int</span> renderer_flags <span style="color:#f92672">=</span> SDL_RENDERER_PRESENTVSYNC <span style="color:#f92672">|</span> SDL_RENDERER_ACCELERATED; <span style="color:#75715e">// Use hardware rendering and vsync
-</span><span style="color:#75715e"></span>
-    <span style="color:#66d9ef">if</span> (SDL_Init(SDL_INIT_VIDEO) <span style="color:#f92672">&lt;</span> <span style="color:#ae81ff">0</span>) {
-        printf(<span style="color:#e6db74">&#34;Couldn&#39;t initialize SDL: %s</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>, SDL_GetError());
-        exit(<span style="color:#ae81ff">1</span>);
-    }
-
-    <span style="color:#f92672">*</span>window <span style="color:#f92672">=</span> SDL_CreateWindow(window_title, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, WINDOW_WIDTH, WINDOW_HEIGHT, window_flags);
-    <span style="color:#66d9ef">if</span> (window <span style="color:#f92672">==</span> NULL) {
-        printf(<span style="color:#e6db74">&#34;Failed to create window: %s</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>, SDL_GetError());
-        exit(<span style="color:#ae81ff">1</span>);
-    }
-
-    <span style="color:#f92672">*</span>renderer <span style="color:#f92672">=</span> SDL_CreateRenderer(<span style="color:#f92672">*</span>window, <span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>, renderer_flags);
-    <span style="color:#66d9ef">if</span> (renderer <span style="color:#f92672">==</span> NULL) {
-        printf(<span style="color:#e6db74">&#34;Failed to create renderer: %s</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>, SDL_GetError());
-        exit(<span style="color:#ae81ff">1</span>);
-    }
-}
-
-<span style="color:#66d9ef">int</span> <span style="color:#a6e22e">main</span>() {
-    SDL_Window<span style="color:#f92672">*</span> window <span style="color:#f92672">=</span> NULL;
-    SDL_Renderer<span style="color:#f92672">*</span> renderer <span style="color:#f92672">=</span> NULL;
-    SDL_Event event;
-    <span style="color:#66d9ef">bool</span> running <span style="color:#f92672">=</span> true;
-
-    <span style="color:#75715e">// Create a new window to run the in
-</span><span style="color:#75715e"></span>    sdl2_create_window(<span style="color:#f92672">&amp;</span>window, <span style="color:#f92672">&amp;</span>renderer, <span style="color:#e6db74">&#34;SDL2 example&#34;</span>);
-
-	<span style="color:#75715e">// Main loop
-</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">while</span>(running) {
-		SDL_SetRenderDrawColor(renderer, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>, SDL_ALPHA_OPAQUE);
-        SDL_RenderClear(renderer);
-
-        <span style="color:#75715e">// Do rendering here
-</span><span style="color:#75715e"></span>
-		<span style="color:#75715e">// Check if the close button is pressed
-</span><span style="color:#75715e"></span>		<span style="color:#75715e">// and break out of the loop if it is.
-</span><span style="color:#75715e"></span>		<span style="color:#66d9ef">if</span>(SDL_PollEvent(<span style="color:#f92672">&amp;</span>event)) {
-			<span style="color:#66d9ef">if</span>(event.type <span style="color:#f92672">==</span> SDL_QUIT) {
-				<span style="color:#75715e">// The program needs to stop running!
-</span><span style="color:#75715e"></span>				running <span style="color:#f92672">=</span> false;
-			}
-		}
-
-        SDL_RenderPresent(renderer);
-    }
-
-    <span style="color:#75715e">// Stop everything
-</span><span style="color:#75715e"></span>    SDL_DestroyRenderer(renderer);
-    SDL_DestroyWindow(window);
-    SDL_Quit();
-
-    <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">0</span>;
-}
-</code></pre></div><p>Makefile to create the binary:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-Makefile" data-lang="Makefile">CC <span style="color:#f92672">=</span> gcc
-CFLAGS <span style="color:#f92672">=</span> -std<span style="color:#f92672">=</span>c99 -Wall -Wextra -Wconversion -Ofast -Wpedantic -Werror <span style="color:#ae81ff">\
-</span><span style="color:#ae81ff"></span>         <span style="color:#e6db74">`</span>sdl2-config --cflags<span style="color:#e6db74">`</span> -lSDL2 -lSDL2_ttf -lSDL2_image -lSDL2_mixer -lm
-
-<span style="color:#a6e22e">all</span><span style="color:#f92672">:</span>
-	@echo Building...
-	<span style="color:#66d9ef">$(</span>CC<span style="color:#66d9ef">)</span> src/main.c -o main <span style="color:#66d9ef">$(</span>CFLAGS<span style="color:#66d9ef">)</span>
-</code></pre></div><p>When the resulting binary is executed, the follwing empty window should appear:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;stddef.h&gt;</span><span style="color:#75715e">
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;stdlib.h&gt;</span><span style="color:#75715e">
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;stdio.h&gt;</span><span style="color:#75715e">
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;stdbool.h&gt;</span><span style="color:#75715e">
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;math.h&gt;</span><span style="color:#75715e">
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;SDL2/SDL.h&gt;</span><span style="color:#75715e">
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;SDL2/SDL_image.h&gt;</span><span style="color:#75715e">
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;SDL2/SDL_ttf.h&gt;</span><span style="color:#75715e">
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;SDL2/SDL_mixer.h&gt;</span><span style="color:#75715e">
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#define WINDOW_WIDTH 640
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">#define WINDOW_HEIGHT 480
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">void</span> <span style="color:#a6e22e">sdl2_create_window</span>(SDL_Window<span style="color:#f92672">**</span> window, SDL_Renderer<span style="color:#f92672">**</span> renderer, <span style="color:#66d9ef">const</span> <span style="color:#66d9ef">char</span><span style="color:#f92672">*</span> window_title) {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">unsigned</span> <span style="color:#66d9ef">int</span> window_flags <span style="color:#f92672">=</span> SDL_WINDOW_RESIZABLE;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">unsigned</span> <span style="color:#66d9ef">int</span> renderer_flags <span style="color:#f92672">=</span> SDL_RENDERER_PRESENTVSYNC <span style="color:#f92672">|</span> SDL_RENDERER_ACCELERATED; <span style="color:#75715e">// Use hardware rendering and vsync
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">SDL_Init</span>(SDL_INIT_VIDEO) <span style="color:#f92672">&lt;</span> <span style="color:#ae81ff">0</span>) {
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">printf</span>(<span style="color:#e6db74">&#34;Couldn&#39;t initialize SDL: %s</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>, <span style="color:#a6e22e">SDL_GetError</span>());
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">exit</span>(<span style="color:#ae81ff">1</span>);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">*</span>window <span style="color:#f92672">=</span> <span style="color:#a6e22e">SDL_CreateWindow</span>(window_title, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, WINDOW_WIDTH, WINDOW_HEIGHT, window_flags);
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> (window <span style="color:#f92672">==</span> NULL) {
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">printf</span>(<span style="color:#e6db74">&#34;Failed to create window: %s</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>, <span style="color:#a6e22e">SDL_GetError</span>());
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">exit</span>(<span style="color:#ae81ff">1</span>);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">*</span>renderer <span style="color:#f92672">=</span> <span style="color:#a6e22e">SDL_CreateRenderer</span>(<span style="color:#f92672">*</span>window, <span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>, renderer_flags);
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> (renderer <span style="color:#f92672">==</span> NULL) {
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">printf</span>(<span style="color:#e6db74">&#34;Failed to create renderer: %s</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>, <span style="color:#a6e22e">SDL_GetError</span>());
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">exit</span>(<span style="color:#ae81ff">1</span>);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">int</span> <span style="color:#a6e22e">main</span>() {
+</span></span><span style="display:flex;"><span>    SDL_Window<span style="color:#f92672">*</span> window <span style="color:#f92672">=</span> NULL;
+</span></span><span style="display:flex;"><span>    SDL_Renderer<span style="color:#f92672">*</span> renderer <span style="color:#f92672">=</span> NULL;
+</span></span><span style="display:flex;"><span>    SDL_Event event;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">bool</span> running <span style="color:#f92672">=</span> true;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Create a new window to run the in
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#a6e22e">sdl2_create_window</span>(<span style="color:#f92672">&amp;</span>window, <span style="color:#f92672">&amp;</span>renderer, <span style="color:#e6db74">&#34;SDL2 example&#34;</span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#75715e">// Main loop
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">while</span>(running) {
+</span></span><span style="display:flex;"><span>		<span style="color:#a6e22e">SDL_SetRenderDrawColor</span>(renderer, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>, SDL_ALPHA_OPAQUE);
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">SDL_RenderClear</span>(renderer);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// Do rendering here
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span>		<span style="color:#75715e">// Check if the close button is pressed
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>		<span style="color:#75715e">// and break out of the loop if it is.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>		<span style="color:#66d9ef">if</span>(<span style="color:#a6e22e">SDL_PollEvent</span>(<span style="color:#f92672">&amp;</span>event)) {
+</span></span><span style="display:flex;"><span>			<span style="color:#66d9ef">if</span>(event.type <span style="color:#f92672">==</span> SDL_QUIT) {
+</span></span><span style="display:flex;"><span>				<span style="color:#75715e">// The program needs to stop running!
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>				running <span style="color:#f92672">=</span> false;
+</span></span><span style="display:flex;"><span>			}
+</span></span><span style="display:flex;"><span>		}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">SDL_RenderPresent</span>(renderer);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Stop everything
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#a6e22e">SDL_DestroyRenderer</span>(renderer);
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">SDL_DestroyWindow</span>(window);
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">SDL_Quit</span>();
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">0</span>;
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>Makefile to create the binary:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-Makefile" data-lang="Makefile"><span style="display:flex;"><span>CC <span style="color:#f92672">=</span> gcc
+</span></span><span style="display:flex;"><span>CFLAGS <span style="color:#f92672">=</span> -std<span style="color:#f92672">=</span>c99 -Wall -Wextra -Wconversion -Ofast -Wpedantic -Werror <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>         <span style="color:#e6db74">`</span>sdl2-config --cflags<span style="color:#e6db74">`</span> -lSDL2 -lSDL2_ttf -lSDL2_image -lSDL2_mixer -lm
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">all</span><span style="color:#f92672">:</span>
+</span></span><span style="display:flex;"><span>	@echo Building...
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">$(</span>CC<span style="color:#66d9ef">)</span> src/main.c -o main <span style="color:#66d9ef">$(</span>CFLAGS<span style="color:#66d9ef">)</span>
+</span></span></code></pre></div><p>When the resulting binary is executed, the follwing empty window should appear:</p>
 <p><a href="images/example_window.png"><img src="images/example_window.png" alt="SDL2 empty window"></a></p>
 <h2 id="small-code-examples">Small code examples</h2>
 <h3 id="drawing-a-line">Drawing a line</h3>
 <p>To draw a line over the whole window, the following code can be used:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#75715e">// Get begin and end values for the line
-</span><span style="color:#75715e"></span><span style="color:#66d9ef">int</span> x_start <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
-<span style="color:#66d9ef">int</span> y_start <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
-<span style="color:#66d9ef">int</span> x_end, y_end;
-<span style="color:#75715e">// Make sure the line ends at the bottom right of the screen
-</span><span style="color:#75715e"></span>SDL_GetWindowSize(window, <span style="color:#f92672">&amp;</span>x_end, <span style="color:#f92672">&amp;</span>y_end);
-
-<span style="color:#75715e">// Set the line color
-</span><span style="color:#75715e"></span>SDL_SetRenderDrawColor(renderer, <span style="color:#ae81ff">255</span>, <span style="color:#ae81ff">255</span>, <span style="color:#ae81ff">255</span>, SDL_ALPHA_OPAQUE);
-<span style="color:#75715e">// Draw the line
-</span><span style="color:#75715e"></span>SDL_RenderDrawLine(renderer, x_start, y_start, x_end, y_end);
-</code></pre></div><p>If the application is now compiled and run again, a line should appear on the screen, going from the top left <code>(0,0)</code> to the bottom right <code>(&lt;window width&gt;,&lt;window height&gt;)</code>. The line also changes shape when the window gets resized:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#75715e">// Get begin and end values for the line
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">int</span> x_start <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">int</span> y_start <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">int</span> x_end, y_end;
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Make sure the line ends at the bottom right of the screen
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#a6e22e">SDL_GetWindowSize</span>(window, <span style="color:#f92672">&amp;</span>x_end, <span style="color:#f92672">&amp;</span>y_end);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Set the line color
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#a6e22e">SDL_SetRenderDrawColor</span>(renderer, <span style="color:#ae81ff">255</span>, <span style="color:#ae81ff">255</span>, <span style="color:#ae81ff">255</span>, SDL_ALPHA_OPAQUE);
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Draw the line
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#a6e22e">SDL_RenderDrawLine</span>(renderer, x_start, y_start, x_end, y_end);
+</span></span></code></pre></div><p>If the application is now compiled and run again, a line should appear on the screen, going from the top left <code>(0,0)</code> to the bottom right <code>(&lt;window width&gt;,&lt;window height&gt;)</code>. The line also changes shape when the window gets resized:</p>
 <p><a href="images/sdl2_line_high.png"><img src="images/sdl2_line_high.png" alt="SDL2 high line"></a></p>
 <p><a href="images/sdl2_line_wide.png"><img src="images/sdl2_line_wide.png" alt="SDL2 wide line"></a></p>
 <h2 id="drawing-a-rectangle">Drawing a rectangle</h2>
 <p>Drawing a rectangle is something SDL2 can do by itself. It can either draw only the outline or fill it in with a color.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-C" data-lang="C"><span style="color:#75715e">// Set draw color
-</span><span style="color:#75715e"></span>SDL_SetRenderDrawColor(renderer, <span style="color:#ae81ff">255</span>, <span style="color:#ae81ff">255</span>, <span style="color:#ae81ff">255</span>, SDL_ALPHA_OPAQUE);
-
-<span style="color:#75715e">// Create a rectangle
-</span><span style="color:#75715e"></span>SDL_Rect example_rectangle;
-example_rectangle.x <span style="color:#f92672">=</span> <span style="color:#ae81ff">50</span>;	<span style="color:#75715e">// Set horizontal top left coordinate
-</span><span style="color:#75715e"></span>example_rectangle.y <span style="color:#f92672">=</span> <span style="color:#ae81ff">50</span>;	<span style="color:#75715e">// Set vertical top left coordinate
-</span><span style="color:#75715e"></span>example_rectangle.w <span style="color:#f92672">=</span> <span style="color:#ae81ff">50</span>;	<span style="color:#75715e">// Set width
-</span><span style="color:#75715e"></span>example_rectangle.h <span style="color:#f92672">=</span> <span style="color:#ae81ff">50</span>;	<span style="color:#75715e">// Set height
-</span><span style="color:#75715e"></span>
-<span style="color:#75715e">// Draw a colored rectangle
-</span><span style="color:#75715e"></span>SDL_RenderDrawRect(renderer, <span style="color:#f92672">&amp;</span>example_rectangle);
-<span style="color:#75715e">// Or, to fill in the rectangle as well
-</span><span style="color:#75715e">//SDL_RenderFillRect(renderer, &amp;example_rectangle);
-</span></code></pre></div><p><a href="images/sdl2_rectangle.png"><img src="images/sdl2_rectangle.png" alt="SDL2 rectangle"></a></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-C" data-lang="C"><span style="display:flex;"><span><span style="color:#75715e">// Set draw color
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#a6e22e">SDL_SetRenderDrawColor</span>(renderer, <span style="color:#ae81ff">255</span>, <span style="color:#ae81ff">255</span>, <span style="color:#ae81ff">255</span>, SDL_ALPHA_OPAQUE);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Create a rectangle
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>SDL_Rect example_rectangle;
+</span></span><span style="display:flex;"><span>example_rectangle.x <span style="color:#f92672">=</span> <span style="color:#ae81ff">50</span>;	<span style="color:#75715e">// Set horizontal top left coordinate
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>example_rectangle.y <span style="color:#f92672">=</span> <span style="color:#ae81ff">50</span>;	<span style="color:#75715e">// Set vertical top left coordinate
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>example_rectangle.w <span style="color:#f92672">=</span> <span style="color:#ae81ff">50</span>;	<span style="color:#75715e">// Set width
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>example_rectangle.h <span style="color:#f92672">=</span> <span style="color:#ae81ff">50</span>;	<span style="color:#75715e">// Set height
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Draw a colored rectangle
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#a6e22e">SDL_RenderDrawRect</span>(renderer, <span style="color:#f92672">&amp;</span>example_rectangle);
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Or, to fill in the rectangle as well
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">//SDL_RenderFillRect(renderer, &amp;example_rectangle);
+</span></span></span></code></pre></div><p><a href="images/sdl2_rectangle.png"><img src="images/sdl2_rectangle.png" alt="SDL2 rectangle"></a></p>
 <h2 id="drawing-a-circle">Drawing a circle</h2>
 <p>Drawing a circle is not something SDL2 can do by itself, but it can be done using a function and a custom datatype:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#75715e">// Create a datatype called &#34;SDL_Circle&#34;
-</span><span style="color:#75715e"></span><span style="color:#66d9ef">typedef</span> <span style="color:#66d9ef">struct</span> {
-	<span style="color:#66d9ef">int</span> x, y, r;	<span style="color:#75715e">// point x, point y, radius
-</span><span style="color:#75715e"></span>} SDL_Circle;
-
-SDL_Circle circle;
-circle.x <span style="color:#f92672">=</span> <span style="color:#ae81ff">240</span>;
-circle.y <span style="color:#f92672">=</span> <span style="color:#ae81ff">240</span>;
-circle.r <span style="color:#f92672">=</span> <span style="color:#ae81ff">240</span>;
-
-<span style="color:#75715e">// Render a circle by drawing 360 lines
-</span><span style="color:#75715e"></span><span style="color:#66d9ef">void</span> <span style="color:#a6e22e">SDL_RenderDrawCircle</span>(SDL_Renderer<span style="color:#f92672">*</span> renderer, <span style="color:#66d9ef">const</span> SDL_Circle<span style="color:#f92672">*</span> circle) {
-	<span style="color:#66d9ef">const</span> <span style="color:#66d9ef">double</span> PI <span style="color:#f92672">=</span> acos(<span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>);
-	<span style="color:#66d9ef">double</span> angle <span style="color:#f92672">=</span> <span style="color:#ae81ff">360</span>;
-	<span style="color:#66d9ef">do</span> {
-		<span style="color:#75715e">// Calculate a point
-</span><span style="color:#75715e"></span>		<span style="color:#66d9ef">double</span> rotation <span style="color:#f92672">=</span> angle <span style="color:#f92672">*</span> <span style="color:#ae81ff">2</span><span style="color:#f92672">*</span>PI <span style="color:#f92672">/</span> <span style="color:#ae81ff">360</span>;
-		<span style="color:#66d9ef">double</span> point_x_start <span style="color:#f92672">=</span> circle<span style="color:#f92672">-&gt;</span>x <span style="color:#f92672">+</span> cos(rotation) <span style="color:#f92672">*</span> circle<span style="color:#f92672">-&gt;</span>r;
-		<span style="color:#66d9ef">double</span> point_y_start <span style="color:#f92672">=</span> circle<span style="color:#f92672">-&gt;</span>y <span style="color:#f92672">+</span> sin(rotation) <span style="color:#f92672">*</span> circle<span style="color:#f92672">-&gt;</span>r;
-
-		<span style="color:#75715e">// Calculate the next point
-</span><span style="color:#75715e"></span>		rotation <span style="color:#f92672">=</span> (angle<span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>) <span style="color:#f92672">*</span> <span style="color:#ae81ff">2</span><span style="color:#f92672">*</span>PI <span style="color:#f92672">/</span> <span style="color:#ae81ff">360</span>;
-		<span style="color:#66d9ef">double</span> point_x_end <span style="color:#f92672">=</span> circle<span style="color:#f92672">-&gt;</span>x <span style="color:#f92672">+</span> cos(rotation) <span style="color:#f92672">*</span> circle<span style="color:#f92672">-&gt;</span>r;
-		<span style="color:#66d9ef">double</span> point_y_end <span style="color:#f92672">=</span> circle<span style="color:#f92672">-&gt;</span>y <span style="color:#f92672">+</span> sin(rotation) <span style="color:#f92672">*</span> circle<span style="color:#f92672">-&gt;</span>r;
-
-		<span style="color:#75715e">// Draw a line between the two points
-</span><span style="color:#75715e"></span>		SDL_RenderDrawLine(renderer, (<span style="color:#66d9ef">int</span>)point_x_start, (<span style="color:#66d9ef">int</span>)point_y_start, (<span style="color:#66d9ef">int</span>)point_x_end, (<span style="color:#66d9ef">int</span>)point_y_end);
-	} <span style="color:#66d9ef">while</span>(angle<span style="color:#f92672">--&gt;</span><span style="color:#ae81ff">1</span>);
-}
-
-<span style="color:#75715e">// in the main loop, call the function as follows after setting the right color:
-</span><span style="color:#75715e"></span>SDL_RenderDrawCircle(renderer, <span style="color:#f92672">&amp;</span>circle);
-</code></pre></div><p>This results in the following drawing being made:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#75715e">// Create a datatype called &#34;SDL_Circle&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">typedef</span> <span style="color:#66d9ef">struct</span> {
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">int</span> x, y, r;	<span style="color:#75715e">// point x, point y, radius
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>} SDL_Circle;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>SDL_Circle circle;
+</span></span><span style="display:flex;"><span>circle.x <span style="color:#f92672">=</span> <span style="color:#ae81ff">240</span>;
+</span></span><span style="display:flex;"><span>circle.y <span style="color:#f92672">=</span> <span style="color:#ae81ff">240</span>;
+</span></span><span style="display:flex;"><span>circle.r <span style="color:#f92672">=</span> <span style="color:#ae81ff">240</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Render a circle by drawing 360 lines
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">void</span> <span style="color:#a6e22e">SDL_RenderDrawCircle</span>(SDL_Renderer<span style="color:#f92672">*</span> renderer, <span style="color:#66d9ef">const</span> SDL_Circle<span style="color:#f92672">*</span> circle) {
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">const</span> <span style="color:#66d9ef">double</span> PI <span style="color:#f92672">=</span> <span style="color:#a6e22e">acos</span>(<span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>);
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">double</span> angle <span style="color:#f92672">=</span> <span style="color:#ae81ff">360</span>;
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">do</span> {
+</span></span><span style="display:flex;"><span>		<span style="color:#75715e">// Calculate a point
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>		<span style="color:#66d9ef">double</span> rotation <span style="color:#f92672">=</span> angle <span style="color:#f92672">*</span> <span style="color:#ae81ff">2</span><span style="color:#f92672">*</span>PI <span style="color:#f92672">/</span> <span style="color:#ae81ff">360</span>;
+</span></span><span style="display:flex;"><span>		<span style="color:#66d9ef">double</span> point_x_start <span style="color:#f92672">=</span> circle<span style="color:#f92672">-&gt;</span>x <span style="color:#f92672">+</span> <span style="color:#a6e22e">cos</span>(rotation) <span style="color:#f92672">*</span> circle<span style="color:#f92672">-&gt;</span>r;
+</span></span><span style="display:flex;"><span>		<span style="color:#66d9ef">double</span> point_y_start <span style="color:#f92672">=</span> circle<span style="color:#f92672">-&gt;</span>y <span style="color:#f92672">+</span> <span style="color:#a6e22e">sin</span>(rotation) <span style="color:#f92672">*</span> circle<span style="color:#f92672">-&gt;</span>r;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>		<span style="color:#75715e">// Calculate the next point
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>		rotation <span style="color:#f92672">=</span> (angle<span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>) <span style="color:#f92672">*</span> <span style="color:#ae81ff">2</span><span style="color:#f92672">*</span>PI <span style="color:#f92672">/</span> <span style="color:#ae81ff">360</span>;
+</span></span><span style="display:flex;"><span>		<span style="color:#66d9ef">double</span> point_x_end <span style="color:#f92672">=</span> circle<span style="color:#f92672">-&gt;</span>x <span style="color:#f92672">+</span> <span style="color:#a6e22e">cos</span>(rotation) <span style="color:#f92672">*</span> circle<span style="color:#f92672">-&gt;</span>r;
+</span></span><span style="display:flex;"><span>		<span style="color:#66d9ef">double</span> point_y_end <span style="color:#f92672">=</span> circle<span style="color:#f92672">-&gt;</span>y <span style="color:#f92672">+</span> <span style="color:#a6e22e">sin</span>(rotation) <span style="color:#f92672">*</span> circle<span style="color:#f92672">-&gt;</span>r;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>		<span style="color:#75715e">// Draw a line between the two points
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>		<span style="color:#a6e22e">SDL_RenderDrawLine</span>(renderer, (<span style="color:#66d9ef">int</span>)point_x_start, (<span style="color:#66d9ef">int</span>)point_y_start, (<span style="color:#66d9ef">int</span>)point_x_end, (<span style="color:#66d9ef">int</span>)point_y_end);
+</span></span><span style="display:flex;"><span>	} <span style="color:#66d9ef">while</span>(angle<span style="color:#f92672">--&gt;</span><span style="color:#ae81ff">1</span>);
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// in the main loop, call the function as follows after setting the right color:
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#a6e22e">SDL_RenderDrawCircle</span>(renderer, <span style="color:#f92672">&amp;</span>circle);
+</span></span></code></pre></div><p>This results in the following drawing being made:</p>
 <p><a href="images/sdl2_circle.png"><img src="images/sdl2_circle.png" alt="SDL2 circle"></a></p>
 <h2 id="drawing-an-image">Drawing an image</h2>
 <p>SDL2 can draw images as sprites:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#75715e">// Enable support for JPG, PNG and/or TIF before creating the window
-</span><span style="color:#75715e"></span>IMG_Init(IMG_INIT_JPG<span style="color:#f92672">|</span>IMG_INIT_PNG<span style="color:#f92672">|</span>IMG_INIT_TIF);
-
-<span style="color:#75715e">// Import image files before running the main loop
-</span><span style="color:#75715e"></span>SDL_Texture<span style="color:#f92672">*</span> example_texture <span style="color:#f92672">=</span> IMG_LoadTexture(renderer, <span style="color:#e6db74">&#34;image.jpg&#34;</span>);
-
-<span style="color:#75715e">// Render the texture inside the main loop
-</span><span style="color:#75715e"></span>SDL_Rect dstrect;
-<span style="color:#66d9ef">int</span> rotation <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
-dstrect.x <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
-dstrect.y <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
-SDL_GetWindowSize(window, <span style="color:#f92672">&amp;</span>dstrect.w, <span style="color:#f92672">&amp;</span>dstrect.h);
-SDL_RenderCopyEx(renderer, example_texture, NULL, <span style="color:#f92672">&amp;</span>dstrect, rotation, NULL, SDL_FLIP_NONE);
-
-<span style="color:#75715e">// After the main window, before the window closes, run IMG_Quit();
-</span><span style="color:#75715e"></span>IMG_Quit();
-</code></pre></div><p>This results in the image being drawn on the screen:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#75715e">// Enable support for JPG, PNG and/or TIF before creating the window
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#a6e22e">IMG_Init</span>(IMG_INIT_JPG<span style="color:#f92672">|</span>IMG_INIT_PNG<span style="color:#f92672">|</span>IMG_INIT_TIF);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Import image files before running the main loop
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>SDL_Texture<span style="color:#f92672">*</span> example_texture <span style="color:#f92672">=</span> <span style="color:#a6e22e">IMG_LoadTexture</span>(renderer, <span style="color:#e6db74">&#34;image.jpg&#34;</span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Render the texture inside the main loop
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>SDL_Rect dstrect;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">int</span> rotation <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
+</span></span><span style="display:flex;"><span>dstrect.x <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
+</span></span><span style="display:flex;"><span>dstrect.y <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">SDL_GetWindowSize</span>(window, <span style="color:#f92672">&amp;</span>dstrect.w, <span style="color:#f92672">&amp;</span>dstrect.h);
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">SDL_RenderCopyEx</span>(renderer, example_texture, NULL, <span style="color:#f92672">&amp;</span>dstrect, rotation, NULL, SDL_FLIP_NONE);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// After the main window, before the window closes, run IMG_Quit();
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#a6e22e">IMG_Quit</span>();
+</span></span></code></pre></div><p>This results in the image being drawn on the screen:</p>
 <p><a href="images/sdl2_image_rendering.png"><img src="images/sdl2_image_rendering.png" alt="SDL2 image rendering"></a></p>
 <h2 id="playing-audio">Playing audio</h2>
 <p>To play audio, the following code can be used:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#75715e">// Initialize audio before the main loop
-</span><span style="color:#75715e"></span><span style="color:#66d9ef">int</span> number_of_channels <span style="color:#f92672">=</span> <span style="color:#ae81ff">50</span>;    <span style="color:#75715e">// SDL2 will play max 50 audio clips at the same time
-</span><span style="color:#75715e"></span>
-<span style="color:#66d9ef">if</span>(Mix_OpenAudio(<span style="color:#ae81ff">44100</span>, AUDIO_S16SYS, <span style="color:#ae81ff">2</span>, <span style="color:#ae81ff">512</span>) <span style="color:#f92672">&lt;</span> <span style="color:#ae81ff">0</span>) {
-    fprintf(stderr, <span style="color:#e6db74">&#34;Could not open audio: %s</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>, SDL_GetError());
-    exit(<span style="color:#ae81ff">1</span>);
-}
-<span style="color:#66d9ef">if</span>(Mix_AllocateChannels(number_of_channels) <span style="color:#f92672">&lt;</span> <span style="color:#ae81ff">0</span>) {
-    fprintf(stderr, <span style="color:#e6db74">&#34;Could not allocate mixing channels: %s</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>, SDL_GetError());
-    exit(<span style="color:#ae81ff">1</span>);
-}
-
-<span style="color:#75715e">// Before the main loop, import all audio files as mix chunks
-</span><span style="color:#75715e"></span>Mix_Chunk<span style="color:#f92672">*</span> example_audio <span style="color:#f92672">=</span> Mix_LoadWAV(<span style="color:#e6db74">&#34;audio.wav&#34;</span>);
-
-<span style="color:#75715e">// During the main loop, when audio needs to play, it can be done using the following code
-</span><span style="color:#75715e"></span>Mix_PlayChannel(<span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>, example_audio, <span style="color:#ae81ff">0</span>);  <span style="color:#75715e">// -1 automatically selects the first available audio channel
-</span><span style="color:#75715e"></span>
-<span style="color:#75715e">// After the main loop, before the program shuts down, make sure to close the audio mixer
-</span><span style="color:#75715e"></span>Mix_CloseAudio();
-</code></pre></div><h2 id="rendering-text">Rendering text</h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#75715e">// Initialize audio before the main loop
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">int</span> number_of_channels <span style="color:#f92672">=</span> <span style="color:#ae81ff">50</span>;    <span style="color:#75715e">// SDL2 will play max 50 audio clips at the same time
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">if</span>(<span style="color:#a6e22e">Mix_OpenAudio</span>(<span style="color:#ae81ff">44100</span>, AUDIO_S16SYS, <span style="color:#ae81ff">2</span>, <span style="color:#ae81ff">512</span>) <span style="color:#f92672">&lt;</span> <span style="color:#ae81ff">0</span>) {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">fprintf</span>(stderr, <span style="color:#e6db74">&#34;Could not open audio: %s</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>, <span style="color:#a6e22e">SDL_GetError</span>());
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">exit</span>(<span style="color:#ae81ff">1</span>);
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">if</span>(<span style="color:#a6e22e">Mix_AllocateChannels</span>(number_of_channels) <span style="color:#f92672">&lt;</span> <span style="color:#ae81ff">0</span>) {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">fprintf</span>(stderr, <span style="color:#e6db74">&#34;Could not allocate mixing channels: %s</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>, <span style="color:#a6e22e">SDL_GetError</span>());
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">exit</span>(<span style="color:#ae81ff">1</span>);
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Before the main loop, import all audio files as mix chunks
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>Mix_Chunk<span style="color:#f92672">*</span> example_audio <span style="color:#f92672">=</span> <span style="color:#a6e22e">Mix_LoadWAV</span>(<span style="color:#e6db74">&#34;audio.wav&#34;</span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// During the main loop, when audio needs to play, it can be done using the following code
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#a6e22e">Mix_PlayChannel</span>(<span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>, example_audio, <span style="color:#ae81ff">0</span>);  <span style="color:#75715e">// -1 automatically selects the first available audio channel
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// After the main loop, before the program shuts down, make sure to close the audio mixer
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#a6e22e">Mix_CloseAudio</span>();
+</span></span></code></pre></div><h2 id="rendering-text">Rendering text</h2>
 <p>To render text in SDL2, a font file with the extension <em>.ttf</em> is needed. It is to be placed in the same directory as the binary, or in a subdirectory within the project.</p>
 <p>First, enable font support and load a font by running the code below:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c">TTF_Init();
-<span style="color:#66d9ef">int</span> font_size <span style="color:#f92672">=</span> <span style="color:#ae81ff">16</span>;
-TTF_Font<span style="color:#f92672">*</span> font <span style="color:#f92672">=</span> TTF_OpenFont(<span style="color:#e6db74">&#34;path/to/font-file.ttf&#34;</span>, font_size);
-</code></pre></div><p>Then, to render text on the screen using this font, the following function can be used:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#66d9ef">void</span> <span style="color:#a6e22e">text_render</span>(SDL_Renderer<span style="color:#f92672">*</span> renderer, TTF_Font<span style="color:#f92672">*</span> font, <span style="color:#66d9ef">char</span><span style="color:#f92672">*</span> message, <span style="color:#66d9ef">int</span> position_x, <span style="color:#66d9ef">int</span> position_y, <span style="color:#66d9ef">int</span> rotation_angle, <span style="color:#66d9ef">bool</span> center, SDL_Color<span style="color:#f92672">*</span> text_color) {
-    <span style="color:#75715e">// Declare variables that will contain text size values generated by TTF_SizeText()
-</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">int</span> text_width;
-    <span style="color:#66d9ef">int</span> text_height;
-
-    <span style="color:#75715e">// Tell SDL2 to convert the imported ttf file and message into a texture
-</span><span style="color:#75715e"></span>    SDL_Surface<span style="color:#f92672">*</span> message_surface <span style="color:#f92672">=</span> TTF_RenderText_Solid(font, message, <span style="color:#f92672">*</span>text_color);
-    SDL_Texture<span style="color:#f92672">*</span> message_texture <span style="color:#f92672">=</span> SDL_CreateTextureFromSurface(renderer, message_surface);
-
-    <span style="color:#75715e">// Define dimensions of the text
-</span><span style="color:#75715e"></span>    TTF_SizeText(font, message, <span style="color:#f92672">&amp;</span>text_width, <span style="color:#f92672">&amp;</span>text_height);
-    SDL_Rect message_rect;
-    <span style="color:#66d9ef">if</span>(center) {
-        message_rect.x <span style="color:#f92672">=</span> position_x <span style="color:#f92672">-</span> (text_width <span style="color:#f92672">/</span> <span style="color:#ae81ff">2</span>);
-        message_rect.y <span style="color:#f92672">=</span> position_y <span style="color:#f92672">-</span> (text_height <span style="color:#f92672">/</span> <span style="color:#ae81ff">2</span>);
-    } <span style="color:#66d9ef">else</span> {
-        message_rect.x <span style="color:#f92672">=</span> position_x;
-        message_rect.y <span style="color:#f92672">=</span> position_y;
-    }
-    message_rect.w <span style="color:#f92672">=</span> text_width;
-    message_rect.h <span style="color:#f92672">=</span> text_height;
-
-    <span style="color:#75715e">// Add the text to the rendering queue.
-</span><span style="color:#75715e"></span>    <span style="color:#75715e">// SDL_RenderCopy(renderer, message_texture, NULL, &amp;message_rect);
-</span><span style="color:#75715e"></span>    SDL_RenderCopyEx(renderer, message_texture, NULL, <span style="color:#f92672">&amp;</span>message_rect, rotation_angle, NULL, SDL_FLIP_NONE);
-
-    <span style="color:#75715e">// Delete the texture, since it&#39;s written to the screen already
-</span><span style="color:#75715e"></span>    SDL_FreeSurface(message_surface);
-    SDL_DestroyTexture(message_texture);
-}
-</code></pre></div><p>The function can now be called somewhere in <code>main()</code>:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#75715e">// Define a text color
-</span><span style="color:#75715e"></span>SDL_Color color;
-color.r <span style="color:#f92672">=</span> <span style="color:#ae81ff">255</span>;               <span style="color:#75715e">// red
-</span><span style="color:#75715e"></span>color.g <span style="color:#f92672">=</span> <span style="color:#ae81ff">100</span>;               <span style="color:#75715e">// green
-</span><span style="color:#75715e"></span>color.b <span style="color:#f92672">=</span> <span style="color:#ae81ff">100</span>;               <span style="color:#75715e">// blue
-</span><span style="color:#75715e"></span>color.a <span style="color:#f92672">=</span> SDL_ALPHA_OPAQUE;  <span style="color:#75715e">// alpha
-</span><span style="color:#75715e"></span>
-<span style="color:#75715e">// Define the message
-</span><span style="color:#75715e"></span><span style="color:#66d9ef">char</span><span style="color:#f92672">*</span> message <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Example text&#34;</span>;
-
-<span style="color:#75715e">// Render it all in the main loop
-</span><span style="color:#75715e"></span><span style="color:#66d9ef">int</span> x_end, y_end;
-SDL_GetWindowSize(window, <span style="color:#f92672">&amp;</span>x_end, <span style="color:#f92672">&amp;</span>y_end);
-text_render(renderer, font, message, x_end <span style="color:#f92672">/</span> <span style="color:#ae81ff">2</span>, y_end <span style="color:#f92672">/</span> <span style="color:#ae81ff">2</span>, <span style="color:#f92672">-</span><span style="color:#ae81ff">10</span>, true, <span style="color:#f92672">&amp;</span>color);
-</code></pre></div><p>Just before the window is closed, <code>TTF_Quit()</code> needs to be called to free some memory.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#a6e22e">TTF_Init</span>();
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">int</span> font_size <span style="color:#f92672">=</span> <span style="color:#ae81ff">16</span>;
+</span></span><span style="display:flex;"><span>TTF_Font<span style="color:#f92672">*</span> font <span style="color:#f92672">=</span> <span style="color:#a6e22e">TTF_OpenFont</span>(<span style="color:#e6db74">&#34;path/to/font-file.ttf&#34;</span>, font_size);
+</span></span></code></pre></div><p>Then, to render text on the screen using this font, the following function can be used:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#66d9ef">void</span> <span style="color:#a6e22e">text_render</span>(SDL_Renderer<span style="color:#f92672">*</span> renderer, TTF_Font<span style="color:#f92672">*</span> font, <span style="color:#66d9ef">char</span><span style="color:#f92672">*</span> message, <span style="color:#66d9ef">int</span> position_x, <span style="color:#66d9ef">int</span> position_y, <span style="color:#66d9ef">int</span> rotation_angle, <span style="color:#66d9ef">bool</span> center, SDL_Color<span style="color:#f92672">*</span> text_color) {
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Declare variables that will contain text size values generated by TTF_SizeText()
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">int</span> text_width;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">int</span> text_height;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Tell SDL2 to convert the imported ttf file and message into a texture
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    SDL_Surface<span style="color:#f92672">*</span> message_surface <span style="color:#f92672">=</span> <span style="color:#a6e22e">TTF_RenderText_Solid</span>(font, message, <span style="color:#f92672">*</span>text_color);
+</span></span><span style="display:flex;"><span>    SDL_Texture<span style="color:#f92672">*</span> message_texture <span style="color:#f92672">=</span> <span style="color:#a6e22e">SDL_CreateTextureFromSurface</span>(renderer, message_surface);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Define dimensions of the text
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#a6e22e">TTF_SizeText</span>(font, message, <span style="color:#f92672">&amp;</span>text_width, <span style="color:#f92672">&amp;</span>text_height);
+</span></span><span style="display:flex;"><span>    SDL_Rect message_rect;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span>(center) {
+</span></span><span style="display:flex;"><span>        message_rect.x <span style="color:#f92672">=</span> position_x <span style="color:#f92672">-</span> (text_width <span style="color:#f92672">/</span> <span style="color:#ae81ff">2</span>);
+</span></span><span style="display:flex;"><span>        message_rect.y <span style="color:#f92672">=</span> position_y <span style="color:#f92672">-</span> (text_height <span style="color:#f92672">/</span> <span style="color:#ae81ff">2</span>);
+</span></span><span style="display:flex;"><span>    } <span style="color:#66d9ef">else</span> {
+</span></span><span style="display:flex;"><span>        message_rect.x <span style="color:#f92672">=</span> position_x;
+</span></span><span style="display:flex;"><span>        message_rect.y <span style="color:#f92672">=</span> position_y;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    message_rect.w <span style="color:#f92672">=</span> text_width;
+</span></span><span style="display:flex;"><span>    message_rect.h <span style="color:#f92672">=</span> text_height;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Add the text to the rendering queue.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#75715e">// SDL_RenderCopy(renderer, message_texture, NULL, &amp;message_rect);
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#a6e22e">SDL_RenderCopyEx</span>(renderer, message_texture, NULL, <span style="color:#f92672">&amp;</span>message_rect, rotation_angle, NULL, SDL_FLIP_NONE);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Delete the texture, since it&#39;s written to the screen already
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#a6e22e">SDL_FreeSurface</span>(message_surface);
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">SDL_DestroyTexture</span>(message_texture);
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>The function can now be called somewhere in <code>main()</code>:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#75715e">// Define a text color
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>SDL_Color color;
+</span></span><span style="display:flex;"><span>color.r <span style="color:#f92672">=</span> <span style="color:#ae81ff">255</span>;               <span style="color:#75715e">// red
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>color.g <span style="color:#f92672">=</span> <span style="color:#ae81ff">100</span>;               <span style="color:#75715e">// green
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>color.b <span style="color:#f92672">=</span> <span style="color:#ae81ff">100</span>;               <span style="color:#75715e">// blue
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>color.a <span style="color:#f92672">=</span> SDL_ALPHA_OPAQUE;  <span style="color:#75715e">// alpha
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Define the message
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">char</span><span style="color:#f92672">*</span> message <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Example text&#34;</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Render it all in the main loop
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">int</span> x_end, y_end;
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">SDL_GetWindowSize</span>(window, <span style="color:#f92672">&amp;</span>x_end, <span style="color:#f92672">&amp;</span>y_end);
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">text_render</span>(renderer, font, message, x_end <span style="color:#f92672">/</span> <span style="color:#ae81ff">2</span>, y_end <span style="color:#f92672">/</span> <span style="color:#ae81ff">2</span>, <span style="color:#f92672">-</span><span style="color:#ae81ff">10</span>, true, <span style="color:#f92672">&amp;</span>color);
+</span></span></code></pre></div><p>Just before the window is closed, <code>TTF_Quit()</code> needs to be called to free some memory.</p>
 <p>This will result in the following window being shown:</p>
 <p><a href="images/sdl2_example_text.png"><img src="images/sdl2_example_text.png" alt="SDL2 text rendering"></a></p>
 <h2 id="keyboard-input">Keyboard input</h2>
@@ -438,7 +437,7 @@ text_render(renderer, font, message, x_end <span style="color:#f92672">/</span> 
           <line x1="16" y1="17" x2="8" y2="17"></line>
           <polyline points="10 9 9 9 8 9"></polyline>
         </svg>
-        1376 Words
+        1384 Words
       </p>
 
       <p>
@@ -603,7 +602,7 @@ text_render(renderer, font, message, x_end <span style="color:#f92672">/</span> 
 
 
 
-<script type="text/javascript" src="/bundle.min.644292943ae47eef02fcd64b11757aeb8caeeaebf473a823b62099edccac808e8d82689359f285e5d95994e5ad5ae3b9c1ccc281eb1828e67d0ba6630f95b832.js" integrity="sha512-ZEKSlDrkfu8C/NZLEXV664yu6uv0c6gjtiCZ7cysgI6NgmiTWfKF5dlZlOWtWuO5wczCgesYKOZ9C6ZjD5W4Mg=="></script>
+<script type="text/javascript" src="/bundle.min.205d491810c28f95aa953fae884e1c27abe13fdf93ec63b882d0036b248d4a6282eb2d134e4e7225c6ad6e86db87b08488a361ca4a7383d01fcff43f3d57b9c3.js" integrity="sha512-IF1JGBDCj5WqlT&#43;uiE4cJ6vhP9&#43;T7GO4gtADaySNSmKC6y0TTk5yJcatbobbh7CEiKNhykpzg9Afz/Q/PVe5ww=="></script>
 
 
 

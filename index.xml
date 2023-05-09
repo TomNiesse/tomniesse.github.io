@@ -18,7 +18,7 @@
     </item>
     
     <item>
-      <title>Printing ABS using an Ender 3 (v1), without an enclosure</title>
+      <title>3D printing ABS using an Ender 3 (v1), without an enclosure</title>
       <link>https://tomniesse.github.io/posts/ender3-abs-printing/</link>
       <pubDate>Sun, 09 Apr 2023 13:28:55 +0200</pubDate>
       
@@ -37,7 +37,6 @@ And if someone else can do it, it must be possible.</description>
       <description>Introduction This page explains how the game &amp;ldquo;Dune Dynasty II&amp;rdquo; can be ran on an embedded linux OS. The OS is created using buildroot.
 All required configurations and compile-commands are documented on this page.
 The below image shows the game (and embedded OS) running.
-
 Previous work This post is based on another post in which a basic embedded OS is created. However, the toolchain used uClibc as C library, which will not work here.</description>
     </item>
     

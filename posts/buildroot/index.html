@@ -64,7 +64,6 @@ What is Buildroot? Buildroot, just like the yocto project, is a set of tools to 
 
 
 
-
     <meta property="article:published_time" content="2021-11-18 13:28:55 &#43;0200 &#43;0200" />
 
 
@@ -175,25 +174,25 @@ What is Buildroot? Buildroot, just like the yocto project, is a set of tools to 
 <p>If the kernel is compiled using <code>arm-none-eabi-gcc</code> and the rest of the system is compiled using <code>aarch64-linux-gnu-gcc</code>, the system will not run. To ensure that the system runs (well) on the target board, a cross-compiling toolchain will be set up. This toolchain contains a cross-compiling <code>gcc</code>, <code>ld</code> and other tools that would normally be used to (cross-)compile a program or OS. The tools in the toolchain will be used to compile the whole system.</p>
 <p>In this post, <a href="https://crosstool-ng.github.io">crosstool-NG</a> is used.</p>
 <h2 id="downloading">Downloading</h2>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">git clone https://github.com/crosstool-ng/crosstool-ng
-</code></pre></div><h2 id="compiling">Compiling</h2>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">./bootstrap <span style="color:#75715e"># only if crosstool-NG is cloned from github</span>
-./configure --enable-local
-make
-</code></pre></div><h2 id="configuring-a-cross-compiling-toolchain">Configuring a cross-compiling toolchain</h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>git clone https://github.com/crosstool-ng/crosstool-ng
+</span></span></code></pre></div><h2 id="compiling">Compiling</h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>./bootstrap <span style="color:#75715e"># only if crosstool-NG is cloned from github</span>
+</span></span><span style="display:flex;"><span>./configure --enable-local
+</span></span><span style="display:flex;"><span>make
+</span></span></code></pre></div><h2 id="configuring-a-cross-compiling-toolchain">Configuring a cross-compiling toolchain</h2>
 <p>The command</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">./ct-ng list-samples
-</code></pre></div><p>will give a list of possible targets to compile for. The entry <code>aarch64-rpi4-linux-gnu</code> is used by executing the following command:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">./ct-ng aarch64-rpi4-linux-gnu
-</code></pre></div><p>Because the GNU C library is quite big compared to something like uClibc, the <code>.config</code> file will be edited to use uClibc instead of the GNU C library. The goal is to make the target system a little smaller in disk size. The <code>.config</code> file is edited using the following command:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">./ct-ng menuconfig
-</code></pre></div><p>The following changes were made inside the menuconfig menu:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>./ct-ng list-samples
+</span></span></code></pre></div><p>will give a list of possible targets to compile for. The entry <code>aarch64-rpi4-linux-gnu</code> is used by executing the following command:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>./ct-ng aarch64-rpi4-linux-gnu
+</span></span></code></pre></div><p>Because the GNU C library is quite big compared to something like uClibc, the <code>.config</code> file will be edited to use uClibc instead of the GNU C library. The goal is to make the target system a little smaller in disk size. The <code>.config</code> file is edited using the following command:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>./ct-ng menuconfig
+</span></span></code></pre></div><p>The following changes were made inside the menuconfig menu:</p>
 <ul>
 <li>Under <code>C library</code>, the option <code>C library</code> is changed to <code>uClibc</code></li>
 </ul>
 <p>Then the menuconfig is exited and restarted to reload all options:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">./ct-ng menuconfig
-</code></pre></div><ul>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>./ct-ng menuconfig
+</span></span></code></pre></div><ul>
 <li>Under <code>C library</code>, the option <code>Add support for locales</code> is enabled</li>
 <li>Under <code>C library</code>, the option <code>Add support for IPv6</code> is enabled</li>
 <li>Under <code>C library</code>, the option <code>enable iconv</code> is enabled</li>
@@ -206,29 +205,29 @@ make
 </ul>
 <h2 id="building-the-toolchain">Building the toolchain</h2>
 <p>After the toolchain is configured, it can be built using the following command:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">./ct-ng build -j<span style="color:#e6db74">`</span>nproc<span style="color:#e6db74">`</span>
-</code></pre></div><p>This build process will take a <em>long</em> time. Therefore, it should <em>not</em> be done in a (misconfigured) VM, but on a pc with lots of cores and/or threads. This can reduce the build time from a day to a few hours (maybe even less).</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>./ct-ng build -j<span style="color:#e6db74">`</span>nproc<span style="color:#e6db74">`</span>
+</span></span></code></pre></div><p>This build process will take a <em>long</em> time. Therefore, it should <em>not</em> be done in a (misconfigured) VM, but on a pc with lots of cores and/or threads. This can reduce the build time from a day to a few hours (maybe even less).</p>
 <h2 id="checking-if-the-toolchain-works">Checking if the toolchain works</h2>
 <p>After crosstool-NG is done creating a toolchain, a folder called <code>x-tools</code> can be found in the home-directory of the current user (<code>/home/$USER/x-tools</code>). Inside the <code>x-tools</code> directory, all cross-compiling toolchains can be found. To test if the new toolchain is the right version, the following command is executed inside <code>/home/$USER/x-tools/aarch64-rpi4-linux-uclibc/bin</code>:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">toolchain-gcc -v
-<span style="color:#75715e"># or, if the &#34;Tuple&#39;s alias&#34; option was not set when configuring the toolchain:</span>
-aarch64-rpi4-linux-uclibc-gcc -v
-</code></pre></div><p>The executed binary states that it is version <code>10.3.0</code>, just like the version that was specified in the menuconfig of crosstool-NG. For now, it is assumed that the binary will cross-compile without errors.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>toolchain-gcc -v
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># or, if the &#34;Tuple&#39;s alias&#34; option was not set when configuring the toolchain:</span>
+</span></span><span style="display:flex;"><span>aarch64-rpi4-linux-uclibc-gcc -v
+</span></span></code></pre></div><p>The executed binary states that it is version <code>10.3.0</code>, just like the version that was specified in the menuconfig of crosstool-NG. For now, it is assumed that the binary will cross-compile without errors.</p>
 <h1 id="creating-a-basic-buildroot-os">Creating a basic Buildroot OS</h1>
 <h2 id="downloading-buildroot">Downloading Buildroot</h2>
 <p>To get started, Buildroot can be downloaded from the <a href="https://buildroot.org/download.html">Buildroot website</a>. There are two download options to choose from; &ldquo;LTS&rdquo; or &ldquo;stable&rdquo;. For newer devices, the stable option is a good option. For this blog, the stable <em>.tar.gz</em> archive is used.</p>
 <h2 id="extracting">Extracting</h2>
 <p>To extract the <em>.tar.gz</em> file, the following command can be executed:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">tar -xvf buildroot-&lt;VERSION_GOES_HERE&gt;.tar.gz
-</code></pre></div><h2 id="initial-setup">Initial setup</h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>tar -xvf buildroot-&lt;VERSION_GOES_HERE&gt;.tar.gz
+</span></span></code></pre></div><h2 id="initial-setup">Initial setup</h2>
 <p>To view the target devices Buildroot can build systems for, the following command can be executed:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">make list-defconfigs
-</code></pre></div><p>To configure Buildroot to build for the Raspberry Pi 4 (64 bit), the following command can be issued from the Buildroot directory:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">make raspberrypi4_64_defconfig
-</code></pre></div><p>To then configure the system, run the following command:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>make list-defconfigs
+</span></span></code></pre></div><p>To configure Buildroot to build for the Raspberry Pi 4 (64 bit), the following command can be issued from the Buildroot directory:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>make raspberrypi4_64_defconfig
+</span></span></code></pre></div><p>To then configure the system, run the following command:</p>
 <h2 id="configuring-the-target-system">Configuring the target system</h2>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">make menuconfig
-</code></pre></div><p>For this post, the following changed were made to the configuration:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>make menuconfig
+</span></span></code></pre></div><p>For this post, the following changed were made to the configuration:</p>
 <ul>
 <li>Under <code>Build options</code>, the option <code>Enable compiler cache</code> is enabled</li>
 <li>Under <code>Bootloaders</code>, all the options are disabled (the bootloader will be compiled manually)</li>
@@ -250,13 +249,13 @@ aarch64-rpi4-linux-uclibc-gcc -v
 <li>Under <code>System configuration</code>, the option <code>/dev management</code> is set to <code>Dynamic using devtmpfs + mdev</code> (to load drivers automatically when the target device boots)</li>
 </ul>
 <p>Most linux desktops use <code>udev</code> to manage device drivers, but because this system uses <code>BusyBox</code> as init system, so <code>mdev</code> is used. To enable <code>mdev</code> at boot, the file <code>buildroot-&lt;VERSION_GOES_HERE&gt;/board/raspberrypi/post-build.sh</code> needs the following extra lines at the bottom, leaving the rest of the file as is:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">cp package/busybox/S10mdev <span style="color:#e6db74">${</span>TARGET_DIR<span style="color:#e6db74">}</span>/etc/init.d/S10mdev
-chmod <span style="color:#ae81ff">755</span> <span style="color:#e6db74">${</span>TARGET_DIR<span style="color:#e6db74">}</span>/etc/init.d/S10mdev
-cp package/busybox/mdev.conf <span style="color:#e6db74">${</span>TARGET_DIR<span style="color:#e6db74">}</span>/etc/mdev.conf
-</code></pre></div><h2 id="building">Building</h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>cp package/busybox/S10mdev <span style="color:#e6db74">${</span>TARGET_DIR<span style="color:#e6db74">}</span>/etc/init.d/S10mdev
+</span></span><span style="display:flex;"><span>chmod <span style="color:#ae81ff">755</span> <span style="color:#e6db74">${</span>TARGET_DIR<span style="color:#e6db74">}</span>/etc/init.d/S10mdev
+</span></span><span style="display:flex;"><span>cp package/busybox/mdev.conf <span style="color:#e6db74">${</span>TARGET_DIR<span style="color:#e6db74">}</span>/etc/mdev.conf
+</span></span></code></pre></div><h2 id="building">Building</h2>
 <p>To build the embedded OS, the following command can be executed:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">make clean <span style="color:#f92672">&amp;&amp;</span> make
-</code></pre></div><p>The reason for the <code>make clean</code> part is that Buildroot remembers <em>a lot</em>, and will sometimes refuse to build (correctly) because of a cached configuration.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>make clean <span style="color:#f92672">&amp;&amp;</span> make
+</span></span></code></pre></div><p>The reason for the <code>make clean</code> part is that Buildroot remembers <em>a lot</em>, and will sometimes refuse to build (correctly) because of a cached configuration.</p>
 <h2 id="after-compiling">After compiling</h2>
 <p>When buildroot is done compiling, a file called <code>rootfs.tar.gz</code> can be found in the <code>output/images</code> folder. This is the entire embedded OS, minus the bootloader. The bootloader will be compiled manually.</p>
 <p>The same <code>output/images</code> folder also contains a linux image called <code>Image</code>. This image needs to be converted into a U-boot image (<code>uImage</code>)</p>
@@ -265,143 +264,143 @@ The files, <code>start4.elf</code> and <code>fixup4.dat</code> are needed later.
 <h2 id="converting-the-linux-image-into-a-uimage">Converting the linux Image into a uImage</h2>
 <p>Buildroot created a file called <code>Image</code>. However, the U-boot bootloader (which wil be built in the next chapter) cannot boot this image file as it is. In order for U-boot to boot the kernel, the image file has to be converted to a U-boot image (<code>uImage</code>).</p>
 <p>To convert the linux image into a uImage, the package <code>u-boot-tools</code> (or <code>uboot-tools</code>) is required. Then the <code>Image</code> file can be converted using the following command:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">mkimage -n <span style="color:#e6db74">&#39;Linux kernel&#39;</span> -A arm64 -O linux -C none -T kernel -a 0x00080000 -e 0x00080000 -d arch/arm64/boot/Image uImage
-</code></pre></div><p>A file called <code>uImage</code> will now be created. This file contains the entire linux kernel binary, including some extra header stuff that <code>u-boot-tools</code> added. This file is the kernel which runs the system.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>mkimage -n <span style="color:#e6db74">&#39;Linux kernel&#39;</span> -A arm64 -O linux -C none -T kernel -a 0x00080000 -e 0x00080000 -d arch/arm64/boot/Image uImage
+</span></span></code></pre></div><p>A file called <code>uImage</code> will now be created. This file contains the entire linux kernel binary, including some extra header stuff that <code>u-boot-tools</code> added. This file is the kernel which runs the system.</p>
 <h1 id="adding-a-bootloader-u-boot">Adding a bootloader (U-boot)</h1>
 <p>Although Buildroot can include the U-boot bootloader (among others) by enabling some settings, it might be nice to go a little more in depth to learn how U-boot actually works.</p>
 <h2 id="downloading-u-boot">Downloading U-boot</h2>
 <p>The U-boot bootloader can be downloaded from <a href="https://github.com/u-boot/u-boot">github</a>.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">git clone https://github.com/u-boot/u-boot
-cd u-boot/
-</code></pre></div><h2 id="configuring-the-u-boot-source">Configuring the U-boot source</h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>git clone https://github.com/u-boot/u-boot
+</span></span><span style="display:flex;"><span>cd u-boot/
+</span></span></code></pre></div><h2 id="configuring-the-u-boot-source">Configuring the U-boot source</h2>
 <p>To see which default configurations U-boot has, execute the following command:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">ls configs
-<span style="color:#75715e"># or, to only see raspberry pi entries</span>
-ls configs | grep rpi
-</code></pre></div><p>To create a basic configuration for the Raspberry Pi 4, the following command can be executed:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">ARCH<span style="color:#f92672">=</span>arm64 CROSS_COMPILE<span style="color:#f92672">=</span>~/x-tools/aarch64-rpi4-linux-uclibc/bin/aarch64-rpi4-linux-uclibc- make rpi_4_defconfig
-</code></pre></div><p>To then further configure the source, the <code>make menuconfig</code> command can be given:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">ARCH<span style="color:#f92672">=</span>arm64 CROSS_COMPILE<span style="color:#f92672">=</span>~/x-tools/aarch64-rpi4-linux-uclibc/bin/aarch64-rpi4-linux-uclibc- make menuconfig
-</code></pre></div><p>In this post, the autoboot timer is changed from <code>2</code> to <code>0</code> for production-builds. This option can be changed in the following region:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">Boot options -&gt;
-    Autoboot options -&gt;
-        delay in seconds before automatically booting
-</code></pre></div><p>For test builds, it is recommended to leave this value as is.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>ls configs
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># or, to only see raspberry pi entries</span>
+</span></span><span style="display:flex;"><span>ls configs | grep rpi
+</span></span></code></pre></div><p>To create a basic configuration for the Raspberry Pi 4, the following command can be executed:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>ARCH<span style="color:#f92672">=</span>arm64 CROSS_COMPILE<span style="color:#f92672">=</span>~/x-tools/aarch64-rpi4-linux-uclibc/bin/aarch64-rpi4-linux-uclibc- make rpi_4_defconfig
+</span></span></code></pre></div><p>To then further configure the source, the <code>make menuconfig</code> command can be given:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>ARCH<span style="color:#f92672">=</span>arm64 CROSS_COMPILE<span style="color:#f92672">=</span>~/x-tools/aarch64-rpi4-linux-uclibc/bin/aarch64-rpi4-linux-uclibc- make menuconfig
+</span></span></code></pre></div><p>In this post, the autoboot timer is changed from <code>2</code> to <code>0</code> for production-builds. This option can be changed in the following region:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>Boot options -&gt;
+</span></span><span style="display:flex;"><span>    Autoboot options -&gt;
+</span></span><span style="display:flex;"><span>        delay in seconds before automatically booting
+</span></span></code></pre></div><p>For test builds, it is recommended to leave this value as is.</p>
 <h2 id="compiling-u-boot">Compiling U-boot</h2>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">ARCH<span style="color:#f92672">=</span>arm64 CROSS_COMPILE<span style="color:#f92672">=</span>~/x-tools/aarch64-rpi4-linux-uclibc/bin/aarch64-rpi4-linux-uclibc- make -j<span style="color:#e6db74">`</span>nproc<span style="color:#e6db74">`</span>
-</code></pre></div><p>The compile process will not take long. After the compilation is complete, a file called <code>u-boot.bin</code> (the U-boot binary) will exist.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>ARCH<span style="color:#f92672">=</span>arm64 CROSS_COMPILE<span style="color:#f92672">=</span>~/x-tools/aarch64-rpi4-linux-uclibc/bin/aarch64-rpi4-linux-uclibc- make -j<span style="color:#e6db74">`</span>nproc<span style="color:#e6db74">`</span>
+</span></span></code></pre></div><p>The compile process will not take long. After the compilation is complete, a file called <code>u-boot.bin</code> (the U-boot binary) will exist.</p>
 <h2 id="creating-raspberry-pi-boot-configuration">Creating Raspberry Pi boot configuration</h2>
 <p>Normally, the Raspberry Pi 4 boots a file called <code>kernel.img</code> (sometimes <code>kernel&lt;version number here&gt;.img</code>). In this post, the Raspberry Pi 4 should start the U-boot bootloader instead of the kernel. This can be done by creating a file called <code>config.txt</code> with the following content:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#75715e"># Enable UART communication</span>
-enable_uart<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span>
-
-<span style="color:#75715e"># Enable 64 bit mode</span>
-arm_64bit<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span>
-
-<span style="color:#75715e"># Make the raspberry Pi 4 start U-boot (u-boot.bin) instead of the default kernel8.img</span>
-kernel<span style="color:#f92672">=</span>u-boot.bin
-
-<span style="color:#75715e"># If the bluetooth device interferes with any uart/serial messages, uncomment this</span>
-<span style="color:#75715e">#dtoverlay=miniuart-bt</span>
-
-<span style="color:#75715e"># Uncomment to go fast</span>
-<span style="color:#75715e">#arm_boost=1</span>
-
-<span style="color:#75715e"># Uncomment to enable DRM VC4 V3D driver</span>
-<span style="color:#75715e">#dtoverlay=vc4-kms-v3d</span>
-<span style="color:#75715e">#max_framebuffers=2</span>
-
-<span style="color:#75715e"># Uncomment to disable overscan</span>
-<span style="color:#75715e">#disable_overscan=1</span>
-</code></pre></div><h2 id="creating-a-u-boot-boot-script">Creating a U-boot boot script</h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># Enable UART communication</span>
+</span></span><span style="display:flex;"><span>enable_uart<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Enable 64 bit mode</span>
+</span></span><span style="display:flex;"><span>arm_64bit<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Make the raspberry Pi 4 start U-boot (u-boot.bin) instead of the default kernel8.img</span>
+</span></span><span style="display:flex;"><span>kernel<span style="color:#f92672">=</span>u-boot.bin
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># If the bluetooth device interferes with any uart/serial messages, uncomment this</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#dtoverlay=miniuart-bt</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Uncomment to go fast</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#arm_boost=1</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Uncomment to enable DRM VC4 V3D driver</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#dtoverlay=vc4-kms-v3d</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#max_framebuffers=2</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Uncomment to disable overscan</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#disable_overscan=1</span>
+</span></span></code></pre></div><h2 id="creating-a-u-boot-boot-script">Creating a U-boot boot script</h2>
 <p>By default, when the U-boot bootloader starts up, it will look for a file called <code>boot.scr</code>. The <code>boot.scr</code> file is a boot script. This script will be used to load the kernel (<code>uImage</code>) and device tree (<code>bcm2711-rpi-4-b.dtb</code>) into memory and boot the system.</p>
 <p>To create a bootscript, a file called <code>boot.txt</code> is created. This file will be converted to <code>boot.scr</code> and contains the following:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">sleep <span style="color:#ae81ff">1</span> <span style="color:#75715e"># some SD cards are slow and will fail to list files in time</span>
-
-echo +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-echo +-----------------------------------------------------------+
-echo +----------------Embedded OS is starting!-------------------+
-echo +-----------------------------------------------------------+
-echo +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-echo ++++ Setting kernel parameters ++++++++++++++++++++++++++++++
-setenv bootargs <span style="color:#e6db74">&#39;dwc_otg.lpm_enable=0 console=ttyAMA0,115200 console=tty1 kgdboc=ttyAMA0,115200 root=/dev/mmcblk0p2 rootwait&#39;</span>
-
-echo ++++ Loading kernel into memory +++++++++++++++++++++++++++++
-load mmc <span style="color:#ae81ff">0</span> $kernel_addr_r uImage
-
-echo ++++ Loading device tree into memory ++++++++++++++++++++++++
-load mmc <span style="color:#ae81ff">0</span> $fdt_addr_r bcm2711-rpi-4-b.dtb
-
-echo ++++ Starting system ++++++++++++++++++++++++++++++++++++++++
-bootm $kernel_addr_r - $fdt_addr_r
-</code></pre></div><p>The <code>boot.txt</code> file is then converted to <code>boot.scr</code> using the following command:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">mkimage -A arm64 -O linux -T script -C none -a <span style="color:#ae81ff">0</span> -e <span style="color:#ae81ff">0</span> -n <span style="color:#e6db74">&#34;bootscript&#34;</span> -d boot.txt boot.scr
-</code></pre></div><h1 id="creating-a-system-image">Creating a system image</h1>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>sleep <span style="color:#ae81ff">1</span> <span style="color:#75715e"># some SD cards are slow and will fail to list files in time</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>echo +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+</span></span><span style="display:flex;"><span>echo +-----------------------------------------------------------+
+</span></span><span style="display:flex;"><span>echo +----------------Embedded OS is starting!-------------------+
+</span></span><span style="display:flex;"><span>echo +-----------------------------------------------------------+
+</span></span><span style="display:flex;"><span>echo +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>echo ++++ Setting kernel parameters ++++++++++++++++++++++++++++++
+</span></span><span style="display:flex;"><span>setenv bootargs <span style="color:#e6db74">&#39;dwc_otg.lpm_enable=0 console=ttyAMA0,115200 console=tty1 kgdboc=ttyAMA0,115200 root=/dev/mmcblk0p2 rootwait&#39;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>echo ++++ Loading kernel into memory +++++++++++++++++++++++++++++
+</span></span><span style="display:flex;"><span>load mmc <span style="color:#ae81ff">0</span> $kernel_addr_r uImage
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>echo ++++ Loading device tree into memory ++++++++++++++++++++++++
+</span></span><span style="display:flex;"><span>load mmc <span style="color:#ae81ff">0</span> $fdt_addr_r bcm2711-rpi-4-b.dtb
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>echo ++++ Starting system ++++++++++++++++++++++++++++++++++++++++
+</span></span><span style="display:flex;"><span>bootm $kernel_addr_r - $fdt_addr_r
+</span></span></code></pre></div><p>The <code>boot.txt</code> file is then converted to <code>boot.scr</code> using the following command:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>mkimage -A arm64 -O linux -T script -C none -a <span style="color:#ae81ff">0</span> -e <span style="color:#ae81ff">0</span> -n <span style="color:#e6db74">&#34;bootscript&#34;</span> -d boot.txt boot.scr
+</span></span></code></pre></div><h1 id="creating-a-system-image">Creating a system image</h1>
 <h2 id="creating-an-image-file">Creating an image file</h2>
 <p>To create partitions, the program <code>parted</code> will be used. There will be two partitions: a boot partition called <code>BOOT</code> and a root partition called <code>ROOTFS</code>. The boot partition will have a fat16 filesystem and the root filesystem will use the ext4 filesystem.</p>
 <p>To prevent disks from being destroyed, a virtual disk image will be created using dd:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#75715e"># create a file called `system.img` with a size of 600MiB</span>
-dd <span style="color:#66d9ef">if</span><span style="color:#f92672">=</span>/dev/zero of<span style="color:#f92672">=</span>system.img bs<span style="color:#f92672">=</span>1MiB count<span style="color:#f92672">=</span><span style="color:#ae81ff">600</span> status<span style="color:#f92672">=</span>progress
-</code></pre></div><p>Then, this virtual disk image will be partitioned using <code>parted</code>:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">parted system.img
-</code></pre></div><p>Within <code>parted</code>, run the <code>mklabel</code> command and set the partition table type to <code>msdos</code>:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#f92672">(</span>parted<span style="color:#f92672">)</span> mklabel msdos
-</code></pre></div><p>Then create the boot and root partitions:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#f92672">(</span>parted<span style="color:#f92672">)</span> mkpart primary fat16 2048s 30MiB
-<span style="color:#f92672">(</span>parted<span style="color:#f92672">)</span> mkpart primary ext4 30MiB 100%
-<span style="color:#f92672">(</span>parted<span style="color:#f92672">)</span> set <span style="color:#ae81ff">1</span> boot on
-<span style="color:#f92672">(</span>parted<span style="color:#f92672">)</span> print
-</code></pre></div><p>When done, exit parted by entering <code>quit</code>:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#f92672">(</span>parted<span style="color:#f92672">)</span> quit
-</code></pre></div><h2 id="partitioning-the-system-image">Partitioning the system image</h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># create a file called `system.img` with a size of 600MiB</span>
+</span></span><span style="display:flex;"><span>dd <span style="color:#66d9ef">if</span><span style="color:#f92672">=</span>/dev/zero of<span style="color:#f92672">=</span>system.img bs<span style="color:#f92672">=</span>1MiB count<span style="color:#f92672">=</span><span style="color:#ae81ff">600</span> status<span style="color:#f92672">=</span>progress
+</span></span></code></pre></div><p>Then, this virtual disk image will be partitioned using <code>parted</code>:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>parted system.img
+</span></span></code></pre></div><p>Within <code>parted</code>, run the <code>mklabel</code> command and set the partition table type to <code>msdos</code>:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#f92672">(</span>parted<span style="color:#f92672">)</span> mklabel msdos
+</span></span></code></pre></div><p>Then create the boot and root partitions:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#f92672">(</span>parted<span style="color:#f92672">)</span> mkpart primary fat16 2048s 30MiB
+</span></span><span style="display:flex;"><span><span style="color:#f92672">(</span>parted<span style="color:#f92672">)</span> mkpart primary ext4 30MiB 100%
+</span></span><span style="display:flex;"><span><span style="color:#f92672">(</span>parted<span style="color:#f92672">)</span> set <span style="color:#ae81ff">1</span> boot on
+</span></span><span style="display:flex;"><span><span style="color:#f92672">(</span>parted<span style="color:#f92672">)</span> print
+</span></span></code></pre></div><p>When done, exit parted by entering <code>quit</code>:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#f92672">(</span>parted<span style="color:#f92672">)</span> quit
+</span></span></code></pre></div><h2 id="partitioning-the-system-image">Partitioning the system image</h2>
 <p>First, mount the virtual disk image as follows:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#75715e"># Create a variable for the mount drive path</span>
-SYSTEM_IMAGE<span style="color:#f92672">=</span><span style="color:#e6db74">`</span>sudo losetup -Pf system.img --show<span style="color:#e6db74">`</span>
-</code></pre></div><p>Normally, disk devices in linux have paths like <code>/dev/sda</code>, <code>/dev/sdb</code>, <code>/dev/mmcblk0</code>, etc. This virtual device will have the path <code>/dev/loop0</code>. Multiple virtual devices can be mounted. The next mounted virtual disks will have the path <code>/dev/loop1</code>, <code>/dev/loop2</code>, <code>/dev/loop3</code>, etc.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># Create a variable for the mount drive path</span>
+</span></span><span style="display:flex;"><span>SYSTEM_IMAGE<span style="color:#f92672">=</span><span style="color:#e6db74">`</span>sudo losetup -Pf system.img --show<span style="color:#e6db74">`</span>
+</span></span></code></pre></div><p>Normally, disk devices in linux have paths like <code>/dev/sda</code>, <code>/dev/sdb</code>, <code>/dev/mmcblk0</code>, etc. This virtual device will have the path <code>/dev/loop0</code>. Multiple virtual devices can be mounted. The next mounted virtual disks will have the path <code>/dev/loop1</code>, <code>/dev/loop2</code>, <code>/dev/loop3</code>, etc.</p>
 <p>In this post, the path to the virtual disk is stored in the <code>SYSTEM_IMAGE</code> variable. To view the path to the virtual disk device, run the following command:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">echo $SYSTEM_IMAGE
-</code></pre></div><p>Then, partition it using the following command:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#75715e"># Create actual partitions for boot and rootfs now</span>
-sudo mkfs.vfat -n BOOT <span style="color:#e6db74">`</span>echo <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">${</span>SYSTEM_IMAGE<span style="color:#e6db74">}</span><span style="color:#e6db74">p1&#34;</span><span style="color:#e6db74">`</span>   <span style="color:#75715e"># Create a fat16 partition for boot files</span>
-sudo mkfs.ext4 -L ROOTFS <span style="color:#e6db74">`</span>echo <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">${</span>SYSTEM_IMAGE<span style="color:#e6db74">}</span><span style="color:#e6db74">p2&#34;</span><span style="color:#e6db74">`</span> <span style="color:#75715e"># Create an ext4 partition for rootfs files</span>
-</code></pre></div><h2 id="mounting-the-partitions">Mounting the partitions</h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>echo $SYSTEM_IMAGE
+</span></span></code></pre></div><p>Then, partition it using the following command:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># Create actual partitions for boot and rootfs now</span>
+</span></span><span style="display:flex;"><span>sudo mkfs.vfat -n BOOT <span style="color:#e6db74">`</span>echo <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">${</span>SYSTEM_IMAGE<span style="color:#e6db74">}</span><span style="color:#e6db74">p1&#34;</span><span style="color:#e6db74">`</span>   <span style="color:#75715e"># Create a fat16 partition for boot files</span>
+</span></span><span style="display:flex;"><span>sudo mkfs.ext4 -L ROOTFS <span style="color:#e6db74">`</span>echo <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">${</span>SYSTEM_IMAGE<span style="color:#e6db74">}</span><span style="color:#e6db74">p2&#34;</span><span style="color:#e6db74">`</span> <span style="color:#75715e"># Create an ext4 partition for rootfs files</span>
+</span></span></code></pre></div><h2 id="mounting-the-partitions">Mounting the partitions</h2>
 <p>To mount the system image, use the following commands to mount the virtual disk image to a folder called <code>target_mnt</code>:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">mkdir ./target_mnt
-sudo mount <span style="color:#e6db74">`</span>echo <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">${</span>SYSTEM_IMAGE<span style="color:#e6db74">}</span><span style="color:#e6db74">p2&#34;</span><span style="color:#e6db74">`</span> ./target_mnt
-sudo mkdir ./target_mnt/boot
-sudo mount <span style="color:#e6db74">`</span>echo <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">${</span>SYSTEM_IMAGE<span style="color:#e6db74">}</span><span style="color:#e6db74">p1&#34;</span><span style="color:#e6db74">`</span> ./target_mnt/boot
-</code></pre></div><h2 id="copying-boot-files">Copying boot files</h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>mkdir ./target_mnt
+</span></span><span style="display:flex;"><span>sudo mount <span style="color:#e6db74">`</span>echo <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">${</span>SYSTEM_IMAGE<span style="color:#e6db74">}</span><span style="color:#e6db74">p2&#34;</span><span style="color:#e6db74">`</span> ./target_mnt
+</span></span><span style="display:flex;"><span>sudo mkdir ./target_mnt/boot
+</span></span><span style="display:flex;"><span>sudo mount <span style="color:#e6db74">`</span>echo <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">${</span>SYSTEM_IMAGE<span style="color:#e6db74">}</span><span style="color:#e6db74">p1&#34;</span><span style="color:#e6db74">`</span> ./target_mnt/boot
+</span></span></code></pre></div><h2 id="copying-boot-files">Copying boot files</h2>
 <p>First, all required firmware files will be copied from the buildroot output folder to the boot folder:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">sudo cp ./buildroot-&lt;VERSION_GOES_HERE&gt;/output/images/bcm2711-rpi-4-b.dtb ./target_mnt/boot/
-sudo cp ./buildroot-&lt;VERSION_GOES_HERE&gt;/output/images/rpi-firmware/start4.elf ./target_mnt/boot/
-sudo cp ./buildroot-&lt;VERSION_GOES_HERE&gt;/output/images/rpi-firmware/fixup4.dat ./target_mnt/boot/
-</code></pre></div><p>Then, the kernel is copied to the boot folder:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">sudo cp ./buildroot-&lt;VERSION_GOES_HERE&gt;/output/images/uImage ./target_mnt/boot/
-</code></pre></div><p>After that, the bootloader and related configurations are copied to the boot folder:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#75715e"># Copy the bootloader</span>
-sudo cp ./u-boot/u-boot.bin ./target_mnt/boot/
-
-<span style="color:#75715e"># Copy config.txt, to the Raspberry Pi boots U-boot</span>
-sudo cp ./u-boot/config.txt ./target_mnt/boot/
-
-<span style="color:#75715e"># Copy boot.scr, this bootscript starts the embedded OS</span>
-sudo cp ./u-boot/boot.scr ./target_mnt/boot/
-</code></pre></div><h2 id="extracting-the-root-filesystem-to-the-rootfs-partition">Extracting the root filesystem to the <code>ROOTFS</code> partition</h2>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">cd ./target_mnt
-sudo tar -xvf ../buildroot-&lt;VERSION_GOES_HERE&gt;/output/images/rootfs.tar.gz .
-cd ../
-</code></pre></div><h2 id="unmounting-the-image">Unmounting the image</h2>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">sudo sync
-sudo umount ./target_mnt/boot -l
-sudo umount ./target_mnt -l
-sudo losetup -D
-sudo rm -rf ./target_mnt
-</code></pre></div><h1 id="flashing-the-virtual-disk-image-to-an-sd">Flashing the virtual disk image to an SD</h1>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>sudo cp ./buildroot-&lt;VERSION_GOES_HERE&gt;/output/images/bcm2711-rpi-4-b.dtb ./target_mnt/boot/
+</span></span><span style="display:flex;"><span>sudo cp ./buildroot-&lt;VERSION_GOES_HERE&gt;/output/images/rpi-firmware/start4.elf ./target_mnt/boot/
+</span></span><span style="display:flex;"><span>sudo cp ./buildroot-&lt;VERSION_GOES_HERE&gt;/output/images/rpi-firmware/fixup4.dat ./target_mnt/boot/
+</span></span></code></pre></div><p>Then, the kernel is copied to the boot folder:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>sudo cp ./buildroot-&lt;VERSION_GOES_HERE&gt;/output/images/uImage ./target_mnt/boot/
+</span></span></code></pre></div><p>After that, the bootloader and related configurations are copied to the boot folder:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># Copy the bootloader</span>
+</span></span><span style="display:flex;"><span>sudo cp ./u-boot/u-boot.bin ./target_mnt/boot/
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Copy config.txt, to the Raspberry Pi boots U-boot</span>
+</span></span><span style="display:flex;"><span>sudo cp ./u-boot/config.txt ./target_mnt/boot/
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Copy boot.scr, this bootscript starts the embedded OS</span>
+</span></span><span style="display:flex;"><span>sudo cp ./u-boot/boot.scr ./target_mnt/boot/
+</span></span></code></pre></div><h2 id="extracting-the-root-filesystem-to-the-rootfs-partition">Extracting the root filesystem to the <code>ROOTFS</code> partition</h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>cd ./target_mnt
+</span></span><span style="display:flex;"><span>sudo tar -xvf ../buildroot-&lt;VERSION_GOES_HERE&gt;/output/images/rootfs.tar.gz .
+</span></span><span style="display:flex;"><span>cd ../
+</span></span></code></pre></div><h2 id="unmounting-the-image">Unmounting the image</h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>sudo sync
+</span></span><span style="display:flex;"><span>sudo umount ./target_mnt/boot -l
+</span></span><span style="display:flex;"><span>sudo umount ./target_mnt -l
+</span></span><span style="display:flex;"><span>sudo losetup -D
+</span></span><span style="display:flex;"><span>sudo rm -rf ./target_mnt
+</span></span></code></pre></div><h1 id="flashing-the-virtual-disk-image-to-an-sd">Flashing the virtual disk image to an SD</h1>
 <p>The <code>system.img</code> file (which now contains the entire embedded OS) can be flashed to an SD card using <code>dd</code> as follows:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">sudo dd <span style="color:#66d9ef">if</span><span style="color:#f92672">=</span>system.img of<span style="color:#f92672">=</span>/dev/YOUR_DEVICE_GOES_HERE bs<span style="color:#f92672">=</span>1MiB status<span style="color:#f92672">=</span>progress
-sudo sync
-</code></pre></div><p>Since <code>system.img</code> is an image file the flashing process is exactly the same as all other &ldquo;Raspberry Pi Linux distro&rsquo;s&rdquo;.<br>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>sudo dd <span style="color:#66d9ef">if</span><span style="color:#f92672">=</span>system.img of<span style="color:#f92672">=</span>/dev/YOUR_DEVICE_GOES_HERE bs<span style="color:#f92672">=</span>1MiB status<span style="color:#f92672">=</span>progress
+</span></span><span style="display:flex;"><span>sudo sync
+</span></span></code></pre></div><p>Since <code>system.img</code> is an image file the flashing process is exactly the same as all other &ldquo;Raspberry Pi Linux distro&rsquo;s&rdquo;.<br>
 Therefore, if <code>dd</code> seems too scary, the following tools can be used to flash the <code>system.img</code> file:<br>
 <a href="https://www.raspberrypi.com/software">Raspberry Pi Imager</a>,<br>
 <a href="https://www.balena.io/etcher">Etcher</a>,<br>
@@ -611,7 +610,7 @@ There are two other posts that use this basic buildroot OS to create two other p
 
 
 
-<script type="text/javascript" src="/bundle.min.644292943ae47eef02fcd64b11757aeb8caeeaebf473a823b62099edccac808e8d82689359f285e5d95994e5ad5ae3b9c1ccc281eb1828e67d0ba6630f95b832.js" integrity="sha512-ZEKSlDrkfu8C/NZLEXV664yu6uv0c6gjtiCZ7cysgI6NgmiTWfKF5dlZlOWtWuO5wczCgesYKOZ9C6ZjD5W4Mg=="></script>
+<script type="text/javascript" src="/bundle.min.205d491810c28f95aa953fae884e1c27abe13fdf93ec63b882d0036b248d4a6282eb2d134e4e7225c6ad6e86db87b08488a361ca4a7383d01fcff43f3d57b9c3.js" integrity="sha512-IF1JGBDCj5WqlT&#43;uiE4cJ6vhP9&#43;T7GO4gtADaySNSmKC6y0TTk5yJcatbobbh7CEiKNhykpzg9Afz/Q/PVe5ww=="></script>
 
 
 

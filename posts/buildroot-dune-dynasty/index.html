@@ -8,7 +8,6 @@
 <meta name="description" content="Introduction This page explains how the game &amp;ldquo;Dune Dynasty II&amp;rdquo; can be ran on an embedded linux OS. The OS is created using buildroot.
 All required configurations and compile-commands are documented on this page.
 The below image shows the game (and embedded OS) running.
-
 Previous work This post is based on another post in which a basic embedded OS is created. However, the toolchain used uClibc as C library, which will not work here." />
 <meta name="keywords" content=", untagged" />
 <meta name="robots" content="noodp" />
@@ -43,7 +42,6 @@ Previous work This post is based on another post in which a basic embedded OS is
 <meta itemprop="description" content="Introduction This page explains how the game &ldquo;Dune Dynasty II&rdquo; can be ran on an embedded linux OS. The OS is created using buildroot.
 All required configurations and compile-commands are documented on this page.
 The below image shows the game (and embedded OS) running.
-
 Previous work This post is based on another post in which a basic embedded OS is created. However, the toolchain used uClibc as C library, which will not work here."><meta itemprop="datePublished" content="2021-12-21T13:28:55+02:00" />
 <meta itemprop="dateModified" content="2021-12-21T13:28:55+02:00" />
 <meta itemprop="wordCount" content="3094"><meta itemprop="image" content="https://tomniesse.github.io/"/>
@@ -55,7 +53,6 @@ Previous work This post is based on another post in which a basic embedded OS is
 <meta name="twitter:description" content="Introduction This page explains how the game &ldquo;Dune Dynasty II&rdquo; can be ran on an embedded linux OS. The OS is created using buildroot.
 All required configurations and compile-commands are documented on this page.
 The below image shows the game (and embedded OS) running.
-
 Previous work This post is based on another post in which a basic embedded OS is created. However, the toolchain used uClibc as C library, which will not work here."/>
 
 
@@ -64,13 +61,11 @@ Previous work This post is based on another post in which a basic embedded OS is
 <meta property="og:description" content="Introduction This page explains how the game &ldquo;Dune Dynasty II&rdquo; can be ran on an embedded linux OS. The OS is created using buildroot.
 All required configurations and compile-commands are documented on this page.
 The below image shows the game (and embedded OS) running.
-
 Previous work This post is based on another post in which a basic embedded OS is created. However, the toolchain used uClibc as C library, which will not work here." />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://tomniesse.github.io/posts/buildroot-dune-dynasty/" /><meta property="og:image" content="https://tomniesse.github.io/"/><meta property="article:section" content="posts" />
 <meta property="article:published_time" content="2021-12-21T13:28:55+02:00" />
 <meta property="article:modified_time" content="2021-12-21T13:28:55+02:00" /><meta property="og:site_name" content="Welcome!" />
-
 
 
 
@@ -180,12 +175,12 @@ Not very interesting.</p>
 <p>For this OS, a new toolchain using glibc will be used. This is because uClibc creates lots of segfaults (probably while resolving libraries).</p>
 <h2 id="creating-a-new-toolchain-configuration">Creating a new toolchain configuration</h2>
 <p>First, a new toolchain configuration is created inside the crosstool-NG folder:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">./ct-ng distclean
-./ct-ng aarch64-rpi4-linux-gnu
-</code></pre></div><h2 id="making-a-few-changes-to-the-toolchain-configuration">Making a few changes to the toolchain configuration</h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>./ct-ng distclean
+</span></span><span style="display:flex;"><span>./ct-ng aarch64-rpi4-linux-gnu
+</span></span></code></pre></div><h2 id="making-a-few-changes-to-the-toolchain-configuration">Making a few changes to the toolchain configuration</h2>
 <p>Then, the toolchain options are changed using:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">./ct-ng menuconfig
-</code></pre></div><p>The following options were changed:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>./ct-ng menuconfig
+</span></span></code></pre></div><p>The following options were changed:</p>
 <ul>
 <li>Under <code>C compiler</code>, the option <code>Version of gcc</code> is set to the second to latest option (<code>10.3.0</code> at time of writing)</li>
 <li>Under <code>Operating System</code>, the option <code>Version of linux</code> is set to <code>5.10.79</code> (this is the version of linux that will be compiled later in this post)</li>
@@ -194,8 +189,8 @@ Not very interesting.</p>
 <h2 id="building-the-new-toolchain">Building the new toolchain</h2>
 <p><em>If <code>~/x-tools/</code> already contains a toolchain with the same name; move, rename or delete that toolchain. If it is not dealt with, the wrong linux headers might still be present and the target OS will fail to run. crosstool-NG will not build a shiny new toolchain automatically.</em></p>
 <p>To then build the new toolchain, execute the build command:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">./ct-ng build -j<span style="color:#e6db74">`</span>nproc<span style="color:#e6db74">`</span>
-</code></pre></div><h1 id="creating-a-new-buildroot-os">Creating a new Buildroot OS</h1>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>./ct-ng build -j<span style="color:#e6db74">`</span>nproc<span style="color:#e6db74">`</span>
+</span></span></code></pre></div><h1 id="creating-a-new-buildroot-os">Creating a new Buildroot OS</h1>
 <p>The previous post describes how to make a Buildroot OS using uClibc. Because this does not apply here anymore, a completely new Buildroot OS will be created.</p>
 <h2 id="creating-a-new-configuration">Creating a new configuration</h2>
 <p>Within Buildroot, using <code>make menuconfig</code>, the following options are changed to create a new OS:</p>
@@ -296,31 +291,31 @@ Not very interesting.</p>
 <li>Disable automatic network setup</li>
 </ul>
 <p>To make sure these changes are always present in the target OS, the following will be appended to <code>/path/to/buildroot-&lt;VERSION_GOES_HERE&gt;/board/raspberrypi/post-build.sh</code>:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#75715e"># Make sure device firmware is being loaded during boot</span>
-cp package/busybox/S10mdev <span style="color:#e6db74">${</span>TARGET_DIR<span style="color:#e6db74">}</span>/etc/init.d/S10mdev
-chmod <span style="color:#ae81ff">755</span> <span style="color:#e6db74">${</span>TARGET_DIR<span style="color:#e6db74">}</span>/etc/init.d/S10mdev
-chmod +x <span style="color:#e6db74">${</span>TARGET_DIR<span style="color:#e6db74">}</span>/etc/init.d/S10mdev
-cp package/busybox/mdev.conf <span style="color:#e6db74">${</span>TARGET_DIR<span style="color:#e6db74">}</span>/etc/mdev.conf
-
-<span style="color:#75715e"># Skip login by changing /etc/inittab</span>
-sed -i s<span style="color:#e6db74">&#39;|console::respawn:/sbin/getty -L  console 0 vt100 # GENERIC_SERIAL|# login bypass|g&#39;</span> <span style="color:#e6db74">${</span>TARGET_DIR<span style="color:#e6db74">}</span>/etc/inittab
-sed -i <span style="color:#e6db74">&#39;s|tty1::respawn:/sbin/getty -L  tty1 0 vt100 # HDMI console|::respawn:-/bin/sh -c &#34;xinit&#34;|g&#39;</span> <span style="color:#e6db74">${</span>TARGET_DIR<span style="color:#e6db74">}</span>/etc/inittab
-
-<span style="color:#75715e"># Make sure X.org works</span>
-sed -i <span style="color:#e6db74">&#39;s| Driver|#Driver|g&#39;</span> <span style="color:#e6db74">${</span>TARGET_DIR<span style="color:#e6db74">}</span>/etc/X11/xorg.conf
-
-<span style="color:#75715e"># Configure ratpoison WM</span>
-echo <span style="color:#e6db74">&#34;startup_message off&#34;</span> &gt; <span style="color:#e6db74">${</span>TARGET_DIR<span style="color:#e6db74">}</span>/.ratpoisonrc
-echo <span style="color:#e6db74">&#34;exec /usr/local/bin/dunedynasty&#34;</span> &gt;&gt; <span style="color:#e6db74">${</span>TARGET_DIR<span style="color:#e6db74">}</span>/.ratpoisonrc
-
-<span style="color:#75715e"># Configure xinit</span>
-echo <span style="color:#e6db74">&#39;export LD_LIBRARY_PATH=&#34;/lib:/usr/lib:/usr/local/lib&#34;&#39;</span> &gt; <span style="color:#e6db74">${</span>TARGET_DIR<span style="color:#e6db74">}</span>/.xinitrc
-echo <span style="color:#e6db74">&#34;ratpoison&#34;</span> &gt;&gt; <span style="color:#e6db74">${</span>TARGET_DIR<span style="color:#e6db74">}</span>/.xinitrc
-
-<span style="color:#75715e"># Delete X.org and networking init files</span>
-rm <span style="color:#e6db74">${</span>TARGET_DIR<span style="color:#e6db74">}</span>/etc/init.d/S40xorg
-rm <span style="color:#e6db74">${</span>TARGET_DIR<span style="color:#e6db74">}</span>/etc/init.d/S40network
-</code></pre></div><h2 id="automatically-build-and-install-allegro5-and-dune-dynasty-to-target-os">Automatically build and install Allegro5 and Dune Dynasty to target OS</h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># Make sure device firmware is being loaded during boot</span>
+</span></span><span style="display:flex;"><span>cp package/busybox/S10mdev <span style="color:#e6db74">${</span>TARGET_DIR<span style="color:#e6db74">}</span>/etc/init.d/S10mdev
+</span></span><span style="display:flex;"><span>chmod <span style="color:#ae81ff">755</span> <span style="color:#e6db74">${</span>TARGET_DIR<span style="color:#e6db74">}</span>/etc/init.d/S10mdev
+</span></span><span style="display:flex;"><span>chmod +x <span style="color:#e6db74">${</span>TARGET_DIR<span style="color:#e6db74">}</span>/etc/init.d/S10mdev
+</span></span><span style="display:flex;"><span>cp package/busybox/mdev.conf <span style="color:#e6db74">${</span>TARGET_DIR<span style="color:#e6db74">}</span>/etc/mdev.conf
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Skip login by changing /etc/inittab</span>
+</span></span><span style="display:flex;"><span>sed -i s<span style="color:#e6db74">&#39;|console::respawn:/sbin/getty -L  console 0 vt100 # GENERIC_SERIAL|# login bypass|g&#39;</span> <span style="color:#e6db74">${</span>TARGET_DIR<span style="color:#e6db74">}</span>/etc/inittab
+</span></span><span style="display:flex;"><span>sed -i <span style="color:#e6db74">&#39;s|tty1::respawn:/sbin/getty -L  tty1 0 vt100 # HDMI console|::respawn:-/bin/sh -c &#34;xinit&#34;|g&#39;</span> <span style="color:#e6db74">${</span>TARGET_DIR<span style="color:#e6db74">}</span>/etc/inittab
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Make sure X.org works</span>
+</span></span><span style="display:flex;"><span>sed -i <span style="color:#e6db74">&#39;s| Driver|#Driver|g&#39;</span> <span style="color:#e6db74">${</span>TARGET_DIR<span style="color:#e6db74">}</span>/etc/X11/xorg.conf
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Configure ratpoison WM</span>
+</span></span><span style="display:flex;"><span>echo <span style="color:#e6db74">&#34;startup_message off&#34;</span> &gt; <span style="color:#e6db74">${</span>TARGET_DIR<span style="color:#e6db74">}</span>/.ratpoisonrc
+</span></span><span style="display:flex;"><span>echo <span style="color:#e6db74">&#34;exec /usr/local/bin/dunedynasty&#34;</span> &gt;&gt; <span style="color:#e6db74">${</span>TARGET_DIR<span style="color:#e6db74">}</span>/.ratpoisonrc
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Configure xinit</span>
+</span></span><span style="display:flex;"><span>echo <span style="color:#e6db74">&#39;export LD_LIBRARY_PATH=&#34;/lib:/usr/lib:/usr/local/lib&#34;&#39;</span> &gt; <span style="color:#e6db74">${</span>TARGET_DIR<span style="color:#e6db74">}</span>/.xinitrc
+</span></span><span style="display:flex;"><span>echo <span style="color:#e6db74">&#34;ratpoison&#34;</span> &gt;&gt; <span style="color:#e6db74">${</span>TARGET_DIR<span style="color:#e6db74">}</span>/.xinitrc
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Delete X.org and networking init files</span>
+</span></span><span style="display:flex;"><span>rm <span style="color:#e6db74">${</span>TARGET_DIR<span style="color:#e6db74">}</span>/etc/init.d/S40xorg
+</span></span><span style="display:flex;"><span>rm <span style="color:#e6db74">${</span>TARGET_DIR<span style="color:#e6db74">}</span>/etc/init.d/S40network
+</span></span></code></pre></div><h2 id="automatically-build-and-install-allegro5-and-dune-dynasty-to-target-os">Automatically build and install Allegro5 and Dune Dynasty to target OS</h2>
 <p>The <code>post-build.sh</code> file will also be used to automatically install Allegro5 and Dune Dynasty to the target OS.</p>
 <p>There are two directories within Buildroot that are required when building and installing Allegro5 and Dune Dynasty:</p>
 <ul>
@@ -330,397 +325,397 @@ rm <span style="color:#e6db74">${</span>TARGET_DIR<span style="color:#e6db74">}<
 <p>Compiling can only be done against the <code>sysroot</code> directory, while the target OS is stored in the <code>target</code> directory. For this reason, Allegro5 must be installed to both directories to compile and run Dune Dynasty correctly.</p>
 <h3 id="creating-a-toolchain-for-both-allegro5-and-dune-dynasty">Creating a toolchain for both Allegro5 and Dune Dynasty</h3>
 <p>A file called <code>Toolchain-raspberrypi4_64.cmake</code> is created inside the <code>/path/to/buildroot-&lt;VERSION_GOES_HERE&gt;/board/raspberrypi</code>, with the following contents:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#75715e">#############</span>
-<span style="color:#75715e"># Set target OS</span>
-<span style="color:#75715e">#############</span>
-
-set<span style="color:#f92672">(</span>CMAKE_SYSTEM_NAME Linux<span style="color:#f92672">)</span>
-
-<span style="color:#75715e">######################################################</span>
-<span style="color:#75715e"># Force CMake to use the toolchain built by crosstool-NG</span>
-<span style="color:#75715e"># (both 64 bit and 32 bit cross-compiling toolchains can</span>
-<span style="color:#75715e"># be used here)</span>
-<span style="color:#75715e">######################################################</span>
-
-set<span style="color:#f92672">(</span>CMAKE_TOOLCHAIN_FILE /home/&lt;YOUR_USERNAME_GOES_HERE&gt;/x-tools/aarch64-rpi4-linux-gnu/bin/aarch64-rpi4-linux-gnu<span style="color:#f92672">)</span>
-set<span style="color:#f92672">(</span>CMAKE_C_COMPILER <span style="color:#e6db74">${</span>CMAKE_TOOLCHAIN_FILE<span style="color:#e6db74">}</span>-gcc<span style="color:#f92672">)</span>
-set<span style="color:#f92672">(</span>CMAKE_CXX_COMPILER <span style="color:#e6db74">${</span>CMAKE_TOOLCHAIN_FILE<span style="color:#e6db74">}</span>-g++<span style="color:#f92672">)</span>
-set<span style="color:#f92672">(</span>CMAKE_LINKER <span style="color:#e6db74">${</span>CMAKE_TOOLCHAIN_FILE<span style="color:#e6db74">}</span>-ld<span style="color:#f92672">)</span>
-
-set<span style="color:#f92672">(</span>MAKE_C_LINK_EXECUTABLE <span style="color:#e6db74">${</span>CMAKE_LINKER<span style="color:#e6db74">}</span><span style="color:#f92672">)</span>
-set<span style="color:#f92672">(</span>MAKE_CXX_LINK_EXECUTABLE <span style="color:#e6db74">${</span>CMAKE_LINKER<span style="color:#e6db74">}</span><span style="color:#f92672">)</span>
-
-<span style="color:#75715e">#########################################################</span>
-<span style="color:#75715e"># Tell CMake to do all compiling against the target sysroot</span>
-<span style="color:#75715e">#########################################################</span>
-
-set<span style="color:#f92672">(</span>CMAKE_SYSROOT /path/to/buildroot-&lt;VERSION_GOES_HERE&gt;/output/host/aarch64-buildroot-linux-gnu/sysroot<span style="color:#f92672">)</span>
-set<span style="color:#f92672">(</span>CMAKE_SYSROOT_COMPILE <span style="color:#e6db74">${</span>CMAKE_SYSROOT<span style="color:#e6db74">}</span>/<span style="color:#f92672">)</span>
-set<span style="color:#f92672">(</span>CMAKE_SYSROOT_LINK <span style="color:#e6db74">${</span>CMAKE_SYSROOT<span style="color:#e6db74">}</span>/<span style="color:#f92672">)</span>
-set<span style="color:#f92672">(</span>CMAKE_SYSTEM_PREFIX_PATH <span style="color:#e6db74">${</span>CMAKE_SYSROOT<span style="color:#e6db74">}</span>/<span style="color:#f92672">)</span>
-set<span style="color:#f92672">(</span>CMAKE_INSTALL_PREFIX <span style="color:#e6db74">${</span>CMAKE_SYSROOT<span style="color:#e6db74">}</span><span style="color:#f92672">)</span>
-
-<span style="color:#75715e">#######################################################</span>
-<span style="color:#75715e"># Make sure CMake does not link against host OS libraries</span>
-<span style="color:#75715e">#######################################################</span>
-
-set<span style="color:#f92672">(</span>CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER<span style="color:#f92672">)</span>
-set<span style="color:#f92672">(</span>CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY<span style="color:#f92672">)</span>
-set<span style="color:#f92672">(</span>CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY<span style="color:#f92672">)</span>
-set<span style="color:#f92672">(</span>CMAKE_FINE_ROOT_PATH_MODE_PACKAGE ONLY<span style="color:#f92672">)</span>
-
-<span style="color:#75715e">###############################################</span>
-<span style="color:#75715e"># Make sure Allegro5 is found (using pkg-config).</span>
-<span style="color:#75715e"># Only Dune Dynasty needs this. When building</span>
-<span style="color:#75715e"># Allegro5, this part is ignored by CMake.</span>
-<span style="color:#75715e">###############################################</span>
-
-set<span style="color:#f92672">(</span>ENV<span style="color:#f92672">{</span>PKG_CONFIG_DIR<span style="color:#f92672">}</span> <span style="color:#e6db74">&#34;&#34;</span><span style="color:#f92672">)</span>
-set<span style="color:#f92672">(</span>ENV<span style="color:#f92672">{</span>PKG_CONFIG_LIBDIR<span style="color:#f92672">}</span> <span style="color:#e6db74">${</span>CMAKE_SYSROOT<span style="color:#e6db74">}</span>/usr/lib/pkgconfig:<span style="color:#e6db74">${</span>CMAKE_SYSROOT<span style="color:#e6db74">}</span>/usr/share/pkgconfig:<span style="color:#e6db74">${</span>CMAKE_SYSROOT<span style="color:#e6db74">}</span>/usr/local/lib/pkgconfig/<span style="color:#f92672">)</span>
-set<span style="color:#f92672">(</span>ENV<span style="color:#f92672">{</span>PKG_CONFIG_PATH<span style="color:#f92672">}</span> <span style="color:#e6db74">${</span>PKG_CONFIG_LIBDIR<span style="color:#e6db74">}</span><span style="color:#f92672">)</span>
-set<span style="color:#f92672">(</span>ENV<span style="color:#f92672">{</span>PKG_CONFIG_SYSROOT_DIR<span style="color:#f92672">}</span> <span style="color:#e6db74">${</span>CMAKE_SYSROOT<span style="color:#e6db74">}</span><span style="color:#f92672">)</span>
-</code></pre></div><p>This toolchain file is used by Allegro5 and Dune Dynasty to cross-compile and link to the target Buildroot OS.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e">#############</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Set target OS</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#############</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>set<span style="color:#f92672">(</span>CMAKE_SYSTEM_NAME Linux<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">######################################################</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Force CMake to use the toolchain built by crosstool-NG</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># (both 64 bit and 32 bit cross-compiling toolchains can</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># be used here)</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">######################################################</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>set<span style="color:#f92672">(</span>CMAKE_TOOLCHAIN_FILE /home/&lt;YOUR_USERNAME_GOES_HERE&gt;/x-tools/aarch64-rpi4-linux-gnu/bin/aarch64-rpi4-linux-gnu<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>set<span style="color:#f92672">(</span>CMAKE_C_COMPILER <span style="color:#e6db74">${</span>CMAKE_TOOLCHAIN_FILE<span style="color:#e6db74">}</span>-gcc<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>set<span style="color:#f92672">(</span>CMAKE_CXX_COMPILER <span style="color:#e6db74">${</span>CMAKE_TOOLCHAIN_FILE<span style="color:#e6db74">}</span>-g++<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>set<span style="color:#f92672">(</span>CMAKE_LINKER <span style="color:#e6db74">${</span>CMAKE_TOOLCHAIN_FILE<span style="color:#e6db74">}</span>-ld<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>set<span style="color:#f92672">(</span>MAKE_C_LINK_EXECUTABLE <span style="color:#e6db74">${</span>CMAKE_LINKER<span style="color:#e6db74">}</span><span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>set<span style="color:#f92672">(</span>MAKE_CXX_LINK_EXECUTABLE <span style="color:#e6db74">${</span>CMAKE_LINKER<span style="color:#e6db74">}</span><span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#########################################################</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Tell CMake to do all compiling against the target sysroot</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#########################################################</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>set<span style="color:#f92672">(</span>CMAKE_SYSROOT /path/to/buildroot-&lt;VERSION_GOES_HERE&gt;/output/host/aarch64-buildroot-linux-gnu/sysroot<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>set<span style="color:#f92672">(</span>CMAKE_SYSROOT_COMPILE <span style="color:#e6db74">${</span>CMAKE_SYSROOT<span style="color:#e6db74">}</span>/<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>set<span style="color:#f92672">(</span>CMAKE_SYSROOT_LINK <span style="color:#e6db74">${</span>CMAKE_SYSROOT<span style="color:#e6db74">}</span>/<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>set<span style="color:#f92672">(</span>CMAKE_SYSTEM_PREFIX_PATH <span style="color:#e6db74">${</span>CMAKE_SYSROOT<span style="color:#e6db74">}</span>/<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>set<span style="color:#f92672">(</span>CMAKE_INSTALL_PREFIX <span style="color:#e6db74">${</span>CMAKE_SYSROOT<span style="color:#e6db74">}</span><span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#######################################################</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Make sure CMake does not link against host OS libraries</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#######################################################</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>set<span style="color:#f92672">(</span>CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>set<span style="color:#f92672">(</span>CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>set<span style="color:#f92672">(</span>CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>set<span style="color:#f92672">(</span>CMAKE_FINE_ROOT_PATH_MODE_PACKAGE ONLY<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">###############################################</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Make sure Allegro5 is found (using pkg-config).</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Only Dune Dynasty needs this. When building</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Allegro5, this part is ignored by CMake.</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">###############################################</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>set<span style="color:#f92672">(</span>ENV<span style="color:#f92672">{</span>PKG_CONFIG_DIR<span style="color:#f92672">}</span> <span style="color:#e6db74">&#34;&#34;</span><span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>set<span style="color:#f92672">(</span>ENV<span style="color:#f92672">{</span>PKG_CONFIG_LIBDIR<span style="color:#f92672">}</span> <span style="color:#e6db74">${</span>CMAKE_SYSROOT<span style="color:#e6db74">}</span>/usr/lib/pkgconfig:<span style="color:#e6db74">${</span>CMAKE_SYSROOT<span style="color:#e6db74">}</span>/usr/share/pkgconfig:<span style="color:#e6db74">${</span>CMAKE_SYSROOT<span style="color:#e6db74">}</span>/usr/local/lib/pkgconfig/<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>set<span style="color:#f92672">(</span>ENV<span style="color:#f92672">{</span>PKG_CONFIG_PATH<span style="color:#f92672">}</span> <span style="color:#e6db74">${</span>PKG_CONFIG_LIBDIR<span style="color:#e6db74">}</span><span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>set<span style="color:#f92672">(</span>ENV<span style="color:#f92672">{</span>PKG_CONFIG_SYSROOT_DIR<span style="color:#f92672">}</span> <span style="color:#e6db74">${</span>CMAKE_SYSROOT<span style="color:#e6db74">}</span><span style="color:#f92672">)</span>
+</span></span></code></pre></div><p>This toolchain file is used by Allegro5 and Dune Dynasty to cross-compile and link to the target Buildroot OS.</p>
 <h3 id="automate-the-installation-of-allegro5-and-dune-dynasty">Automate the installation of Allegro5 and Dune Dynasty</h3>
 <p>To make sure Allegro5 and Dune Dynasty are added to the target OS after Buildroot is done creating it, the following is appended to <code>/path/to/buildroot-&lt;VERSION_GOES_HERE&gt;/board/raspberrypi/post-build.sh</code>:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#75715e"># Add Allegro5 and Dune Dynasty to the target rootfs</span>
-
-<span style="color:#75715e"># Create a temporary download directory</span>
-rm -rf tmp
-mkdir tmp
-cd tmp
-
-<span style="color:#75715e"># Install Allegro5 to target OS and development sysroot</span>
-wget https://github.com/liballeg/allegro5/releases/download/5.2.7.0/allegro-5.2.7.0.tar.gz
-tar -xvf allegro-5.2.7.0.tar.gz
-rm -rf allegro-5.2.7.0.tar.gz
-cp ../board/raspberrypi/Toolchain-raspberrypi4_64.cmake allegro-5.2.7.0/cmake/
-cd allegro-5.2.7.0/
-mkdir build
-cd build
-rm -rf CMakeFiles CMakeCache.txt addons cmake_install.cmake demos docs examples include lib Makefile tests
-cmake -DCMAKE_TOOLCHAIN_FILE<span style="color:#f92672">=</span>cmake/Toolchain-raspberrypi4_64.cmake -DSHARED<span style="color:#f92672">=</span>on -DCMAKE_LINKER_FLAGS<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;-static-libgcc -static-libstdc++&#34;</span> ..
-make -j<span style="color:#e6db74">`</span>nproc<span style="color:#e6db74">`</span>
-DESTDIR<span style="color:#f92672">=</span><span style="color:#e6db74">${</span>TARGET_DIR<span style="color:#e6db74">}</span>/../host/aarch64-buildroot-linux-gnu/sysroot make install <span style="color:#75715e"># install to target sysroot to compile dune dynasty against</span>
-DESTDIR<span style="color:#f92672">=</span><span style="color:#e6db74">${</span>TARGET_DIR<span style="color:#e6db74">}</span> make install <span style="color:#75715e"># install to target system</span>
-
-cd ../../
-
-<span style="color:#75715e"># Install Dune Dynasty to target OS</span>
-rm -rf dunedynasty-1.5.7/
-wget https://versaweb.dl.sourceforge.net/project/dunedynasty/dunedynasty-1.5/dunedynasty-1.5.7.tar.gz
-tar -xvf dunedynasty-1.5.7.tar.gz
-rm -rf dunedynasty-1.5.7.tar.gz
-cp ../board/raspberrypi/Toolchain-raspberrypi4_64.cmake dunedynasty-1.5.7/cmake/
-cd dunedynasty-1.5.7/
-mkdir build
-cd build
-cmake -DCMAKE_TOOLCHAIN_FILE<span style="color:#f92672">=</span>cmake/Toolchain-raspberrypi4_64.cmake ..
-make -j<span style="color:#e6db74">`</span>nproc<span style="color:#e6db74">`</span>
-DESTDIR<span style="color:#f92672">=</span><span style="color:#e6db74">${</span>TARGET_DIR<span style="color:#e6db74">}</span> make install <span style="color:#75715e"># install to target system</span>
-
-cd ../../../
-</code></pre></div><h2 id="creating-a-new-buildroot-os-1">Creating a new Buildroot OS</h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># Add Allegro5 and Dune Dynasty to the target rootfs</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Create a temporary download directory</span>
+</span></span><span style="display:flex;"><span>rm -rf tmp
+</span></span><span style="display:flex;"><span>mkdir tmp
+</span></span><span style="display:flex;"><span>cd tmp
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Install Allegro5 to target OS and development sysroot</span>
+</span></span><span style="display:flex;"><span>wget https://github.com/liballeg/allegro5/releases/download/5.2.7.0/allegro-5.2.7.0.tar.gz
+</span></span><span style="display:flex;"><span>tar -xvf allegro-5.2.7.0.tar.gz
+</span></span><span style="display:flex;"><span>rm -rf allegro-5.2.7.0.tar.gz
+</span></span><span style="display:flex;"><span>cp ../board/raspberrypi/Toolchain-raspberrypi4_64.cmake allegro-5.2.7.0/cmake/
+</span></span><span style="display:flex;"><span>cd allegro-5.2.7.0/
+</span></span><span style="display:flex;"><span>mkdir build
+</span></span><span style="display:flex;"><span>cd build
+</span></span><span style="display:flex;"><span>rm -rf CMakeFiles CMakeCache.txt addons cmake_install.cmake demos docs examples include lib Makefile tests
+</span></span><span style="display:flex;"><span>cmake -DCMAKE_TOOLCHAIN_FILE<span style="color:#f92672">=</span>cmake/Toolchain-raspberrypi4_64.cmake -DSHARED<span style="color:#f92672">=</span>on -DCMAKE_LINKER_FLAGS<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;-static-libgcc -static-libstdc++&#34;</span> ..
+</span></span><span style="display:flex;"><span>make -j<span style="color:#e6db74">`</span>nproc<span style="color:#e6db74">`</span>
+</span></span><span style="display:flex;"><span>DESTDIR<span style="color:#f92672">=</span><span style="color:#e6db74">${</span>TARGET_DIR<span style="color:#e6db74">}</span>/../host/aarch64-buildroot-linux-gnu/sysroot make install <span style="color:#75715e"># install to target sysroot to compile dune dynasty against</span>
+</span></span><span style="display:flex;"><span>DESTDIR<span style="color:#f92672">=</span><span style="color:#e6db74">${</span>TARGET_DIR<span style="color:#e6db74">}</span> make install <span style="color:#75715e"># install to target system</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>cd ../../
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Install Dune Dynasty to target OS</span>
+</span></span><span style="display:flex;"><span>rm -rf dunedynasty-1.5.7/
+</span></span><span style="display:flex;"><span>wget https://versaweb.dl.sourceforge.net/project/dunedynasty/dunedynasty-1.5/dunedynasty-1.5.7.tar.gz
+</span></span><span style="display:flex;"><span>tar -xvf dunedynasty-1.5.7.tar.gz
+</span></span><span style="display:flex;"><span>rm -rf dunedynasty-1.5.7.tar.gz
+</span></span><span style="display:flex;"><span>cp ../board/raspberrypi/Toolchain-raspberrypi4_64.cmake dunedynasty-1.5.7/cmake/
+</span></span><span style="display:flex;"><span>cd dunedynasty-1.5.7/
+</span></span><span style="display:flex;"><span>mkdir build
+</span></span><span style="display:flex;"><span>cd build
+</span></span><span style="display:flex;"><span>cmake -DCMAKE_TOOLCHAIN_FILE<span style="color:#f92672">=</span>cmake/Toolchain-raspberrypi4_64.cmake ..
+</span></span><span style="display:flex;"><span>make -j<span style="color:#e6db74">`</span>nproc<span style="color:#e6db74">`</span>
+</span></span><span style="display:flex;"><span>DESTDIR<span style="color:#f92672">=</span><span style="color:#e6db74">${</span>TARGET_DIR<span style="color:#e6db74">}</span> make install <span style="color:#75715e"># install to target system</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>cd ../../../
+</span></span></code></pre></div><h2 id="creating-a-new-buildroot-os-1">Creating a new Buildroot OS</h2>
 <p>To then create a new OS, the make command is executed within Buildroot:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">make clean
-make
-</code></pre></div><p>After Buildroot is done, a file called <code>rootfs.tar.gz</code> is created inside the <code>/path/to/buildroot-&lt;VERSION_GOES_HERE&gt;/output/images</code> directory. This is the entire OS, minus the kernel.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>make clean
+</span></span><span style="display:flex;"><span>make
+</span></span></code></pre></div><p>After Buildroot is done, a file called <code>rootfs.tar.gz</code> is created inside the <code>/path/to/buildroot-&lt;VERSION_GOES_HERE&gt;/output/images</code> directory. This is the entire OS, minus the kernel.</p>
 <h1 id="compiling-the-linux-kernel">Compiling the linux kernel</h1>
 <p>While Buildroot is doing it&rsquo;s thing, a linux kernel can be compiled. There exists a <a href="https://github.com/raspberrypi/linux">github repository</a> containing a complete kernel source for the Raspberry Pi. This source will be used to create a kernel.</p>
 <h2 id="downloading-the-source">Downloading the source</h2>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">git clone https://github.com/raspberrypi/linux
-git checkout rpi-5.10.y <span style="color:#75715e"># version 5.10.y matches the one from the toolchain</span>
-git checkout d261fd9f97da8b6b3ed1fa613cc3fd6abb41f0be <span style="color:#75715e"># known working commit for the paranoid (optional)</span>
-cd linux
-</code></pre></div><h2 id="configuring-the-source">Configuring the source</h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>git clone https://github.com/raspberrypi/linux
+</span></span><span style="display:flex;"><span>git checkout rpi-5.10.y <span style="color:#75715e"># version 5.10.y matches the one from the toolchain</span>
+</span></span><span style="display:flex;"><span>git checkout d261fd9f97da8b6b3ed1fa613cc3fd6abb41f0be <span style="color:#75715e"># known working commit for the paranoid (optional)</span>
+</span></span><span style="display:flex;"><span>cd linux
+</span></span></code></pre></div><h2 id="configuring-the-source">Configuring the source</h2>
 <p>To see all available default configurations:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">ls arch/arm64/configs/
-</code></pre></div><p>To pick the one for the Raspberry Pi 4:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">ARCH<span style="color:#f92672">=</span>arm64 CROSS_COMPILE<span style="color:#f92672">=</span>~/x-tools/aarch64-rpi4-linux-gnu/bin/aarch64-rpi4-linux-gnu- make bcm2711_defconfig
-</code></pre></div><h2 id="compiling">Compiling</h2>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">ARCH<span style="color:#f92672">=</span>arm64 CROSS_COMPILE<span style="color:#f92672">=</span>~/x-tools/aarch64-rpi4-linux-gnu/bin/aarch64-rpi4-linux-gnu- make clean
-ARCH<span style="color:#f92672">=</span>arm64 CROSS_COMPILE<span style="color:#f92672">=</span>~/x-tools/aarch64-rpi4-linux-gnu/bin/aarch64-rpi4-linux-gnu- make -j<span style="color:#e6db74">`</span>nproc<span style="color:#e6db74">`</span>
-ARCH<span style="color:#f92672">=</span>arm64 CROSS_COMPILE<span style="color:#f92672">=</span>~/x-tools/aarch64-rpi4-linux-gnu/bin/aarch64-rpi4-linux-gnu- make modules -j<span style="color:#e6db74">`</span>nproc<span style="color:#e6db74">`</span>
-</code></pre></div><p>After the compiling process is done, there should be a file called <code>Image</code> inside the <code>/path/to/linux/arch/arm64/boot</code> directory.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>ls arch/arm64/configs/
+</span></span></code></pre></div><p>To pick the one for the Raspberry Pi 4:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>ARCH<span style="color:#f92672">=</span>arm64 CROSS_COMPILE<span style="color:#f92672">=</span>~/x-tools/aarch64-rpi4-linux-gnu/bin/aarch64-rpi4-linux-gnu- make bcm2711_defconfig
+</span></span></code></pre></div><h2 id="compiling">Compiling</h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>ARCH<span style="color:#f92672">=</span>arm64 CROSS_COMPILE<span style="color:#f92672">=</span>~/x-tools/aarch64-rpi4-linux-gnu/bin/aarch64-rpi4-linux-gnu- make clean
+</span></span><span style="display:flex;"><span>ARCH<span style="color:#f92672">=</span>arm64 CROSS_COMPILE<span style="color:#f92672">=</span>~/x-tools/aarch64-rpi4-linux-gnu/bin/aarch64-rpi4-linux-gnu- make -j<span style="color:#e6db74">`</span>nproc<span style="color:#e6db74">`</span>
+</span></span><span style="display:flex;"><span>ARCH<span style="color:#f92672">=</span>arm64 CROSS_COMPILE<span style="color:#f92672">=</span>~/x-tools/aarch64-rpi4-linux-gnu/bin/aarch64-rpi4-linux-gnu- make modules -j<span style="color:#e6db74">`</span>nproc<span style="color:#e6db74">`</span>
+</span></span></code></pre></div><p>After the compiling process is done, there should be a file called <code>Image</code> inside the <code>/path/to/linux/arch/arm64/boot</code> directory.</p>
 <h1 id="creating-a-system-image">Creating a system image</h1>
 <p>Buildroot is done, Linux is compiled. Everything can now be put inside of a system image. This process will be automated using a file called <code>build_image.sh</code>.</p>
 <h2 id="creating-raspberry-pi-4-boot-configuration-configtxt">Creating Raspberry Pi 4 boot configuration (config.txt)</h2>
 <p>Before <code>build_image.sh</code> can do it&rsquo;s thing, a file called <code>config.txt</code> will be created in the root directory of the project. The file will have the following contents:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-ini" data-lang="ini"><span style="color:#75715e"># Enable 64 bit mode</span>
-<span style="color:#a6e22e">arm_64bit</span><span style="color:#f92672">=</span><span style="color:#e6db74">1</span>
-
-<span style="color:#75715e"># Make the raspberry Pi 4 start the linux binary called &#34;Image&#34;</span>
-<span style="color:#a6e22e">kernel</span><span style="color:#f92672">=</span><span style="color:#e6db74">Image</span>
-
-<span style="color:#75715e"># Disable bluetooth</span>
-<span style="color:#a6e22e">dtoverlay</span><span style="color:#f92672">=</span><span style="color:#e6db74">disable-bt</span>
-
-<span style="color:#75715e"># Run cut-down files</span>
-<span style="color:#a6e22e">start_file</span><span style="color:#f92672">=</span><span style="color:#e6db74">start4cd.elf</span>
-<span style="color:#a6e22e">fixup_file</span><span style="color:#f92672">=</span><span style="color:#e6db74">fixup4cd.dat</span>
-
-<span style="color:#75715e"># Go fast</span>
-<span style="color:#a6e22e">arm_boost</span><span style="color:#f92672">=</span><span style="color:#e6db74">1</span>
-<span style="color:#a6e22e">initial_turbo</span><span style="color:#f92672">=</span><span style="color:#e6db74">20</span>
-<span style="color:#a6e22e">boot_delay</span><span style="color:#f92672">=</span><span style="color:#e6db74">0</span>
-<span style="color:#a6e22e">boot_delay_ms</span><span style="color:#f92672">=</span><span style="color:#e6db74">0</span>
-<span style="color:#a6e22e">force_eeprom_read</span><span style="color:#f92672">=</span><span style="color:#e6db74">0</span>
-<span style="color:#a6e22e">start_cd</span><span style="color:#f92672">=</span><span style="color:#e6db74">1</span>
-<span style="color:#a6e22e">start_x</span><span style="color:#f92672">=</span><span style="color:#e6db74">0</span>
-<span style="color:#a6e22e">enable_uart</span><span style="color:#f92672">=</span><span style="color:#e6db74">0</span>
-
-<span style="color:#75715e"># Disable rainbow splash screen</span>
-<span style="color:#a6e22e">disable_splash</span><span style="color:#f92672">=</span><span style="color:#e6db74">1</span>
-
-<span style="color:#75715e"># Enable DRM VC4 V3D driver overlay</span>
-<span style="color:#a6e22e">dtoverlay</span><span style="color:#f92672">=</span><span style="color:#e6db74">vc4-fkms-v3d-pi4</span>
-<span style="color:#a6e22e">max_framebuffers</span><span style="color:#f92672">=</span><span style="color:#e6db74">2</span>
-<span style="color:#a6e22e">gpu_mem</span><span style="color:#f92672">=</span><span style="color:#e6db74">128</span>
-
-<span style="color:#75715e"># Enable audio</span>
-<span style="color:#a6e22e">dtparam</span><span style="color:#f92672">=</span><span style="color:#e6db74">audio=on</span>
-</code></pre></div><h2 id="creating-raspberry-pi-4-boot-configuration-cmdlinetxt">Creating Raspberry Pi 4 boot configuration (cmdline.txt)</h2>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">rng_core.default_quality<span style="color:#f92672">=</span><span style="color:#ae81ff">100</span> dwc_otg.lpm_enable<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span> console<span style="color:#f92672">=</span>tty1 root<span style="color:#f92672">=</span>/dev/mmcblk0p2 rootfstype<span style="color:#f92672">=</span>ext4 rootwait quiet
-</code></pre></div><h2 id="creating-the-build-script">Creating the build script</h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-ini" data-lang="ini"><span style="display:flex;"><span><span style="color:#75715e"># Enable 64 bit mode</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">arm_64bit</span><span style="color:#f92672">=</span><span style="color:#e6db74">1</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Make the raspberry Pi 4 start the linux binary called &#34;Image&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">kernel</span><span style="color:#f92672">=</span><span style="color:#e6db74">Image</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Disable bluetooth</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">dtoverlay</span><span style="color:#f92672">=</span><span style="color:#e6db74">disable-bt</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Run cut-down files</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">start_file</span><span style="color:#f92672">=</span><span style="color:#e6db74">start4cd.elf</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">fixup_file</span><span style="color:#f92672">=</span><span style="color:#e6db74">fixup4cd.dat</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Go fast</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">arm_boost</span><span style="color:#f92672">=</span><span style="color:#e6db74">1</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">initial_turbo</span><span style="color:#f92672">=</span><span style="color:#e6db74">20</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">boot_delay</span><span style="color:#f92672">=</span><span style="color:#e6db74">0</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">boot_delay_ms</span><span style="color:#f92672">=</span><span style="color:#e6db74">0</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">force_eeprom_read</span><span style="color:#f92672">=</span><span style="color:#e6db74">0</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">start_cd</span><span style="color:#f92672">=</span><span style="color:#e6db74">1</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">start_x</span><span style="color:#f92672">=</span><span style="color:#e6db74">0</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">enable_uart</span><span style="color:#f92672">=</span><span style="color:#e6db74">0</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Disable rainbow splash screen</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">disable_splash</span><span style="color:#f92672">=</span><span style="color:#e6db74">1</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Enable DRM VC4 V3D driver overlay</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">dtoverlay</span><span style="color:#f92672">=</span><span style="color:#e6db74">vc4-fkms-v3d-pi4</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">max_framebuffers</span><span style="color:#f92672">=</span><span style="color:#e6db74">2</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">gpu_mem</span><span style="color:#f92672">=</span><span style="color:#e6db74">128</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Enable audio</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">dtparam</span><span style="color:#f92672">=</span><span style="color:#e6db74">audio=on</span>
+</span></span></code></pre></div><h2 id="creating-raspberry-pi-4-boot-configuration-cmdlinetxt">Creating Raspberry Pi 4 boot configuration (cmdline.txt)</h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>rng_core.default_quality<span style="color:#f92672">=</span><span style="color:#ae81ff">100</span> dwc_otg.lpm_enable<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span> console<span style="color:#f92672">=</span>tty1 root<span style="color:#f92672">=</span>/dev/mmcblk0p2 rootfstype<span style="color:#f92672">=</span>ext4 rootwait quiet
+</span></span></code></pre></div><h2 id="creating-the-build-script">Creating the build script</h2>
 <p>The file <code>build_image.sh</code> is created inside the root directory of the project, and has the following contents:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#75715e">#########################################</span>
-<span style="color:#75715e"># Create a system image called &#34;system.img&#34;</span>
-<span style="color:#75715e">#########################################</span>
-
-rm -rf system.img
-sudo dd <span style="color:#66d9ef">if</span><span style="color:#f92672">=</span>/dev/zero of<span style="color:#f92672">=</span>system.img bs<span style="color:#f92672">=</span>1MiB count<span style="color:#f92672">=</span><span style="color:#ae81ff">300</span> status<span style="color:#f92672">=</span>progress
-sudo sync
-
-echo <span style="color:#e6db74">&#34;mklabel msdos&#34;</span> | sudo parted system.img
-echo <span style="color:#e6db74">&#34;mkpart primary fat16 2048s 30MiB&#34;</span> | sudo parted system.img
-echo <span style="color:#e6db74">&#34;mkpart primary ext4 30MiB 100%&#34;</span> | sudo parted system.img
-echo <span style="color:#e6db74">&#34;set 1 boot on&#34;</span> | sudo parted system.img
-<span style="color:#75715e"># echo &#34;print&#34; | sudo parted system.img</span>
-<span style="color:#75715e"># sleep 10</span>
-sudo chmod <span style="color:#ae81ff">777</span> system.img
-
-<span style="color:#75715e">###########################################</span>
-<span style="color:#75715e"># Mount the system image, as if it&#39;s a device</span>
-<span style="color:#75715e">###########################################</span>
-
-SYSTEM_IMAGE<span style="color:#f92672">=</span><span style="color:#e6db74">`</span>sudo losetup -Pf system.img --show<span style="color:#e6db74">`</span>
-
-<span style="color:#75715e">##########################</span>
-<span style="color:#75715e"># Partition the system image</span>
-<span style="color:#75715e">##########################</span>
-
-sudo mkfs.vfat -n BOOT <span style="color:#e6db74">`</span>echo <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">${</span>SYSTEM_IMAGE<span style="color:#e6db74">}</span><span style="color:#e6db74">p1&#34;</span><span style="color:#e6db74">`</span>   <span style="color:#75715e"># Create a fat16 partition for boot files</span>
-sudo mkfs.ext4 -L ROOTFS <span style="color:#e6db74">`</span>echo <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">${</span>SYSTEM_IMAGE<span style="color:#e6db74">}</span><span style="color:#e6db74">p2&#34;</span><span style="color:#e6db74">`</span> <span style="color:#75715e"># Create an ext4 partition for rootfs files</span>
-
-<span style="color:#75715e">########################</span>
-<span style="color:#75715e"># Mount the new partitions</span>
-<span style="color:#75715e">########################</span>
-
-sudo rm -rf ./target_mnt
-mkdir ./target_mnt
-sudo mount <span style="color:#e6db74">`</span>echo <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">${</span>SYSTEM_IMAGE<span style="color:#e6db74">}</span><span style="color:#e6db74">p2&#34;</span><span style="color:#e6db74">`</span> ./target_mnt
-sudo mkdir ./target_mnt/boot
-sudo mount <span style="color:#e6db74">`</span>echo <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">${</span>SYSTEM_IMAGE<span style="color:#e6db74">}</span><span style="color:#e6db74">p1&#34;</span><span style="color:#e6db74">`</span> ./target_mnt/boot
-
-<span style="color:#75715e">###############</span>
-<span style="color:#75715e"># Copy boot files</span>
-<span style="color:#75715e">###############</span>
-
-<span style="color:#75715e"># Raspberry Pi 4 boot configuration</span>
-sudo cp ./config.txt ./target_mnt/boot/
-sudo cp ./cmdline.txt ./target_mnt/boot/
-
-<span style="color:#75715e"># firmware</span>
-sudo cp ./buildroot-2021.11/output/images/rpi-firmware/bcm2711-rpi-4-b.dtb ./target_mnt/boot/
-sudo cp ./buildroot-2021.11/output/images/rpi-firmware/start4cd.elf ./target_mnt/boot/
-sudo cp ./buildroot-2021.11/output/images/rpi-firmware/fixup4cd.dat ./target_mnt/boot/
-sudo cp ./buildroot-2021.11/output/images/rpi-firmware/overlays ./target_mnt/boot -r
-
-<span style="color:#75715e"># kernel</span>
-sudo cp ./linux/arch/arm64/boot/Image ./target_mnt/boot/
-
-sleep <span style="color:#ae81ff">3</span>
-
-<span style="color:#75715e">#################</span>
-<span style="color:#75715e"># Copy rootfs files</span>
-<span style="color:#75715e">#################</span>
-
-<span style="color:#75715e"># buildroot&#39;s rootfs</span>
-cd target_mnt/
-sudo tar -xvf ../buildroot-2021.11/output/images/rootfs.tar.gz .
-cd ..
-
-sleep <span style="color:#ae81ff">3</span>
-
-<span style="color:#75715e"># kernel</span>
-cd linux
-sudo INSTALL_MOD_PATH<span style="color:#f92672">=</span>../target_mnt/ ARCH<span style="color:#f92672">=</span>arm64 CROSS_COMPILE<span style="color:#f92672">=</span>/home/tom/x-tools/aarch64-rpi4-linux-gnu/bin/aarch64-rpi4-linux-gnu- make modules_install
-cd ..
-
-sleep <span style="color:#ae81ff">3</span>
-
-<span style="color:#75715e"># game files</span>
-sudo cp ./data ./target_mnt -r
-
-<span style="color:#75715e">########################</span>
-<span style="color:#75715e"># Unmount the system image</span>
-<span style="color:#75715e">########################</span>
-
-sudo sync
-sudo umount ./target_mnt/boot -l
-sudo umount ./target_mnt -l
-sudo losetup -D
-sudo rm -rf ./target_mnt
-</code></pre></div><p>The system should now be ready to run Dune Dynasty. Flash the system.img file to any Raspberry Pi 4&rsquo;s SD card and see the OS in action!</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e">#########################################</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Create a system image called &#34;system.img&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#########################################</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>rm -rf system.img
+</span></span><span style="display:flex;"><span>sudo dd <span style="color:#66d9ef">if</span><span style="color:#f92672">=</span>/dev/zero of<span style="color:#f92672">=</span>system.img bs<span style="color:#f92672">=</span>1MiB count<span style="color:#f92672">=</span><span style="color:#ae81ff">300</span> status<span style="color:#f92672">=</span>progress
+</span></span><span style="display:flex;"><span>sudo sync
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>echo <span style="color:#e6db74">&#34;mklabel msdos&#34;</span> | sudo parted system.img
+</span></span><span style="display:flex;"><span>echo <span style="color:#e6db74">&#34;mkpart primary fat16 2048s 30MiB&#34;</span> | sudo parted system.img
+</span></span><span style="display:flex;"><span>echo <span style="color:#e6db74">&#34;mkpart primary ext4 30MiB 100%&#34;</span> | sudo parted system.img
+</span></span><span style="display:flex;"><span>echo <span style="color:#e6db74">&#34;set 1 boot on&#34;</span> | sudo parted system.img
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># echo &#34;print&#34; | sudo parted system.img</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># sleep 10</span>
+</span></span><span style="display:flex;"><span>sudo chmod <span style="color:#ae81ff">777</span> system.img
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">###########################################</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Mount the system image, as if it&#39;s a device</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">###########################################</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>SYSTEM_IMAGE<span style="color:#f92672">=</span><span style="color:#e6db74">`</span>sudo losetup -Pf system.img --show<span style="color:#e6db74">`</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">##########################</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Partition the system image</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">##########################</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>sudo mkfs.vfat -n BOOT <span style="color:#e6db74">`</span>echo <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">${</span>SYSTEM_IMAGE<span style="color:#e6db74">}</span><span style="color:#e6db74">p1&#34;</span><span style="color:#e6db74">`</span>   <span style="color:#75715e"># Create a fat16 partition for boot files</span>
+</span></span><span style="display:flex;"><span>sudo mkfs.ext4 -L ROOTFS <span style="color:#e6db74">`</span>echo <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">${</span>SYSTEM_IMAGE<span style="color:#e6db74">}</span><span style="color:#e6db74">p2&#34;</span><span style="color:#e6db74">`</span> <span style="color:#75715e"># Create an ext4 partition for rootfs files</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">########################</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Mount the new partitions</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">########################</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>sudo rm -rf ./target_mnt
+</span></span><span style="display:flex;"><span>mkdir ./target_mnt
+</span></span><span style="display:flex;"><span>sudo mount <span style="color:#e6db74">`</span>echo <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">${</span>SYSTEM_IMAGE<span style="color:#e6db74">}</span><span style="color:#e6db74">p2&#34;</span><span style="color:#e6db74">`</span> ./target_mnt
+</span></span><span style="display:flex;"><span>sudo mkdir ./target_mnt/boot
+</span></span><span style="display:flex;"><span>sudo mount <span style="color:#e6db74">`</span>echo <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">${</span>SYSTEM_IMAGE<span style="color:#e6db74">}</span><span style="color:#e6db74">p1&#34;</span><span style="color:#e6db74">`</span> ./target_mnt/boot
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">###############</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Copy boot files</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">###############</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Raspberry Pi 4 boot configuration</span>
+</span></span><span style="display:flex;"><span>sudo cp ./config.txt ./target_mnt/boot/
+</span></span><span style="display:flex;"><span>sudo cp ./cmdline.txt ./target_mnt/boot/
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># firmware</span>
+</span></span><span style="display:flex;"><span>sudo cp ./buildroot-2021.11/output/images/rpi-firmware/bcm2711-rpi-4-b.dtb ./target_mnt/boot/
+</span></span><span style="display:flex;"><span>sudo cp ./buildroot-2021.11/output/images/rpi-firmware/start4cd.elf ./target_mnt/boot/
+</span></span><span style="display:flex;"><span>sudo cp ./buildroot-2021.11/output/images/rpi-firmware/fixup4cd.dat ./target_mnt/boot/
+</span></span><span style="display:flex;"><span>sudo cp ./buildroot-2021.11/output/images/rpi-firmware/overlays ./target_mnt/boot -r
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># kernel</span>
+</span></span><span style="display:flex;"><span>sudo cp ./linux/arch/arm64/boot/Image ./target_mnt/boot/
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>sleep <span style="color:#ae81ff">3</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#################</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Copy rootfs files</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#################</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># buildroot&#39;s rootfs</span>
+</span></span><span style="display:flex;"><span>cd target_mnt/
+</span></span><span style="display:flex;"><span>sudo tar -xvf ../buildroot-2021.11/output/images/rootfs.tar.gz .
+</span></span><span style="display:flex;"><span>cd ..
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>sleep <span style="color:#ae81ff">3</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># kernel</span>
+</span></span><span style="display:flex;"><span>cd linux
+</span></span><span style="display:flex;"><span>sudo INSTALL_MOD_PATH<span style="color:#f92672">=</span>../target_mnt/ ARCH<span style="color:#f92672">=</span>arm64 CROSS_COMPILE<span style="color:#f92672">=</span>/home/tom/x-tools/aarch64-rpi4-linux-gnu/bin/aarch64-rpi4-linux-gnu- make modules_install
+</span></span><span style="display:flex;"><span>cd ..
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>sleep <span style="color:#ae81ff">3</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># game files</span>
+</span></span><span style="display:flex;"><span>sudo cp ./data ./target_mnt -r
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">########################</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Unmount the system image</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">########################</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>sudo sync
+</span></span><span style="display:flex;"><span>sudo umount ./target_mnt/boot -l
+</span></span><span style="display:flex;"><span>sudo umount ./target_mnt -l
+</span></span><span style="display:flex;"><span>sudo losetup -D
+</span></span><span style="display:flex;"><span>sudo rm -rf ./target_mnt
+</span></span></code></pre></div><p>The system should now be ready to run Dune Dynasty. Flash the system.img file to any Raspberry Pi 4&rsquo;s SD card and see the OS in action!</p>
 <h1 id="debugging">Debugging</h1>
 <p>If the system does not boot into ratpoison automatically, the game can be started manually, using the following commands:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#75715e"># start X.org (will start one xterm window for now)</span>
-xinit
-<span style="color:#75715e"># start twm window manager</span>
-exec twm &amp;
-<span style="color:#75715e"># load some kernel modules related to hardware acceleration (still in testing phase)</span>
-modprobe v3d
-modprobe vc4
-<span style="color:#75715e"># make sure the Dune Dynasty binary can find the Allegro5 library files</span>
-export LD_LIBRARY_PATH<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;/lib:/usr/lib:/usr/local/lib&#34;</span>
-<span style="color:#75715e"># start Dune Dynasty</span>
-/usr/local/bin/dunedynasty
-</code></pre></div><h1 id="extras">Extra&rsquo;s</h1>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># start X.org (will start one xterm window for now)</span>
+</span></span><span style="display:flex;"><span>xinit
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># start twm window manager</span>
+</span></span><span style="display:flex;"><span>exec twm &amp;
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># load some kernel modules related to hardware acceleration (still in testing phase)</span>
+</span></span><span style="display:flex;"><span>modprobe v3d
+</span></span><span style="display:flex;"><span>modprobe vc4
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># make sure the Dune Dynasty binary can find the Allegro5 library files</span>
+</span></span><span style="display:flex;"><span>export LD_LIBRARY_PATH<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;/lib:/usr/lib:/usr/local/lib&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># start Dune Dynasty</span>
+</span></span><span style="display:flex;"><span>/usr/local/bin/dunedynasty
+</span></span></code></pre></div><h1 id="extras">Extra&rsquo;s</h1>
 <h2 id="building-allegro5-manually-optional">Building Allegro5 manually (optional)</h2>
 <p>To compile Dune Dynasty, the <a href="https://github.com/liballeg/allegro5">Allegro5 game programming library</a> is needed.</p>
 <p>Buildroot must be done building before Allegro5 is built; Allegro5 cannot compile against an incomplete OS.</p>
 <h3 id="downloading-the-source-files">Downloading the source files</h3>
 <p>To download and extract the Allegro5 library source file, the following commands are executed:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">wget https://github.com/liballeg/allegro5/releases/download/5.2.7.0/allegro-5.2.7.0.tar.gz
-tar -xvf allegro-5.2.7.0.tar.gz
-rm -rf allegro-5.2.7.0.tar.gz
-cd allegro-5.2.7.0/
-</code></pre></div><h3 id="configuring-cmake">Configuring CMake</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>wget https://github.com/liballeg/allegro5/releases/download/5.2.7.0/allegro-5.2.7.0.tar.gz
+</span></span><span style="display:flex;"><span>tar -xvf allegro-5.2.7.0.tar.gz
+</span></span><span style="display:flex;"><span>rm -rf allegro-5.2.7.0.tar.gz
+</span></span><span style="display:flex;"><span>cd allegro-5.2.7.0/
+</span></span></code></pre></div><h3 id="configuring-cmake">Configuring CMake</h3>
 <p>In the folder <code>allegro-5.2.7.0/cmake</code> are a bunch of files related to CMake. Within the list of files there is a file called <a href="https://github.com/liballeg/allegro5/blob/master/cmake/Toolchain-raspberrypi.cmake">Toolchain-raspberrypi.cmake</a>. This file contains configuration that tells CMake how to build the library for the first Raspberry Pi. The first Raspberry Pi is 32 bit and the toolchain does <em>not</em> have multilib support enabled. Therefor, a new toolchain must be created.</p>
 <p>A custom file called <code>Toolchain-raspberrypi4_64.cmake</code> will be created and placed inside the <code>allegro-5.2.7.0/cmake</code> directory. The file will contain the following contents:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#75715e">#############</span>
-<span style="color:#75715e"># Set target OS</span>
-<span style="color:#75715e">#############</span>
-
-set<span style="color:#f92672">(</span>CMAKE_SYSTEM_NAME Linux<span style="color:#f92672">)</span>
-
-<span style="color:#75715e">######################################################</span>
-<span style="color:#75715e"># Force CMake to use the toolchain built by crosstool-NG</span>
-<span style="color:#75715e"># (both 64 bit and 32 bit cross-compiling toolchains can</span>
-<span style="color:#75715e"># be used here)</span>
-<span style="color:#75715e">######################################################</span>
-
-set<span style="color:#f92672">(</span>CMAKE_TOOLCHAIN_FILE /home/&lt;YOUR_USERNAME_GOES_HERE&gt;/x-tools/aarch64-rpi4-linux-gnu/bin/aarch64-rpi4-linux-gnu<span style="color:#f92672">)</span>
-set<span style="color:#f92672">(</span>CMAKE_C_COMPILER <span style="color:#e6db74">${</span>CMAKE_TOOLCHAIN_FILE<span style="color:#e6db74">}</span>-gcc<span style="color:#f92672">)</span>
-set<span style="color:#f92672">(</span>CMAKE_CXX_COMPILER <span style="color:#e6db74">${</span>CMAKE_TOOLCHAIN_FILE<span style="color:#e6db74">}</span>-g++<span style="color:#f92672">)</span>
-set<span style="color:#f92672">(</span>CMAKE_LINKER <span style="color:#e6db74">${</span>CMAKE_TOOLCHAIN_FILE<span style="color:#e6db74">}</span>-ld<span style="color:#f92672">)</span>
-
-set<span style="color:#f92672">(</span>MAKE_C_LINK_EXECUTABLE <span style="color:#e6db74">${</span>CMAKE_LINKER<span style="color:#e6db74">}</span><span style="color:#f92672">)</span>
-set<span style="color:#f92672">(</span>MAKE_CXX_LINK_EXECUTABLE <span style="color:#e6db74">${</span>CMAKE_LINKER<span style="color:#e6db74">}</span><span style="color:#f92672">)</span>
-
-<span style="color:#75715e">#########################################################</span>
-<span style="color:#75715e"># Tell CMake to do all compiling against the target sysroot</span>
-<span style="color:#75715e">#########################################################</span>
-
-set<span style="color:#f92672">(</span>CMAKE_SYSROOT /path/to/buildroot-&lt;VERSION_GOES_HERE&gt;/output/host/aarch64-rpi4-linux-gnu/sysroot<span style="color:#f92672">)</span>
-set<span style="color:#f92672">(</span>CMAKE_SYSROOT_COMPILE <span style="color:#e6db74">${</span>CMAKE_SYSROOT<span style="color:#e6db74">}</span>/<span style="color:#f92672">)</span>
-set<span style="color:#f92672">(</span>CMAKE_SYSROOT_LINK <span style="color:#e6db74">${</span>CMAKE_SYSROOT<span style="color:#e6db74">}</span>/<span style="color:#f92672">)</span>
-set<span style="color:#f92672">(</span>CMAKE_SYSTEM_PREFIX_PATH <span style="color:#e6db74">${</span>CMAKE_SYSROOT<span style="color:#e6db74">}</span>/<span style="color:#f92672">)</span>
-set<span style="color:#f92672">(</span>CMAKE_INSTALL_PREFIX <span style="color:#e6db74">${</span>CMAKE_SYSROOT<span style="color:#e6db74">}</span><span style="color:#f92672">)</span>
-
-<span style="color:#75715e">#######################################################</span>
-<span style="color:#75715e"># Make sure CMake does not link against host OS libraries</span>
-<span style="color:#75715e">#######################################################</span>
-
-set<span style="color:#f92672">(</span>CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER<span style="color:#f92672">)</span>
-set<span style="color:#f92672">(</span>CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY<span style="color:#f92672">)</span>
-set<span style="color:#f92672">(</span>CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY<span style="color:#f92672">)</span>
-set<span style="color:#f92672">(</span>CMAKE_FINE_ROOT_PATH_MODE_PACKAGE ONLY<span style="color:#f92672">)</span>
-</code></pre></div><p>When the following commands are then executed, the Allegro library will be built:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#75715e"># create a build directory and go into it, to separate source code from binaries</span>
-mkdir build/
-cd build/
-
-<span style="color:#75715e"># delete old build files (in case the previous build failed)</span>
-rm -rf CMakeFiles CMakeCache.txt addons cmake_install.cmake demos docs examples include lib Makefile tests
-
-<span style="color:#75715e"># configure CMake</span>
-cmake -DCMAKE_TOOLCHAIN_FILE<span style="color:#f92672">=</span>cmake/Toolchain-raspberrypi4_64.cmake -DSHARED<span style="color:#f92672">=</span>on -DCMAKE_LINKER_FLAGS<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;-static-libgcc -static-libstdc++&#34;</span> ..
-
-<span style="color:#75715e"># build Allegro5</span>
-make -j<span style="color:#e6db74">`</span>nproc<span style="color:#e6db74">`</span>
-</code></pre></div><h3 id="manually-installing-allegro5-to-the-target-buildroot-os">Manually installing Allegro5 to the target Buildroot OS</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e">#############</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Set target OS</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#############</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>set<span style="color:#f92672">(</span>CMAKE_SYSTEM_NAME Linux<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">######################################################</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Force CMake to use the toolchain built by crosstool-NG</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># (both 64 bit and 32 bit cross-compiling toolchains can</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># be used here)</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">######################################################</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>set<span style="color:#f92672">(</span>CMAKE_TOOLCHAIN_FILE /home/&lt;YOUR_USERNAME_GOES_HERE&gt;/x-tools/aarch64-rpi4-linux-gnu/bin/aarch64-rpi4-linux-gnu<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>set<span style="color:#f92672">(</span>CMAKE_C_COMPILER <span style="color:#e6db74">${</span>CMAKE_TOOLCHAIN_FILE<span style="color:#e6db74">}</span>-gcc<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>set<span style="color:#f92672">(</span>CMAKE_CXX_COMPILER <span style="color:#e6db74">${</span>CMAKE_TOOLCHAIN_FILE<span style="color:#e6db74">}</span>-g++<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>set<span style="color:#f92672">(</span>CMAKE_LINKER <span style="color:#e6db74">${</span>CMAKE_TOOLCHAIN_FILE<span style="color:#e6db74">}</span>-ld<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>set<span style="color:#f92672">(</span>MAKE_C_LINK_EXECUTABLE <span style="color:#e6db74">${</span>CMAKE_LINKER<span style="color:#e6db74">}</span><span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>set<span style="color:#f92672">(</span>MAKE_CXX_LINK_EXECUTABLE <span style="color:#e6db74">${</span>CMAKE_LINKER<span style="color:#e6db74">}</span><span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#########################################################</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Tell CMake to do all compiling against the target sysroot</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#########################################################</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>set<span style="color:#f92672">(</span>CMAKE_SYSROOT /path/to/buildroot-&lt;VERSION_GOES_HERE&gt;/output/host/aarch64-rpi4-linux-gnu/sysroot<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>set<span style="color:#f92672">(</span>CMAKE_SYSROOT_COMPILE <span style="color:#e6db74">${</span>CMAKE_SYSROOT<span style="color:#e6db74">}</span>/<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>set<span style="color:#f92672">(</span>CMAKE_SYSROOT_LINK <span style="color:#e6db74">${</span>CMAKE_SYSROOT<span style="color:#e6db74">}</span>/<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>set<span style="color:#f92672">(</span>CMAKE_SYSTEM_PREFIX_PATH <span style="color:#e6db74">${</span>CMAKE_SYSROOT<span style="color:#e6db74">}</span>/<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>set<span style="color:#f92672">(</span>CMAKE_INSTALL_PREFIX <span style="color:#e6db74">${</span>CMAKE_SYSROOT<span style="color:#e6db74">}</span><span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#######################################################</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Make sure CMake does not link against host OS libraries</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#######################################################</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>set<span style="color:#f92672">(</span>CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>set<span style="color:#f92672">(</span>CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>set<span style="color:#f92672">(</span>CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>set<span style="color:#f92672">(</span>CMAKE_FINE_ROOT_PATH_MODE_PACKAGE ONLY<span style="color:#f92672">)</span>
+</span></span></code></pre></div><p>When the following commands are then executed, the Allegro library will be built:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># create a build directory and go into it, to separate source code from binaries</span>
+</span></span><span style="display:flex;"><span>mkdir build/
+</span></span><span style="display:flex;"><span>cd build/
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># delete old build files (in case the previous build failed)</span>
+</span></span><span style="display:flex;"><span>rm -rf CMakeFiles CMakeCache.txt addons cmake_install.cmake demos docs examples include lib Makefile tests
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># configure CMake</span>
+</span></span><span style="display:flex;"><span>cmake -DCMAKE_TOOLCHAIN_FILE<span style="color:#f92672">=</span>cmake/Toolchain-raspberrypi4_64.cmake -DSHARED<span style="color:#f92672">=</span>on -DCMAKE_LINKER_FLAGS<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;-static-libgcc -static-libstdc++&#34;</span> ..
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># build Allegro5</span>
+</span></span><span style="display:flex;"><span>make -j<span style="color:#e6db74">`</span>nproc<span style="color:#e6db74">`</span>
+</span></span></code></pre></div><h3 id="manually-installing-allegro5-to-the-target-buildroot-os">Manually installing Allegro5 to the target Buildroot OS</h3>
 <p>After Allegro5 is done compiling, it can be installed to the target OS using the environment variable <code>DESTDIR</code>:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#75715e"># dune dynasty will compile against this sysroot, it cannot compile against target</span>
-DESTDIR<span style="color:#f92672">=</span>path/to/buildroot-&lt;VERSION_GOES_HERE&gt;/output/host/&lt;COMPILING_TOOLCHAIN_GOES_HERE&gt;/sysroot make install
-<span style="color:#75715e"># install to target OS as well</span>
-DESTDIR<span style="color:#f92672">=</span>path/to/buildroot-&lt;VERSION_GOES_HERE&gt;/output/target/ make install
-</code></pre></div><h2 id="manually-compiling-dune-dynasty-against-the-target-buildroot-os">Manually compiling Dune Dynasty against the target Buildroot OS</h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># dune dynasty will compile against this sysroot, it cannot compile against target</span>
+</span></span><span style="display:flex;"><span>DESTDIR<span style="color:#f92672">=</span>path/to/buildroot-&lt;VERSION_GOES_HERE&gt;/output/host/&lt;COMPILING_TOOLCHAIN_GOES_HERE&gt;/sysroot make install
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># install to target OS as well</span>
+</span></span><span style="display:flex;"><span>DESTDIR<span style="color:#f92672">=</span>path/to/buildroot-&lt;VERSION_GOES_HERE&gt;/output/target/ make install
+</span></span></code></pre></div><h2 id="manually-compiling-dune-dynasty-against-the-target-buildroot-os">Manually compiling Dune Dynasty against the target Buildroot OS</h2>
 <p>It it assumed that Allegro5 was installed to the target Buildroot OS. If it&rsquo;s not, this has to be done before continuing.</p>
 <p>First, download and extract the game:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">wget https://versaweb.dl.sourceforge.net/project/dunedynasty/dunedynasty-1.5/dunedynasty-1.5.7.tar.gz
-tar -xvf dunedynasty-1.5.7.tar.gz
-rm -rf dunedynasty-1.5.7.tar.gz
-</code></pre></div><p>Then, create a toolchain file in the <code>dunedynasty-1.5.7/cmake</code> directory, called <code>Toolchain-raspberrypi4_64.cmake</code>. The toolchain is almost the same as the one from Allegro5, but with some extra configuration at the bottom:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#75715e">#############</span>
-<span style="color:#75715e"># Set target OS</span>
-<span style="color:#75715e">#############</span>
-set<span style="color:#f92672">(</span>CMAKE_SYSTEM_NAME Linux<span style="color:#f92672">)</span>
-
-<span style="color:#75715e">######################################################</span>
-<span style="color:#75715e"># Force CMake to use the toolchain built by crosstool-NG</span>
-<span style="color:#75715e"># (both 64 bit and 32 bit cross-compiling toolchains can</span>
-<span style="color:#75715e"># be used here)</span>
-<span style="color:#75715e">######################################################</span>
-
-set<span style="color:#f92672">(</span>CMAKE_TOOLCHAIN_FILE /home/&lt;YOUR_USERNAME_GOES_HERE&gt;/x-tools/aarch64-rpi4-linux-gnu/bin/aarch64-rpi4-linux-gnu<span style="color:#f92672">)</span>
-set<span style="color:#f92672">(</span>CMAKE_C_COMPILER <span style="color:#e6db74">${</span>CMAKE_TOOLCHAIN_FILE<span style="color:#e6db74">}</span>-gcc<span style="color:#f92672">)</span>
-set<span style="color:#f92672">(</span>CMAKE_CXX_COMPILER <span style="color:#e6db74">${</span>CMAKE_TOOLCHAIN_FILE<span style="color:#e6db74">}</span>-g++<span style="color:#f92672">)</span>
-set<span style="color:#f92672">(</span>CMAKE_LINKER <span style="color:#e6db74">${</span>CMAKE_TOOLCHAIN_FILE<span style="color:#e6db74">}</span>-ld<span style="color:#f92672">)</span>
-
-set<span style="color:#f92672">(</span>MAKE_C_LINK_EXECUTABLE <span style="color:#e6db74">${</span>CMAKE_LINKER<span style="color:#e6db74">}</span><span style="color:#f92672">)</span>
-set<span style="color:#f92672">(</span>MAKE_CXX_LINK_EXECUTABLE <span style="color:#e6db74">${</span>CMAKE_LINKER<span style="color:#e6db74">}</span><span style="color:#f92672">)</span>
-
-<span style="color:#75715e">#########################################################</span>
-<span style="color:#75715e"># Tell CMake to do all compiling against the target sysroot</span>
-<span style="color:#75715e">#########################################################</span>
-
-set<span style="color:#f92672">(</span>CMAKE_SYSROOT /path/to/buildroot-&lt;VERSION_GOES_HERE&gt;/output/host/&lt;COMPILING_TOOLCHAIN_GOES_HERE&gt;/sysroot<span style="color:#f92672">)</span>
-set<span style="color:#f92672">(</span>CMAKE_SYSROOT_COMPILE <span style="color:#e6db74">${</span>CMAKE_SYSROOT<span style="color:#e6db74">}</span>/<span style="color:#f92672">)</span>
-set<span style="color:#f92672">(</span>CMAKE_SYSROOT_LINK <span style="color:#e6db74">${</span>CMAKE_SYSROOT<span style="color:#e6db74">}</span>/<span style="color:#f92672">)</span>
-set<span style="color:#f92672">(</span>CMAKE_SYSTEM_PREFIX_PATH <span style="color:#e6db74">${</span>CMAKE_SYSROOT<span style="color:#e6db74">}</span>/<span style="color:#f92672">)</span>
-set<span style="color:#f92672">(</span>CMAKE_INSTALL_PREFIX <span style="color:#e6db74">${</span>CMAKE_SYSROOT<span style="color:#e6db74">}</span><span style="color:#f92672">)</span>
-
-<span style="color:#75715e">#######################################################</span>
-<span style="color:#75715e"># Make sure CMake does not link against host OS libraries</span>
-<span style="color:#75715e">#######################################################</span>
-
-set<span style="color:#f92672">(</span>CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER<span style="color:#f92672">)</span>
-set<span style="color:#f92672">(</span>CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY<span style="color:#f92672">)</span>
-set<span style="color:#f92672">(</span>CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY<span style="color:#f92672">)</span>
-set<span style="color:#f92672">(</span>CMAKE_FINE_ROOT_PATH_MODE_PACKAGE ONLY<span style="color:#f92672">)</span>
-
-<span style="color:#75715e">##############################################</span>
-<span style="color:#75715e"># Make sure Allegro5 is found (using pkg-config)</span>
-<span style="color:#75715e">##############################################</span>
-
-set<span style="color:#f92672">(</span>ENV<span style="color:#f92672">{</span>PKG_CONFIG_DIR<span style="color:#f92672">}</span> <span style="color:#e6db74">&#34;&#34;</span><span style="color:#f92672">)</span>
-set<span style="color:#f92672">(</span>ENV<span style="color:#f92672">{</span>PKG_CONFIG_LIBDIR<span style="color:#f92672">}</span> <span style="color:#e6db74">${</span>CMAKE_SYSROOT<span style="color:#e6db74">}</span>/usr/lib/pkgconfig:<span style="color:#e6db74">${</span>CMAKE_SYSROOT<span style="color:#e6db74">}</span>/usr/share/pkgconfig:<span style="color:#e6db74">${</span>CMAKE_SYSROOT<span style="color:#e6db74">}</span>/usr/local/lib/pkgconfig/<span style="color:#f92672">)</span>
-set<span style="color:#f92672">(</span>ENV<span style="color:#f92672">{</span>PKG_CONFIG_PATH<span style="color:#f92672">}</span> <span style="color:#e6db74">${</span>PKG_CONFIG_LIBDIR<span style="color:#e6db74">}</span><span style="color:#f92672">)</span>
-set<span style="color:#f92672">(</span>ENV<span style="color:#f92672">{</span>PKG_CONFIG_SYSROOT_DIR<span style="color:#f92672">}</span> <span style="color:#e6db74">${</span>CMAKE_SYSROOT<span style="color:#e6db74">}</span><span style="color:#f92672">)</span>
-</code></pre></div><p>To then compile the game, create a directory called <code>build</code>, go into it and compile everything:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#75715e"># go inside a build directory to separate binaries from source code</span>
-mkdir build/
-cd build/
-
-<span style="color:#75715e"># configure CMake</span>
-cmake -DCMAKE_TOOLCHAIN_FILE<span style="color:#f92672">=</span>../cmake/Toolchain-raspberrypi4_64.cmake ..
-
-<span style="color:#75715e"># build the game</span>
-make -j<span style="color:#e6db74">`</span>nproc<span style="color:#e6db74">`</span>
-</code></pre></div><h3 id="installing-the-game-to-the-target-sysroot">Installing the game to the target sysroot</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>wget https://versaweb.dl.sourceforge.net/project/dunedynasty/dunedynasty-1.5/dunedynasty-1.5.7.tar.gz
+</span></span><span style="display:flex;"><span>tar -xvf dunedynasty-1.5.7.tar.gz
+</span></span><span style="display:flex;"><span>rm -rf dunedynasty-1.5.7.tar.gz
+</span></span></code></pre></div><p>Then, create a toolchain file in the <code>dunedynasty-1.5.7/cmake</code> directory, called <code>Toolchain-raspberrypi4_64.cmake</code>. The toolchain is almost the same as the one from Allegro5, but with some extra configuration at the bottom:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e">#############</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Set target OS</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#############</span>
+</span></span><span style="display:flex;"><span>set<span style="color:#f92672">(</span>CMAKE_SYSTEM_NAME Linux<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">######################################################</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Force CMake to use the toolchain built by crosstool-NG</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># (both 64 bit and 32 bit cross-compiling toolchains can</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># be used here)</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">######################################################</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>set<span style="color:#f92672">(</span>CMAKE_TOOLCHAIN_FILE /home/&lt;YOUR_USERNAME_GOES_HERE&gt;/x-tools/aarch64-rpi4-linux-gnu/bin/aarch64-rpi4-linux-gnu<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>set<span style="color:#f92672">(</span>CMAKE_C_COMPILER <span style="color:#e6db74">${</span>CMAKE_TOOLCHAIN_FILE<span style="color:#e6db74">}</span>-gcc<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>set<span style="color:#f92672">(</span>CMAKE_CXX_COMPILER <span style="color:#e6db74">${</span>CMAKE_TOOLCHAIN_FILE<span style="color:#e6db74">}</span>-g++<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>set<span style="color:#f92672">(</span>CMAKE_LINKER <span style="color:#e6db74">${</span>CMAKE_TOOLCHAIN_FILE<span style="color:#e6db74">}</span>-ld<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>set<span style="color:#f92672">(</span>MAKE_C_LINK_EXECUTABLE <span style="color:#e6db74">${</span>CMAKE_LINKER<span style="color:#e6db74">}</span><span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>set<span style="color:#f92672">(</span>MAKE_CXX_LINK_EXECUTABLE <span style="color:#e6db74">${</span>CMAKE_LINKER<span style="color:#e6db74">}</span><span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#########################################################</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Tell CMake to do all compiling against the target sysroot</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#########################################################</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>set<span style="color:#f92672">(</span>CMAKE_SYSROOT /path/to/buildroot-&lt;VERSION_GOES_HERE&gt;/output/host/&lt;COMPILING_TOOLCHAIN_GOES_HERE&gt;/sysroot<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>set<span style="color:#f92672">(</span>CMAKE_SYSROOT_COMPILE <span style="color:#e6db74">${</span>CMAKE_SYSROOT<span style="color:#e6db74">}</span>/<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>set<span style="color:#f92672">(</span>CMAKE_SYSROOT_LINK <span style="color:#e6db74">${</span>CMAKE_SYSROOT<span style="color:#e6db74">}</span>/<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>set<span style="color:#f92672">(</span>CMAKE_SYSTEM_PREFIX_PATH <span style="color:#e6db74">${</span>CMAKE_SYSROOT<span style="color:#e6db74">}</span>/<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>set<span style="color:#f92672">(</span>CMAKE_INSTALL_PREFIX <span style="color:#e6db74">${</span>CMAKE_SYSROOT<span style="color:#e6db74">}</span><span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#######################################################</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Make sure CMake does not link against host OS libraries</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#######################################################</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>set<span style="color:#f92672">(</span>CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>set<span style="color:#f92672">(</span>CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>set<span style="color:#f92672">(</span>CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>set<span style="color:#f92672">(</span>CMAKE_FINE_ROOT_PATH_MODE_PACKAGE ONLY<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">##############################################</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Make sure Allegro5 is found (using pkg-config)</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">##############################################</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>set<span style="color:#f92672">(</span>ENV<span style="color:#f92672">{</span>PKG_CONFIG_DIR<span style="color:#f92672">}</span> <span style="color:#e6db74">&#34;&#34;</span><span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>set<span style="color:#f92672">(</span>ENV<span style="color:#f92672">{</span>PKG_CONFIG_LIBDIR<span style="color:#f92672">}</span> <span style="color:#e6db74">${</span>CMAKE_SYSROOT<span style="color:#e6db74">}</span>/usr/lib/pkgconfig:<span style="color:#e6db74">${</span>CMAKE_SYSROOT<span style="color:#e6db74">}</span>/usr/share/pkgconfig:<span style="color:#e6db74">${</span>CMAKE_SYSROOT<span style="color:#e6db74">}</span>/usr/local/lib/pkgconfig/<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>set<span style="color:#f92672">(</span>ENV<span style="color:#f92672">{</span>PKG_CONFIG_PATH<span style="color:#f92672">}</span> <span style="color:#e6db74">${</span>PKG_CONFIG_LIBDIR<span style="color:#e6db74">}</span><span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>set<span style="color:#f92672">(</span>ENV<span style="color:#f92672">{</span>PKG_CONFIG_SYSROOT_DIR<span style="color:#f92672">}</span> <span style="color:#e6db74">${</span>CMAKE_SYSROOT<span style="color:#e6db74">}</span><span style="color:#f92672">)</span>
+</span></span></code></pre></div><p>To then compile the game, create a directory called <code>build</code>, go into it and compile everything:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># go inside a build directory to separate binaries from source code</span>
+</span></span><span style="display:flex;"><span>mkdir build/
+</span></span><span style="display:flex;"><span>cd build/
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># configure CMake</span>
+</span></span><span style="display:flex;"><span>cmake -DCMAKE_TOOLCHAIN_FILE<span style="color:#f92672">=</span>../cmake/Toolchain-raspberrypi4_64.cmake ..
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># build the game</span>
+</span></span><span style="display:flex;"><span>make -j<span style="color:#e6db74">`</span>nproc<span style="color:#e6db74">`</span>
+</span></span></code></pre></div><h3 id="installing-the-game-to-the-target-sysroot">Installing the game to the target sysroot</h3>
 <p>Installing the binaries to the target sysroot is exactly the same process as installing Allegro5:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">sudo DESTDIR<span style="color:#f92672">=</span>path/to/buildroot-&lt;VERSION_GOES_HERE&gt;/output/target/ make install <span style="color:#75715e"># install to target OS</span>
-</code></pre></div>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>sudo DESTDIR<span style="color:#f92672">=</span>path/to/buildroot-&lt;VERSION_GOES_HERE&gt;/output/target/ make install <span style="color:#75715e"># install to target OS</span>
+</span></span></code></pre></div>
       </div>
     </article>
 
@@ -872,7 +867,7 @@ make -j<span style="color:#e6db74">`</span>nproc<span style="color:#e6db74">`</s
             <span class="button previous">
                 <a href="https://tomniesse.github.io/posts/ender3-abs-printing/">
                     <span class="button__icon">←</span>
-                    <span class="button__text">Printing ABS using an Ender 3 (v1), without an enclosure</span>
+                    <span class="button__text">3D printing ABS using an Ender 3 (v1), without an enclosure</span>
                 </a>
             </span>
             
@@ -910,7 +905,7 @@ make -j<span style="color:#e6db74">`</span>nproc<span style="color:#e6db74">`</s
 
 
 
-<script type="text/javascript" src="/bundle.min.644292943ae47eef02fcd64b11757aeb8caeeaebf473a823b62099edccac808e8d82689359f285e5d95994e5ad5ae3b9c1ccc281eb1828e67d0ba6630f95b832.js" integrity="sha512-ZEKSlDrkfu8C/NZLEXV664yu6uv0c6gjtiCZ7cysgI6NgmiTWfKF5dlZlOWtWuO5wczCgesYKOZ9C6ZjD5W4Mg=="></script>
+<script type="text/javascript" src="/bundle.min.205d491810c28f95aa953fae884e1c27abe13fdf93ec63b882d0036b248d4a6282eb2d134e4e7225c6ad6e86db87b08488a361ca4a7383d01fcff43f3d57b9c3.js" integrity="sha512-IF1JGBDCj5WqlT&#43;uiE4cJ6vhP9&#43;T7GO4gtADaySNSmKC6y0TTk5yJcatbobbh7CEiKNhykpzg9Afz/Q/PVe5ww=="></script>
 
 
 
