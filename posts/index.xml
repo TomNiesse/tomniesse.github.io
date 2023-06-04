@@ -15,9 +15,9 @@
             <pubDate>Sun, 04 Jun 2023 11:28:55 +0200</pubDate>
             
             <guid>https://tomniesse.github.io/posts/nat66/</guid>
-            <description>For a very specific problem, I needed to daisy chain two routers. This is easily done with IPv4, since it has has NAT. But what about IPv6?
+            <description>For a very specific problem, I needed to daisy chain some routers. This is easily done with IPv4, since it has has NAT. But what about IPv6?
 The issue I recently bought a cheap second hand router. I did this to split the incoming WAN-connection into two LAN-connections. One LAN-connection goes to a separate network with a specific purpose. The other LAN-connection serves as a WAN for another router. The second router is not mounted near a fuse box and can serve much better wifi to the entire house.</description>
-            <content type="html"><![CDATA[<p>For a very specific problem, I needed to daisy chain two routers. This is easily done with IPv4, since it has has NAT. But what about IPv6?</p>
+            <content type="html"><![CDATA[<p>For a very specific problem, I needed to daisy chain some routers. This is easily done with IPv4, since it has has NAT. But what about IPv6?</p>
 <h1 id="the-issue">The issue</h1>
 <p>I recently bought a cheap second hand router. I did this to split the incoming WAN-connection into two LAN-connections. One LAN-connection goes to a separate network with a specific purpose. The other LAN-connection serves as a WAN for another router. The second router is not mounted near a fuse box and can serve much better wifi to the entire house.</p>
 <p><a href="images/topology_block_diagram.png"><img src="images/topology_block_diagram.png" alt="Topology block diagram"></a></p>
