@@ -21,7 +21,7 @@ The issue I recently bought a cheap second hand router. I did this to split the 
 <h1 id="the-issue">The issue</h1>
 <p>I recently bought a cheap second hand router. I did this to split the incoming WAN-connection into two LAN-connections. One LAN-connection goes to a separate network with a specific purpose. The other LAN-connection serves as a WAN for another router. The second router is not mounted near a fuse box and can serve much better wifi to the entire house.</p>
 <p><a href="images/topology_block_diagram.png"><img src="images/topology_block_diagram.png" alt="Topology block diagram"></a></p>
-<p>Using this topology, IPv4 worked almost automatically. However, IPv6 did not. For router 2, this does not matter that much. For router 3 however, it does (I want IPv6 when connecting to wifi). Many answers online involve calling the ISP and asking for another IPv6 prefix. I wasn&rsquo;t going to do this.</p>
+<p>Using this topology, IPv4 worked almost automatically. However, IPv6 did not. For router 2, this does not matter that much. For router 3 however, it does matter (I want IPv6 when connecting to wifi). Many answers online involve calling the ISP and asking for another IPv6 prefix. I wasn&rsquo;t going to do this.</p>
 <h1 id="the-solution">The solution</h1>
 <p>Turns out, IPv6 masquerading exists. And it works just like IPv4&rsquo;s NAT. If both routers could just NAT all IPv6 traffic, I consider my problem solved!</p>
 <h2 id="router-1-settings">Router 1 settings</h2>
