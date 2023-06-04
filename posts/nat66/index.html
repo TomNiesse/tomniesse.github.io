@@ -5,18 +5,17 @@
 <meta http-equiv="X-UA-Compatible" content="ie=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <meta name="author" content="">
-<meta name="description" content="Introduction When looking for a guide on how to print ABS using a cheap printer, people usually say &amp;ldquo;it&amp;rsquo;s impossible&amp;rdquo;, &amp;ldquo;it requires a printer enclosure&amp;rdquo; or &amp;ldquo;you just have to remove the fans&amp;rdquo;.
-I disagree with all those statements. In this youtube video, someone put duct tape on their Ender 3 and was able to print ABS just fine.
-And if someone else can do it, it must be possible." />
+<meta name="description" content="For a very specific problem, I needed to daisy chain two routers. This is easily done with IPv4, since it has has NAT. But what about IPv6?
+The issue I recently bought a cheap second hand router. I did this to split the incoming WAN-connection into two LAN-connections. One LAN-connection goes to a separate network with a specific purpose. The other LAN-connection serves as a WAN for another router. The second router is not mounted near a fuse box and can serve much better wifi to the entire house." />
 <meta name="keywords" content=", untagged" />
 <meta name="robots" content="noodp" />
 <meta name="theme-color" content="" />
-<link rel="canonical" href="https://tomniesse.github.io/posts/ender3-abs-printing/" />
+<link rel="canonical" href="https://tomniesse.github.io/posts/nat66/" />
 
 
     <title>
         
-            Printing ABS using an Ender 3 (v1), without an enclosure :: Tom&#39;s blog 
+            Daisy chained routers and IPv6 (NAT66) :: Tom&#39;s blog 
         
     </title>
 
@@ -37,31 +36,28 @@ And if someone else can do it, it must be possible." />
     <meta name="msapplication-TileColor" content="">
 
 
-<meta itemprop="name" content="Printing ABS using an Ender 3 (v1), without an enclosure">
-<meta itemprop="description" content="Introduction When looking for a guide on how to print ABS using a cheap printer, people usually say &ldquo;it&rsquo;s impossible&rdquo;, &ldquo;it requires a printer enclosure&rdquo; or &ldquo;you just have to remove the fans&rdquo;.
-I disagree with all those statements. In this youtube video, someone put duct tape on their Ender 3 and was able to print ABS just fine.
-And if someone else can do it, it must be possible."><meta itemprop="datePublished" content="2023-04-09T13:28:55+02:00" />
-<meta itemprop="dateModified" content="2023-04-09T13:28:55+02:00" />
-<meta itemprop="wordCount" content="512"><meta itemprop="image" content="https://tomniesse.github.io/"/>
+<meta itemprop="name" content="Daisy chained routers and IPv6 (NAT66)">
+<meta itemprop="description" content="For a very specific problem, I needed to daisy chain two routers. This is easily done with IPv4, since it has has NAT. But what about IPv6?
+The issue I recently bought a cheap second hand router. I did this to split the incoming WAN-connection into two LAN-connections. One LAN-connection goes to a separate network with a specific purpose. The other LAN-connection serves as a WAN for another router. The second router is not mounted near a fuse box and can serve much better wifi to the entire house."><meta itemprop="datePublished" content="2023-06-04T11:28:55+02:00" />
+<meta itemprop="dateModified" content="2023-06-04T11:28:55+02:00" />
+<meta itemprop="wordCount" content="403"><meta itemprop="image" content="https://tomniesse.github.io/"/>
 <meta itemprop="keywords" content="untagged," />
 <meta name="twitter:card" content="summary_large_image"/>
 <meta name="twitter:image" content="https://tomniesse.github.io/"/>
 
-<meta name="twitter:title" content="Printing ABS using an Ender 3 (v1), without an enclosure"/>
-<meta name="twitter:description" content="Introduction When looking for a guide on how to print ABS using a cheap printer, people usually say &ldquo;it&rsquo;s impossible&rdquo;, &ldquo;it requires a printer enclosure&rdquo; or &ldquo;you just have to remove the fans&rdquo;.
-I disagree with all those statements. In this youtube video, someone put duct tape on their Ender 3 and was able to print ABS just fine.
-And if someone else can do it, it must be possible."/>
+<meta name="twitter:title" content="Daisy chained routers and IPv6 (NAT66)"/>
+<meta name="twitter:description" content="For a very specific problem, I needed to daisy chain two routers. This is easily done with IPv4, since it has has NAT. But what about IPv6?
+The issue I recently bought a cheap second hand router. I did this to split the incoming WAN-connection into two LAN-connections. One LAN-connection goes to a separate network with a specific purpose. The other LAN-connection serves as a WAN for another router. The second router is not mounted near a fuse box and can serve much better wifi to the entire house."/>
 
 
 
-    <meta property="og:title" content="Printing ABS using an Ender 3 (v1), without an enclosure" />
-<meta property="og:description" content="Introduction When looking for a guide on how to print ABS using a cheap printer, people usually say &ldquo;it&rsquo;s impossible&rdquo;, &ldquo;it requires a printer enclosure&rdquo; or &ldquo;you just have to remove the fans&rdquo;.
-I disagree with all those statements. In this youtube video, someone put duct tape on their Ender 3 and was able to print ABS just fine.
-And if someone else can do it, it must be possible." />
+    <meta property="og:title" content="Daisy chained routers and IPv6 (NAT66)" />
+<meta property="og:description" content="For a very specific problem, I needed to daisy chain two routers. This is easily done with IPv4, since it has has NAT. But what about IPv6?
+The issue I recently bought a cheap second hand router. I did this to split the incoming WAN-connection into two LAN-connections. One LAN-connection goes to a separate network with a specific purpose. The other LAN-connection serves as a WAN for another router. The second router is not mounted near a fuse box and can serve much better wifi to the entire house." />
 <meta property="og:type" content="article" />
-<meta property="og:url" content="https://tomniesse.github.io/posts/ender3-abs-printing/" /><meta property="og:image" content="https://tomniesse.github.io/"/><meta property="article:section" content="posts" />
-<meta property="article:published_time" content="2023-04-09T13:28:55+02:00" />
-<meta property="article:modified_time" content="2023-04-09T13:28:55+02:00" /><meta property="og:site_name" content="Tom&#39;s blog" />
+<meta property="og:url" content="https://tomniesse.github.io/posts/nat66/" /><meta property="og:image" content="https://tomniesse.github.io/"/><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2023-06-04T11:28:55+02:00" />
+<meta property="article:modified_time" content="2023-06-04T11:28:55+02:00" /><meta property="og:site_name" content="Tom&#39;s blog" />
 
 
 
@@ -69,7 +65,7 @@ And if someone else can do it, it must be possible." />
 
 
 
-    <meta property="article:published_time" content="2023-04-09 13:28:55 &#43;0200 CEST" />
+    <meta property="article:published_time" content="2023-06-04 11:28:55 &#43;0200 CEST" />
 
 
 
@@ -135,7 +131,7 @@ And if someone else can do it, it must be possible." />
           <circle cx="12" cy="12" r="10"></circle>
           <polyline points="12 6 12 12 16 14"></polyline>
         </svg>
-        3 minutes
+        2 minutes
 
         
       </p>
@@ -143,7 +139,7 @@ And if someone else can do it, it must be possible." />
 
     <article>
       <h1 class="post-title">
-        <a href="https://tomniesse.github.io/posts/ender3-abs-printing/">Printing ABS using an Ender 3 (v1), without an enclosure</a>
+        <a href="https://tomniesse.github.io/posts/nat66/">Daisy chained routers and IPv6 (NAT66)</a>
       </h1>
 
       
@@ -153,46 +149,35 @@ And if someone else can do it, it must be possible." />
       
 
       <div class="post-content">
-        <h1 id="introduction">Introduction</h1>
-<p>When looking for a guide on how to print ABS using a cheap printer, people usually say &ldquo;it&rsquo;s impossible&rdquo;, &ldquo;it requires a printer enclosure&rdquo; or &ldquo;you just have to remove the fans&rdquo;.<br>
-I disagree with all those statements. In <a href="https://www.youtube.com/watch?v=wjSpVN19x7A">this youtube video</a>, someone put duct tape on their Ender 3 and was able to print ABS just fine.<br>
-And if someone else can do it, it must be possible.</p>
-<p>This page documents the adventure of ABS printing using a 3D printer without an enclosure.</p>
-<h1 id="airflow-and-duct-tape">Airflow and duct tape</h1>
-<p>The main issue with ABS printing on an Ender 3 is that the cooling fan (not the print cooling fan) blows air down, onto the print.<br>
-If the air is directed away from the print, ABS will print just fine.</p>
-<p>After applying duct tape to my own printer, I got similar results: it produced a good print!<br>
-However, it also melted all the duct tape. This made a big mess.</p>
-<p><a href="images/ducttape_solution.jpg"><img src="images/ducttape_solution.jpg" alt="The duct tape solution"></a></p>
-<h1 id="adding-the-new-airflow-cover-to-the-printer">Adding the new airflow cover to the printer</h1>
-<p>Because duct tape was not a long term solution, I created a new part for the Ender 3 v1. The stl file is <a href="https://www.thingiverse.com/thing:5631450">hosted on thingiverse</a>.</p>
-<p>The designed cover was first printed in PLA. This went as well as one would expect: it melted pretty quickly during printing.<br>
-It held up just long enough to print another cover (made out of ABS).</p>
-<p><a href="images/pla_vs_abs_cover.jpg"><img src="images/pla_vs_abs_cover.jpg" alt="The PLA and ABS airflow covers"></a></p>
-<p>The ABS cover (on the right) has been attached to my printer ever since, and is doing just fine! It doesn&rsquo;t deform like the PLA cover did.</p>
-<h1 id="differences-between-pla-and-abs">Differences between PLA and ABS</h1>
-<p>ABS is a little different when it comes to printing. Here&rsquo;s my experience with it so far:</p>
-<h4 id="pros">Pros</h4>
+        <p>For a very specific problem, I needed to daisy chain two routers. This is easily done with IPv4, since it has has NAT. But what about IPv6?</p>
+<h1 id="the-issue">The issue</h1>
+<p>I recently bought a cheap second hand router. I did this to split the incoming WAN-connection into two LAN-connections. One LAN-connection goes to a separate network with a specific purpose. The other LAN-connection serves as a WAN for another router. The second router is not mounted near a fuse box and can serve much better wifi to the entire house.</p>
+<p><a href="images/topology_block_diagram.png"><img src="images/topology_block_diagram.png" alt="Topology block diagram"></a></p>
+<p>Using this topology, IPv4 worked almost automatically. However, IPv6 did not. For router 2, this does not matter that much. For router 3 however, it does (I want IPv6 when connecting to wifi). Many answers online involve calling the ISP and asking for another IPv6 prefix. I wasn&rsquo;t going to do this.</p>
+<h1 id="the-solution">The solution</h1>
+<p>Turns out, IPv6 masquerading exists. And it works just like IPv4&rsquo;s NAT. If both routers could just NAT all IPv6 traffic, I consider my problem solved!</p>
+<h2 id="router-1-settings">Router 1 settings</h2>
+<p>In router 1, I set a LAN IPv6 as follows:</p>
+<p><a href="images/router1_ipv6_lan_settings.png"><img src="images/router1_ipv6_lan_settings.png" alt="Router 1 settings"></a></p>
+<h2 id="router-3">Router 3</h2>
+<p>In router 3, an OpenWRT router, I changed a few settings:</p>
+<p>In Network-&gt;Firewall-&gt;Zones-&gt;WAN-&gt;Advanced settings, I enabled IPv6 masquerading. This enables NAT6 and causes all IPv6 traffic to be translated, just like with IPv4.</p>
+<p><a href="images/router3_firewall_setting.png"><img src="images/router3_firewall_setting.png" alt="Router 3 firewall setting"></a></p>
+<p>In Network-&gt;Interfaces-&gt;lan-&gt;DHCP Server-&gt;IPv6 Settings, I make sure that router3 advertises itself as a DHCPv6 server:</p>
+<p><a href="images/router3_dhcp_ipv6_settings.png"><img src="images/router3_dhcp_ipv6_settings.png" alt="Router 3 DHCP IPv6 settings"></a></p>
+<p>In Network-&gt;Interfaces-&gt;lan-&gt;DHCP Server-&gt;IPv6 Settings, I make sure that the Router Advertisement (RA) settings are correctly set up. I enabled SLAAC made sure that the <code>M</code>-flag is enabled in the RA-flags and that default router is on <code>on available prefix</code>. This way, router 3 will always hand oud IPv6 addresses, even if there is no connection to router 1. The settings look as follows:</p>
+<p><a href="images/router3_IPv6_RA_settings.png"><img src="images/router3_IPv6_RA_settings.png" alt="Router 3 IPv6 RA settings"></a></p>
+<p>Finally, to make sure router 3 routes all IPv6 traffic to router 1, I set up a static IPv6 route. This is done in Network-&gt;Routing-&gt;Static IPv6 Routes:</p>
+<p><a href="images/router3_static_ipv6_route.png"><img src="images/router3_static_ipv6_route.png" alt="Router 3 static IPv6 route"></a></p>
+<p>When configured, the list of static routes looks as follows:</p>
+<p><a href="images/router3_static_ipv6_routes.png"><img src="images/router3_static_ipv6_routes.png" alt="Router 3 static IPv6 routes"></a></p>
+<h2 id="debugging">Debugging</h2>
+<p>When pinging websites using IPv6, I got a connection. However, if it doesn&rsquo;t work, <code>traceroute</code> can help figure out where the problem is:</p>
 <ul>
-<li>As long as the airflow cover is on, the ambient temperature can be as low as 17°C. Prints will still come out just fine</li>
-<li>As long as the print bed is hot (110°C, the maximum bed temperature for the Ender 3 v1), the ABS sticks to the bed very well.<br>
-Just like with small PLA prints though, a brim may be required.</li>
+<li>No DNS? In router 3, manually set a DNS address in DHCPv6 settings and see if things work now.</li>
+<li>Transmit failure? Router 3&rsquo;s DHCPv6 settings need some changes.</li>
+<li>Timeout? Router 3 doesn&rsquo;t have a (properly configured) IPv6 static route or router 1 doesn&rsquo;t forward the packets (properly).</li>
 </ul>
-<h4 id="cons">Cons</h4>
-<ul>
-<li>The &ldquo;small perimeter speed&rdquo; and &ldquo;overhang speed&rdquo; need some tuning before prints start to look well.</li>
-<li>When printing very fast, ABS doesn&rsquo;t always hold it&rsquo;s shape.<br>
-Sometimes, walls will &ldquo;move inwards&rdquo;. This then creates a &ldquo;)(&quot;-shape instead of a &ldquo;||&quot;-shape.<br>
-The only solution I have found so far is to print more slowly.</li>
-<li>When printing large ABS prints, warping and delamination may occur.</li>
-</ul>
-<h1 id="printing-a-benchy-using-abs">Printing a benchy using ABS</h1>
-<p>To test how well the airflow cover would work, I printed a benchy. It came out looking very well, but the roof was a little weak due to slight delamination.<br>
-This probably had to do with cooling, since the rest of the boat was just fine. The below image shows the Ender 3 printing a benchy out of ABS.<br>
-No enclosure was used and the ambient temperature was around 17°C that day.</p>
-<p><a href="images/benchy.jpg"><img src="images/benchy.jpg" alt="Printing a benchy without a brim"></a></p>
-<h1 id="summary">Summary</h1>
-<p>Printing ABS is possible using an Ender 3 v1. It&rsquo;s not perfect, but still very doable. The delamination is still an issue, but I think it can be fixed.</p>
 
       </div>
     </article>
@@ -218,7 +203,7 @@ No enclosure was used and the ambient temperature was around 17°C that day.</p>
           <line x1="16" y1="17" x2="8" y2="17"></line>
           <polyline points="10 9 9 9 8 9"></polyline>
         </svg>
-        512 Words
+        403 Words
       </p>
 
       <p>
@@ -229,7 +214,7 @@ No enclosure was used and the ambient temperature was around 17°C that day.</p>
           <line x1="3" y1="10" x2="21" y2="10"></line>
         </svg>
         
-          2023-04-09 13:28
+          2023-06-04 11:28
         
 
          
@@ -240,7 +225,7 @@ No enclosure was used and the ambient temperature was around 17°C that day.</p>
       <hr />
       <div class="sharing-buttons">
         
-<a class="resp-sharing-button__link" href="https://facebook.com/sharer/sharer.php?u=https%3a%2f%2ftomniesse.github.io%2fposts%2fender3-abs-printing%2f" target="_blank" rel="noopener" aria-label="" title="Share on facebook">
+<a class="resp-sharing-button__link" href="https://facebook.com/sharer/sharer.php?u=https%3a%2f%2ftomniesse.github.io%2fposts%2fnat66%2f" target="_blank" rel="noopener" aria-label="" title="Share on facebook">
   <div class="resp-sharing-button resp-sharing-button--facebook resp-sharing-button--small"><div aria-hidden="true" class="resp-sharing-button__icon resp-sharing-button__icon--solid">
     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>
     </div>
@@ -248,7 +233,7 @@ No enclosure was used and the ambient temperature was around 17°C that day.</p>
 </a>
 
 
-<a class="resp-sharing-button__link" href="https://twitter.com/intent/tweet/?url=https%3a%2f%2ftomniesse.github.io%2fposts%2fender3-abs-printing%2f" target="_blank" rel="noopener" aria-label="" title="Share on twitter">
+<a class="resp-sharing-button__link" href="https://twitter.com/intent/tweet/?url=https%3a%2f%2ftomniesse.github.io%2fposts%2fnat66%2f" target="_blank" rel="noopener" aria-label="" title="Share on twitter">
   <div class="resp-sharing-button resp-sharing-button--twitter resp-sharing-button--small">
       <div aria-hidden="true" class="resp-sharing-button__icon resp-sharing-button__icon--solid">
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"></path></svg>
@@ -257,7 +242,7 @@ No enclosure was used and the ambient temperature was around 17°C that day.</p>
 </a>
 
 
-<a class="resp-sharing-button__link" href="https://www.tumblr.com/widgets/share/tool?posttype=link&amp;title=Printing%20ABS%20using%20an%20Ender%203%20%28v1%29%2c%20without%20an%20enclosure&amp;caption=Printing%20ABS%20using%20an%20Ender%203%20%28v1%29%2c%20without%20an%20enclosure&amp;canonicalUrl=https%3a%2f%2ftomniesse.github.io%2fposts%2fender3-abs-printing%2f" target="_blank" rel="noopener" aria-label="" title="Share on tumblr">
+<a class="resp-sharing-button__link" href="https://www.tumblr.com/widgets/share/tool?posttype=link&amp;title=Daisy%20chained%20routers%20and%20IPv6%20%28NAT66%29&amp;caption=Daisy%20chained%20routers%20and%20IPv6%20%28NAT66%29&amp;canonicalUrl=https%3a%2f%2ftomniesse.github.io%2fposts%2fnat66%2f" target="_blank" rel="noopener" aria-label="" title="Share on tumblr">
   <div class="resp-sharing-button resp-sharing-button--tumblr resp-sharing-button--small">
     <div aria-hidden="true" class="resp-sharing-button__icon resp-sharing-button__icon--solid">
       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" stroke="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.563 24c-5.093 0-7.031-3.756-7.031-6.411V9.747H5.116V6.648c3.63-1.313 4.512-4.596 4.71-6.469C9.84.051 9.941 0 9.999 0h3.517v6.114h4.801v3.633h-4.82v7.47c.016 1.001.375 2.371 2.207 2.371h.09c.631-.02 1.486-.205 1.936-.419l1.156 3.425c-.436.636-2.4 1.374-4.156 1.404h-.178l.011.002z"/></svg>
@@ -266,7 +251,7 @@ No enclosure was used and the ambient temperature was around 17°C that day.</p>
 </a>
 
 
-<a class="resp-sharing-button__link" href="mailto:?subject=Printing%20ABS%20using%20an%20Ender%203%20%28v1%29%2c%20without%20an%20enclosure&amp;body=https%3a%2f%2ftomniesse.github.io%2fposts%2fender3-abs-printing%2f" target="_self" rel="noopener" aria-label="" title="Share via email">
+<a class="resp-sharing-button__link" href="mailto:?subject=Daisy%20chained%20routers%20and%20IPv6%20%28NAT66%29&amp;body=https%3a%2f%2ftomniesse.github.io%2fposts%2fnat66%2f" target="_self" rel="noopener" aria-label="" title="Share via email">
   <div class="resp-sharing-button resp-sharing-button--email resp-sharing-button--small"><div aria-hidden="true" class="resp-sharing-button__icon resp-sharing-button__icon--solid">
     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
     </div>
@@ -274,7 +259,7 @@ No enclosure was used and the ambient temperature was around 17°C that day.</p>
 </a>
 
 
-<a class="resp-sharing-button__link" href="https://pinterest.com/pin/create/button/?url=https%3a%2f%2ftomniesse.github.io%2fposts%2fender3-abs-printing%2f&amp;media=https%3a%2f%2ftomniesse.github.io%2fposts%2fender3-abs-printing%2f;description=Printing%20ABS%20using%20an%20Ender%203%20%28v1%29%2c%20without%20an%20enclosure" target="_blank" rel="noopener" aria-label="" title="Share on pinterest">
+<a class="resp-sharing-button__link" href="https://pinterest.com/pin/create/button/?url=https%3a%2f%2ftomniesse.github.io%2fposts%2fnat66%2f&amp;media=https%3a%2f%2ftomniesse.github.io%2fposts%2fnat66%2f;description=Daisy%20chained%20routers%20and%20IPv6%20%28NAT66%29" target="_blank" rel="noopener" aria-label="" title="Share on pinterest">
   <div class="resp-sharing-button resp-sharing-button--pinterest resp-sharing-button--small"><div aria-hidden="true" class="resp-sharing-button__icon resp-sharing-button__icon--solid">
     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12.017 0C5.396 0 .029 5.367.029 11.987c0 5.079 3.158 9.417 7.618 11.162-.105-.949-.199-2.403.041-3.439.219-.937 1.406-5.957 1.406-5.957s-.359-.72-.359-1.781c0-1.663.967-2.911 2.168-2.911 1.024 0 1.518.769 1.518 1.688 0 1.029-.653 2.567-.992 3.992-.285 1.193.6 2.165 1.775 2.165 2.128 0 3.768-2.245 3.768-5.487 0-2.861-2.063-4.869-5.008-4.869-3.41 0-5.409 2.562-5.409 5.199 0 1.033.394 2.143.889 2.741.099.12.112.225.085.345-.09.375-.293 1.199-.334 1.363-.053.225-.172.271-.401.165-1.495-.69-2.433-2.878-2.433-4.646 0-3.776 2.748-7.252 7.92-7.252 4.158 0 7.392 2.967 7.392 6.923 0 4.135-2.607 7.462-6.233 7.462-1.214 0-2.354-.629-2.758-1.379l-.749 2.848c-.269 1.045-1.004 2.352-1.498 3.146 1.123.345 2.306.535 3.55.535 6.607 0 11.985-5.365 11.985-11.987C23.97 5.39 18.592.026 11.985.026L12.017 0z"/></svg>
     </div>
@@ -282,7 +267,7 @@ No enclosure was used and the ambient temperature was around 17°C that day.</p>
 </a>
 
 
-<a class="resp-sharing-button__link" href="https://www.linkedin.com/shareArticle?mini=true&amp;url=https%3a%2f%2ftomniesse.github.io%2fposts%2fender3-abs-printing%2f&amp;title=Printing%20ABS%20using%20an%20Ender%203%20%28v1%29%2c%20without%20an%20enclosure&amp;summary=Printing%20ABS%20using%20an%20Ender%203%20%28v1%29%2c%20without%20an%20enclosure&amp;source=https%3a%2f%2ftomniesse.github.io%2fposts%2fender3-abs-printing%2f" target="_blank" rel="noopener" aria-label="" title="Share on linkedin">
+<a class="resp-sharing-button__link" href="https://www.linkedin.com/shareArticle?mini=true&amp;url=https%3a%2f%2ftomniesse.github.io%2fposts%2fnat66%2f&amp;title=Daisy%20chained%20routers%20and%20IPv6%20%28NAT66%29&amp;summary=Daisy%20chained%20routers%20and%20IPv6%20%28NAT66%29&amp;source=https%3a%2f%2ftomniesse.github.io%2fposts%2fnat66%2f" target="_blank" rel="noopener" aria-label="" title="Share on linkedin">
   <div class="resp-sharing-button resp-sharing-button--linkedin resp-sharing-button--small"><div aria-hidden="true" class="resp-sharing-button__icon resp-sharing-button__icon--solid">
     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg>
     </div>
@@ -290,7 +275,7 @@ No enclosure was used and the ambient temperature was around 17°C that day.</p>
 </a>
 
 
-<a class="resp-sharing-button__link" href="https://reddit.com/submit/?url=https%3a%2f%2ftomniesse.github.io%2fposts%2fender3-abs-printing%2f&amp;resubmit=true&amp;title=Printing%20ABS%20using%20an%20Ender%203%20%28v1%29%2c%20without%20an%20enclosure" target="_blank" rel="noopener" aria-label="" title="Share on reddit">
+<a class="resp-sharing-button__link" href="https://reddit.com/submit/?url=https%3a%2f%2ftomniesse.github.io%2fposts%2fnat66%2f&amp;resubmit=true&amp;title=Daisy%20chained%20routers%20and%20IPv6%20%28NAT66%29" target="_blank" rel="noopener" aria-label="" title="Share on reddit">
   <div class="resp-sharing-button resp-sharing-button--reddit resp-sharing-button--small"><div aria-hidden="true" class="resp-sharing-button__icon resp-sharing-button__icon--solid">
     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0zm5.01 4.744c.688 0 1.25.561 1.25 1.249a1.25 1.25 0 0 1-2.498.056l-2.597-.547-.8 3.747c1.824.07 3.48.632 4.674 1.488.308-.309.73-.491 1.207-.491.968 0 1.754.786 1.754 1.754 0 .716-.435 1.333-1.01 1.614a3.111 3.111 0 0 1 .042.52c0 2.694-3.13 4.87-7.004 4.87-3.874 0-7.004-2.176-7.004-4.87 0-.183.015-.366.043-.534A1.748 1.748 0 0 1 4.028 12c0-.968.786-1.754 1.754-1.754.463 0 .898.196 1.207.49 1.207-.883 2.878-1.43 4.744-1.487l.885-4.182a.342.342 0 0 1 .14-.197.35.35 0 0 1 .238-.042l2.906.617a1.214 1.214 0 0 1 1.108-.701zM9.25 12C8.561 12 8 12.562 8 13.25c0 .687.561 1.248 1.25 1.248.687 0 1.248-.561 1.248-1.249 0-.688-.561-1.249-1.249-1.249zm5.5 0c-.687 0-1.248.561-1.248 1.25 0 .687.561 1.248 1.249 1.248.688 0 1.249-.561 1.249-1.249 0-.687-.562-1.249-1.25-1.249zm-5.466 3.99a.327.327 0 0 0-.231.094.33.33 0 0 0 0 .463c.842.842 2.484.913 2.961.913.477 0 2.105-.056 2.961-.913a.361.361 0 0 0 .029-.463.33.33 0 0 0-.464 0c-.547.533-1.684.73-2.512.73-.828 0-1.979-.196-2.512-.73a.326.326 0 0 0-.232-.095z"/></svg>
     </div>
@@ -298,7 +283,7 @@ No enclosure was used and the ambient temperature was around 17°C that day.</p>
 </a>
 
 
-<a class="resp-sharing-button__link" href="https://www.xing.com/app/user?op=share;url=https%3a%2f%2ftomniesse.github.io%2fposts%2fender3-abs-printing%2f;title=Printing%20ABS%20using%20an%20Ender%203%20%28v1%29%2c%20without%20an%20enclosure" target="_blank" rel="noopener" aria-label="" title="Share on xing">
+<a class="resp-sharing-button__link" href="https://www.xing.com/app/user?op=share;url=https%3a%2f%2ftomniesse.github.io%2fposts%2fnat66%2f;title=Daisy%20chained%20routers%20and%20IPv6%20%28NAT66%29" target="_blank" rel="noopener" aria-label="" title="Share on xing">
   <div class="resp-sharing-button resp-sharing-button--xing resp-sharing-button--small"><div aria-hidden="true" class="resp-sharing-button__icon resp-sharing-button__icon--solid">
     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M18.188 0c-.517 0-.741.325-.927.66 0 0-7.455 13.224-7.702 13.657.015.024 4.919 9.023 4.919 9.023.17.308.436.66.967.66h3.454c.211 0 .375-.078.463-.22.089-.151.089-.346-.009-.536l-4.879-8.916c-.004-.006-.004-.016 0-.022L22.139.756c.095-.191.097-.387.006-.535C22.056.078 21.894 0 21.686 0h-3.498zM3.648 4.74c-.211 0-.385.074-.473.216-.09.149-.078.339.02.531l2.34 4.05c.004.01.004.016 0 .021L1.86 16.051c-.099.188-.093.381 0 .529.085.142.239.234.45.234h3.461c.518 0 .766-.348.945-.667l3.734-6.609-2.378-4.155c-.172-.315-.434-.659-.962-.659H3.648v.016z"/></svg>
     </div>
@@ -306,7 +291,7 @@ No enclosure was used and the ambient temperature was around 17°C that day.</p>
 </a>
 
 
-<a class="resp-sharing-button__link" href="whatsapp://send?text=Printing%20ABS%20using%20an%20Ender%203%20%28v1%29%2c%20without%20an%20enclosure%20https%3a%2f%2ftomniesse.github.io%2fposts%2fender3-abs-printing%2f" target="_blank" rel="noopener" aria-label="" title="Share on whatsapp">
+<a class="resp-sharing-button__link" href="whatsapp://send?text=Daisy%20chained%20routers%20and%20IPv6%20%28NAT66%29%20https%3a%2f%2ftomniesse.github.io%2fposts%2fnat66%2f" target="_blank" rel="noopener" aria-label="" title="Share on whatsapp">
   <div class="resp-sharing-button resp-sharing-button--whatsapp resp-sharing-button--small"><div aria-hidden="true" class="resp-sharing-button__icon resp-sharing-button__icon--solid">
     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" stroke="none" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
     </div>
@@ -314,7 +299,7 @@ No enclosure was used and the ambient temperature was around 17°C that day.</p>
 </a>
 
 
-<a class="resp-sharing-button__link" href="https://news.ycombinator.com/submitlink?u=https%3a%2f%2ftomniesse.github.io%2fposts%2fender3-abs-printing%2f&amp;t=Printing%20ABS%20using%20an%20Ender%203%20%28v1%29%2c%20without%20an%20enclosure" target="_blank" rel="noopener" aria-label="" title="Share on hacker news">
+<a class="resp-sharing-button__link" href="https://news.ycombinator.com/submitlink?u=https%3a%2f%2ftomniesse.github.io%2fposts%2fnat66%2f&amp;t=Daisy%20chained%20routers%20and%20IPv6%20%28NAT66%29" target="_blank" rel="noopener" aria-label="" title="Share on hacker news">
   <div class="resp-sharing-button resp-sharing-button--hackernews resp-sharing-button--small"><div aria-hidden="true" class="resp-sharing-button__icon resp-sharing-button__icon--solid">
 			<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M0 24V0h24v24H0zM6.951 5.896l4.112 7.708v5.064h1.583v-4.972l4.148-7.799h-1.749l-2.457 4.875c-.372.745-.688 1.434-.688 1.434s-.297-.708-.651-1.434L8.831 5.896h-1.88z"/></svg>
     </div>
@@ -322,7 +307,7 @@ No enclosure was used and the ambient temperature was around 17°C that day.</p>
 </a>
 
 
-<a class="resp-sharing-button__link" href="https://telegram.me/share/url?text=Printing%20ABS%20using%20an%20Ender%203%20%28v1%29%2c%20without%20an%20enclosure&amp;url=https%3a%2f%2ftomniesse.github.io%2fposts%2fender3-abs-printing%2f" target="_blank" rel="noopener" aria-label="" title="Share on telegram">
+<a class="resp-sharing-button__link" href="https://telegram.me/share/url?text=Daisy%20chained%20routers%20and%20IPv6%20%28NAT66%29&amp;url=https%3a%2f%2ftomniesse.github.io%2fposts%2fnat66%2f" target="_blank" rel="noopener" aria-label="" title="Share on telegram">
   <div class="resp-sharing-button resp-sharing-button--telegram resp-sharing-button--small"><div aria-hidden="true" class="resp-sharing-button__icon resp-sharing-button__icon--solid">
       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
     </div>
@@ -342,18 +327,11 @@ No enclosure was used and the ambient temperature was around 17°C that day.</p>
 
         <div class="pagination__buttons">
             
-            <span class="button previous">
-                <a href="https://tomniesse.github.io/posts/nat66/">
-                    <span class="button__icon">←</span>
-                    <span class="button__text">Daisy chained routers and IPv6 (NAT66)</span>
-                </a>
-            </span>
-            
 
             
             <span class="button next">
-                <a href="https://tomniesse.github.io/posts/buildroot-dune-dynasty/">
-                    <span class="button__text">Creating an embedded OS that runs a DOS game</span>
+                <a href="https://tomniesse.github.io/posts/ender3-abs-printing/">
+                    <span class="button__text">Printing ABS using an Ender 3 (v1), without an enclosure</span>
                     <span class="button__icon">→</span>
                 </a>
             </span>
