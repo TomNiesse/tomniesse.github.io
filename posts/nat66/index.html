@@ -40,7 +40,7 @@ The issue I recently bought a cheap second hand router. I did this to split the 
 <meta itemprop="description" content="For a very specific problem, I needed to daisy chain some routers. This is easily done with IPv4, since it has has NAT. But what about IPv6?
 The issue I recently bought a cheap second hand router. I did this to split the incoming WAN-connection into two LAN-connections. One LAN-connection goes to a separate network with a specific purpose. The other LAN-connection serves as a WAN for another router. The second router is not mounted near a fuse box and can serve much better wifi to the entire house."><meta itemprop="datePublished" content="2023-06-04T11:28:55+02:00" />
 <meta itemprop="dateModified" content="2023-06-04T11:28:55+02:00" />
-<meta itemprop="wordCount" content="403"><meta itemprop="image" content="https://tomniesse.github.io/"/>
+<meta itemprop="wordCount" content="427"><meta itemprop="image" content="https://tomniesse.github.io/"/>
 <meta itemprop="keywords" content="untagged," />
 <meta name="twitter:card" content="summary_large_image"/>
 <meta name="twitter:image" content="https://tomniesse.github.io/"/>
@@ -131,7 +131,7 @@ The issue I recently bought a cheap second hand router. I did this to split the 
           <circle cx="12" cy="12" r="10"></circle>
           <polyline points="12 6 12 12 16 14"></polyline>
         </svg>
-        2 minutes
+        3 minutes
 
         
       </p>
@@ -160,9 +160,12 @@ The issue I recently bought a cheap second hand router. I did this to split the 
 <p>In router 1, I set a LAN IPv6 as follows:</p>
 <p><a href="images/router1_ipv6_lan_settings.png"><img src="images/router1_ipv6_lan_settings.png" alt="Router 1 settings"></a></p>
 <h2 id="router-3">Router 3</h2>
-<p>In router 3, an OpenWRT router, I changed a few settings:</p>
+<p>In router 3, an OpenWRT router, I changed a few settings (as per the <a href="https://openwrt.org/docs/guide-user/network/ipv6/ipv6.nat6">OpenWRT wiki</a>):</p>
 <p>In Network-&gt;Firewall-&gt;Zones-&gt;WAN-&gt;Advanced settings, I enabled IPv6 masquerading. This enables NAT6 and causes all IPv6 traffic to be translated, just like with IPv4.</p>
 <p><a href="images/router3_firewall_setting.png"><img src="images/router3_firewall_setting.png" alt="Router 3 firewall setting"></a></p>
+<p>In Network-&gt; Interfaces-&gt;wan6-&gt;Advanced Settings I disabled IPv6 source routing:</p>
+<p><a href="images/router3_ipv6_source_routing.png"><img src="images/router3_ipv6_source_routing.png" alt="Router 3 source routing setting"></a></p>
+<p>Then, some extra settings were modified to make DHCPv6 work.</p>
 <p>In Network-&gt;Interfaces-&gt;lan-&gt;DHCP Server-&gt;IPv6 Settings, I make sure that router3 advertises itself as a DHCPv6 server:</p>
 <p><a href="images/router3_dhcp_ipv6_settings.png"><img src="images/router3_dhcp_ipv6_settings.png" alt="Router 3 DHCP IPv6 settings"></a></p>
 <p>In Network-&gt;Interfaces-&gt;lan-&gt;DHCP Server-&gt;IPv6 Settings, I make sure that the Router Advertisement (RA) settings are correctly set up. I enabled SLAAC made sure that the <code>M</code>-flag is enabled in the RA-flags and that default router is on <code>on available prefix</code>. This way, router 3 will always hand oud IPv6 addresses, even if there is no connection to router 1. The settings look as follows:</p>
@@ -203,7 +206,7 @@ The issue I recently bought a cheap second hand router. I did this to split the 
           <line x1="16" y1="17" x2="8" y2="17"></line>
           <polyline points="10 9 9 9 8 9"></polyline>
         </svg>
-        403 Words
+        427 Words
       </p>
 
       <p>
