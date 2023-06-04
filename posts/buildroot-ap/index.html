@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="ie=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <meta name="author" content="">
-<meta name="description" content="Introduction This page describes how a minimal access point OS can be created using buildroot.
+<meta name="description" content="Introduction This page describes how a minimal router OS can be created using buildroot.
 All configurations and build commands are documented on this page.
 The resulting OS will boot, connect to the first LAN-network it can find and then start an access point.
 Previous work This post is based on another post in which a basic embedded OS is created.
@@ -18,7 +18,7 @@ Editing the minimal Buildroot OS Configuring the access point part of the target
 
     <title>
         
-            Creating an access point using buildroot :: Welcome!  — The place where I write about hobby stuff
+            Creating an access point using buildroot :: Tom&#39;s blog 
         
     </title>
 
@@ -40,19 +40,19 @@ Editing the minimal Buildroot OS Configuring the access point part of the target
 
 
 <meta itemprop="name" content="Creating an access point using buildroot">
-<meta itemprop="description" content="Introduction This page describes how a minimal access point OS can be created using buildroot.
+<meta itemprop="description" content="Introduction This page describes how a minimal router OS can be created using buildroot.
 All configurations and build commands are documented on this page.
 The resulting OS will boot, connect to the first LAN-network it can find and then start an access point.
 Previous work This post is based on another post in which a basic embedded OS is created.
 Editing the minimal Buildroot OS Configuring the access point part of the target system With the options above all set, the Raspberry Pi 4 should boot the target system without any issues."><meta itemprop="datePublished" content="2021-12-20T13:28:55+02:00" />
 <meta itemprop="dateModified" content="2021-12-20T13:28:55+02:00" />
-<meta itemprop="wordCount" content="1174"><meta itemprop="image" content="https://tomniesse.github.io/"/>
+<meta itemprop="wordCount" content="1173"><meta itemprop="image" content="https://tomniesse.github.io/"/>
 <meta itemprop="keywords" content="untagged," />
 <meta name="twitter:card" content="summary_large_image"/>
 <meta name="twitter:image" content="https://tomniesse.github.io/"/>
 
 <meta name="twitter:title" content="Creating an access point using buildroot"/>
-<meta name="twitter:description" content="Introduction This page describes how a minimal access point OS can be created using buildroot.
+<meta name="twitter:description" content="Introduction This page describes how a minimal router OS can be created using buildroot.
 All configurations and build commands are documented on this page.
 The resulting OS will boot, connect to the first LAN-network it can find and then start an access point.
 Previous work This post is based on another post in which a basic embedded OS is created.
@@ -61,7 +61,7 @@ Editing the minimal Buildroot OS Configuring the access point part of the target
 
 
     <meta property="og:title" content="Creating an access point using buildroot" />
-<meta property="og:description" content="Introduction This page describes how a minimal access point OS can be created using buildroot.
+<meta property="og:description" content="Introduction This page describes how a minimal router OS can be created using buildroot.
 All configurations and build commands are documented on this page.
 The resulting OS will boot, connect to the first LAN-network it can find and then start an access point.
 Previous work This post is based on another post in which a basic embedded OS is created.
@@ -69,7 +69,7 @@ Editing the minimal Buildroot OS Configuring the access point part of the target
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://tomniesse.github.io/posts/buildroot-ap/" /><meta property="og:image" content="https://tomniesse.github.io/"/><meta property="article:section" content="posts" />
 <meta property="article:published_time" content="2021-12-20T13:28:55+02:00" />
-<meta property="article:modified_time" content="2021-12-20T13:28:55+02:00" /><meta property="og:site_name" content="Welcome!" />
+<meta property="article:modified_time" content="2021-12-20T13:28:55+02:00" /><meta property="og:site_name" content="Tom&#39;s blog" />
 
 
 
@@ -162,7 +162,7 @@ Editing the minimal Buildroot OS Configuring the access point part of the target
 
       <div class="post-content">
         <h1 id="introduction">Introduction</h1>
-<p>This page describes how a minimal access point OS can be created using <a href="https://buildroot.org">buildroot</a>.<br>
+<p>This page describes how a minimal router OS can be created using <a href="https://buildroot.org">buildroot</a>.<br>
 All configurations and build commands are documented on this page.</p>
 <p>The resulting OS will boot, connect to the first LAN-network it can find and then start an access point.</p>
 <h1 id="previous-work">Previous work</h1>
@@ -312,7 +312,7 @@ chmod +x <span style="color:#e6db74">${</span>TARGET_DIR<span style="color:#e6db
 If a monitor is connected to the <code>HDMI0</code> port of the Raspberry Pi 4, the following logs can be seen:</p>
 <p><a href="images/started.jpg"><img src="images/started.jpg" alt="Startup logs"></a></p>
 <p>The Raspberry Pi successfully connected to a lan network and then started it&rsquo;s wireless access point. The network SSID should now be visible to client devices and connections can now be made.</p>
-<p>The OS will fail to start the access point if it cannot connect to a LAN network using DHCP. If <code>udhcpc</code> fails after trying 99 times, the OS will not start a wireless network.</p>
+<p>The OS will fail to start the access point if it cannot connect to another LAN network via DHCP. If <code>udhcpc</code> fails after trying 99 times, the OS will not start a wireless network.</p>
 <h1 id="sources">Sources</h1>
 <ul>
 <li><a href="https://bootlin.com/doc/training/buildroot/buildroot-slides.pdf">https://bootlin.com/doc/training/buildroot/buildroot-slides.pdf</a></li>
@@ -346,7 +346,7 @@ If a monitor is connected to the <code>HDMI0</code> port of the Raspberry Pi 4, 
           <line x1="16" y1="17" x2="8" y2="17"></line>
           <polyline points="10 9 9 9 8 9"></polyline>
         </svg>
-        1174 Words
+        1173 Words
       </p>
 
       <p>
