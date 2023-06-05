@@ -36,7 +36,7 @@ The issue I recently bought a cheap second hand router. I did this to split the 
 <p>Then, some extra settings were modified to make DHCPv6 work.</p>
 <p>In Network-&gt;Interfaces-&gt;lan-&gt;DHCP Server-&gt;IPv6 Settings, I make sure that router3 advertises itself as a DHCPv6 server:</p>
 <p><a href="images/router3_dhcp_ipv6_settings.png"><img src="images/router3_dhcp_ipv6_settings.png" alt="Router 3 DHCP IPv6 settings"></a></p>
-<p>In Network-&gt;Interfaces-&gt;lan-&gt;DHCP Server-&gt;IPv6 Settings, I make sure that the Router Advertisement (RA) settings are correctly set up. I enabled SLAAC, made sure that the <code>M</code>-flag is enabled in the RA-flags and that default router is on <code>on available prefix</code>. This way, router 3 will always hand oud IPv6 addresses, even if there is no connection to router 1. The settings look as follows:</p>
+<p>In Network-&gt;Interfaces-&gt;lan-&gt;DHCP Server-&gt;IPv6 Settings, I make sure that the Router Advertisement (RA) settings are correctly set up. I enabled SLAAC, made sure that the <code>M</code>-flag is enabled in the RA-flags and that default router is on <code>on available prefix</code>. This way, router 3 will always hand out IPv6 addresses, even if there is no connection to router 1. The settings look as follows:</p>
 <p><a href="images/router3_IPv6_RA_settings.png"><img src="images/router3_IPv6_RA_settings.png" alt="Router 3 IPv6 RA settings"></a></p>
 <p>Finally, to make sure router 3 routes all IPv6 traffic to router 1, I set up a static IPv6 route. This is done in Network-&gt;Routing-&gt;Static IPv6 Routes:</p>
 <p><a href="images/router3_static_ipv6_route.png"><img src="images/router3_static_ipv6_route.png" alt="Router 3 static IPv6 route"></a></p>
