@@ -38,7 +38,7 @@
 <meta itemprop="name" content="Hosting a lokinet SNApp from inside a docker container">
 <meta itemprop="description" content="What is lokinet? Like the tor project, lokinet is a decentralized onion router that routes (all) traffic through multiple other servers. The nice thing about it is, that it runs on a lower network layer than tor. This makes lokinet able to route traffic using any network protocol, instead of sending everything over TCP. A good example of this is SSH. If a lokinet server is hosting an SSH or VPN service, it can be accessed without the need for port forwarding."><meta itemprop="datePublished" content="2023-04-28T13:28:55+02:00" />
 <meta itemprop="dateModified" content="2023-04-28T13:28:55+02:00" />
-<meta itemprop="wordCount" content="565"><meta itemprop="image" content="https://tomniesse.github.io/"/>
+<meta itemprop="wordCount" content="577"><meta itemprop="image" content="https://tomniesse.github.io/"/>
 <meta itemprop="keywords" content="untagged," />
 <meta name="twitter:card" content="summary_large_image"/>
 <meta name="twitter:image" content="https://tomniesse.github.io/"/>
@@ -177,6 +177,8 @@ The goal of this container is to provide a lokinet service with a permanent <cod
 </span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">RUN</span> echo <span style="color:#e6db74">&#34;/usr/bin/lokinet -g&#34;</span> &gt;&gt; /start.sh<span style="color:#960050;background-color:#1e0010">
 </span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">RUN</span> echo <span style="color:#e6db74">&#34;sed -ie &#39;s|#keyfile=|keyfile=/var/lib/lokinet/snappkey.private|g&#39; /etc/loki/lokinet.ini&#34;</span> &gt;&gt; /start.sh<span style="color:#960050;background-color:#1e0010">
 </span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">RUN</span> echo <span style="color:#e6db74">&#34;sed -ie &#39;s|#keyfile=|keyfile=/var/lib/lokinet/snappkey.private|g&#39; /var/lib/lokinet/lokinet.ini&#34;</span> &gt;&gt; /start.sh<span style="color:#960050;background-color:#1e0010">
+</span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">RUN</span> echo <span style="color:#e6db74">&#34;rm -rf /var/lib/lokinet/nodedb/&#34;</span> &gt;&gt; start.sh<span style="color:#960050;background-color:#1e0010">
+</span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">RUN</span> echo <span style="color:#e6db74">&#34;rm -rf /var/lib/lokinet/profiles.dat&#34;</span> &gt;&gt; start.sh<span style="color:#960050;background-color:#1e0010">
 </span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">RUN</span> echo <span style="color:#e6db74">&#34;/usr/bin/lokinet&#34;</span> &gt;&gt; /start.sh<span style="color:#960050;background-color:#1e0010">
 </span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">RUN</span> chmod +x /start.sh<span style="color:#960050;background-color:#1e0010">
 </span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">ENTRYPOINT</span> [<span style="color:#e6db74">&#34;/start.sh&#34;</span>]<span style="color:#960050;background-color:#1e0010">
@@ -254,7 +256,7 @@ The goal of this container is to provide a lokinet service with a permanent <cod
           <line x1="16" y1="17" x2="8" y2="17"></line>
           <polyline points="10 9 9 9 8 9"></polyline>
         </svg>
-        565 Words
+        577 Words
       </p>
 
       <p>
