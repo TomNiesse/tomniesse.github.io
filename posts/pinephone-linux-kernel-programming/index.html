@@ -24,7 +24,7 @@ What is a kernel module? A kernel is a piece of software that handles all the co
 
 
 
-<link rel="stylesheet" href="/main.5b3e37caf5f369f54ba730903dd9043b99e0b3792e27db9a87f21a3634934b96.css" integrity="sha256-Wz43yvXzafVLpzCQPdkEO5ngs3kuJ9uah/IaNjSTS5Y=">
+<link rel="stylesheet" href="/main.d0bc80ef7c45f171405c3801554202d2e5fe4f2d84ab897a14ccf3b9ea92cca6.css" integrity="sha256-0LyA73xF8XFAXDgBVUIC0uX&#43;Ty2Eq4l6FMzzueqSzKY=">
 
 
 
@@ -40,10 +40,16 @@ What is a kernel module? A kernel is a piece of software that handles all the co
 <meta itemprop="name" content="Programming a character device driver (PinePhone and Linux)">
 <meta itemprop="description" content="Introduction This page describes the process of writing a kernel module that can toggle an LED inside a PinePhone UBports edition.
 Using the user manual of the phone&rsquo;s processor (Allwinner A64), a kernel module will be written that can control the RGB-LED of the phone.
-What is a kernel module? A kernel is a piece of software that handles all the communications between hardware and software. The linux kernel uses modules for this."><meta itemprop="datePublished" content="2021-11-03T13:28:55+02:00" />
+What is a kernel module? A kernel is a piece of software that handles all the communications between hardware and software. The linux kernel uses modules for this.">
+<meta itemprop="datePublished" content="2021-11-03T13:28:55+02:00" />
 <meta itemprop="dateModified" content="2021-11-03T13:28:55+02:00" />
-<meta itemprop="wordCount" content="2217"><meta itemprop="image" content="https://tomniesse.github.io/"/>
+<meta itemprop="wordCount" content="2217">
+<meta itemprop="image" content="https://tomniesse.github.io/"/>
+
+
+
 <meta itemprop="keywords" content="untagged," />
+
 <meta name="twitter:card" content="summary_large_image"/>
 <meta name="twitter:image" content="https://tomniesse.github.io/"/>
 
@@ -59,10 +65,10 @@ What is a kernel module? A kernel is a piece of software that handles all the co
 Using the user manual of the phone&rsquo;s processor (Allwinner A64), a kernel module will be written that can control the RGB-LED of the phone.
 What is a kernel module? A kernel is a piece of software that handles all the communications between hardware and software. The linux kernel uses modules for this." />
 <meta property="og:type" content="article" />
-<meta property="og:url" content="https://tomniesse.github.io/posts/pinephone-linux-kernel-programming/" /><meta property="og:image" content="https://tomniesse.github.io/"/><meta property="article:section" content="posts" />
+<meta property="og:url" content="https://tomniesse.github.io/posts/pinephone-linux-kernel-programming/" />
+<meta property="og:image" content="https://tomniesse.github.io/"/>
 <meta property="article:published_time" content="2021-11-03T13:28:55+02:00" />
 <meta property="article:modified_time" content="2021-11-03T13:28:55+02:00" /><meta property="og:site_name" content="Tom&#39;s blog" />
-
 
 
 
@@ -177,7 +183,7 @@ Using the user manual of the phone&rsquo;s processor (Allwinner A64), a kernel m
 <p>For this project, only the user manual will be used, as it contains all the required information.</p>
 <h2 id="finding-the-right-registers">Finding the right registers</h2>
 <p>Chapter 3.21 (page 376) of the <a href="https://linux-sunxi.org/images/b/b4/Allwinner_A64_User_Manual_V1.1.pdf">user manual</a> contains information about some of the registers in the A64 SoC. At the top of the page, the following text can be read:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">The chip has 7 ports for multi-functional input/out pins. They are shown below:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">The chip has 7 ports for multi-functional input/out pins. They are shown below:
 - Port B(PB): 10 input/output port
 - Port C(PC): 17 input/output port
 - Port D(PD): 25 input/output port
@@ -255,32 +261,32 @@ Using the user manual of the phone&rsquo;s processor (Allwinner A64), a kernel m
 </table>
 <p>A 3 bit value controls pin modes in register <code>PD_CFG2_REG</code>. Let&rsquo;s set some pin modes using the C language</p>
 <p>The C language has a datatype called <code>struct</code>, which can be used to &ldquo;convert&rdquo; the table into the following code:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#66d9ef">typedef</span> <span style="color:#66d9ef">struct</span> {
-    <span style="color:#66d9ef">uint32_t</span> PD_16    : <span style="color:#ae81ff">3</span>;
-    <span style="color:#66d9ef">uint32_t</span> reserved : <span style="color:#ae81ff">1</span>;
-    <span style="color:#66d9ef">uint32_t</span> PD_17    : <span style="color:#ae81ff">3</span>;
-    <span style="color:#66d9ef">uint32_t</span> reserved : <span style="color:#ae81ff">1</span>;
-    <span style="color:#66d9ef">uint32_t</span> PD_18    : <span style="color:#ae81ff">3</span>;
-    <span style="color:#66d9ef">uint32_t</span> reserved : <span style="color:#ae81ff">1</span>;
-    <span style="color:#66d9ef">uint32_t</span> PD_19    : <span style="color:#ae81ff">3</span>;
-    <span style="color:#66d9ef">uint32_t</span> reserved : <span style="color:#ae81ff">1</span>;
-    <span style="color:#66d9ef">uint32_t</span> PD_20    : <span style="color:#ae81ff">3</span>;
-    <span style="color:#66d9ef">uint32_t</span> reserved : <span style="color:#ae81ff">1</span>;
-    <span style="color:#66d9ef">uint32_t</span> PD_21    : <span style="color:#ae81ff">3</span>;
-    <span style="color:#66d9ef">uint32_t</span> reserved : <span style="color:#ae81ff">1</span>;
-    <span style="color:#66d9ef">uint32_t</span> PD_22    : <span style="color:#ae81ff">3</span>;
-    <span style="color:#66d9ef">uint32_t</span> reserved : <span style="color:#ae81ff">1</span>;
-    <span style="color:#66d9ef">uint32_t</span> PD_23    : <span style="color:#ae81ff">3</span>;
-    <span style="color:#66d9ef">uint32_t</span> reserved : <span style="color:#ae81ff">1</span>;
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#66d9ef">typedef</span> <span style="color:#66d9ef">struct</span> {
+    uint32_t PD_16    : <span style="color:#ae81ff">3</span>;
+    uint32_t reserved : <span style="color:#ae81ff">1</span>;
+    uint32_t PD_17    : <span style="color:#ae81ff">3</span>;
+    uint32_t reserved : <span style="color:#ae81ff">1</span>;
+    uint32_t PD_18    : <span style="color:#ae81ff">3</span>;
+    uint32_t reserved : <span style="color:#ae81ff">1</span>;
+    uint32_t PD_19    : <span style="color:#ae81ff">3</span>;
+    uint32_t reserved : <span style="color:#ae81ff">1</span>;
+    uint32_t PD_20    : <span style="color:#ae81ff">3</span>;
+    uint32_t reserved : <span style="color:#ae81ff">1</span>;
+    uint32_t PD_21    : <span style="color:#ae81ff">3</span>;
+    uint32_t reserved : <span style="color:#ae81ff">1</span>;
+    uint32_t PD_22    : <span style="color:#ae81ff">3</span>;
+    uint32_t reserved : <span style="color:#ae81ff">1</span>;
+    uint32_t PD_23    : <span style="color:#ae81ff">3</span>;
+    uint32_t reserved : <span style="color:#ae81ff">1</span>;
 } PD_CFG2_REG_t;
 </code></pre></div><p>The <code>struct</code> will ensure that the right bits are set in memory, without having to set individual bits.</p>
 <h3 id="memory-location">Memory location</h3>
 <p>In the above table, an offset of <code>0x74</code> can be seen. The memory address of this MMIO register will be <code>PIO</code> (<code>0x01C20800</code>) + <code>0x74</code>. In code, this could look as follows:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#75715e">#define PIO 0x01C20800
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#75715e">#define PIO 0x01C20800
 </span><span style="color:#75715e">#define PD_CFG2_REG_ADDRESS (PIO + 0x74)
 </span></code></pre></div><h2 id="altering-the-memory">Altering the memory</h2>
 <p>The code to alter a piece of memory looks a bit magical, but it works quite well:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#75715e">#define MODE_OUTPUT   0x1
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#75715e">#define MODE_OUTPUT   0x1
 </span><span style="color:#75715e">#define MODE_DISABLED 0x7 </span><span style="color:#75715e">// default
 </span><span style="color:#75715e"></span>
 ((<span style="color:#66d9ef">volatile</span> PD_CFG2_REG_t<span style="color:#f92672">*</span>)PD_CFG2_REG_ADDRESS)<span style="color:#f92672">-&gt;</span>PD18 <span style="color:#f92672">=</span> MODE_OUTPUT;
@@ -294,46 +300,46 @@ Using the user manual of the phone&rsquo;s processor (Allwinner A64), a kernel m
 </ul>
 <h2 id="turning-the-io-pins-on-or-off">Turning the IO pins on or off</h2>
 <p>The method that is used to set the pin modes will be used to turn the IO pins on or off as well. The required table is found in chapter 3.21.2.23 (page 388) of the <a href="https://linux-sunxi.org/images/b/b4/Allwinner_A64_User_Manual_V1.1.pdf">user manual</a> and the <code>struct</code> and <code>address</code> will be as follows:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#75715e">#define PIO 0x01C20800                      </span><span style="color:#75715e">// same PIO address as the configure code uses
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#75715e">#define PIO 0x01C20800                      </span><span style="color:#75715e">// same PIO address as the configure code uses
 </span><span style="color:#75715e"></span><span style="color:#75715e">#define PD_DATA_REG_ADDRESS (PIO + 0x7C)    </span><span style="color:#75715e">// this time the offset is 0x7C
 </span><span style="color:#75715e"></span>
 <span style="color:#66d9ef">typedef</span> <span style="color:#66d9ef">struct</span> {
-    <span style="color:#66d9ef">uint32_t</span>  PD_0      : <span style="color:#ae81ff">1</span>;
-    <span style="color:#66d9ef">uint32_t</span>  PD_1      : <span style="color:#ae81ff">1</span>;
-    <span style="color:#66d9ef">uint32_t</span>  PD_2      : <span style="color:#ae81ff">1</span>;
-    <span style="color:#66d9ef">uint32_t</span>  PD_3      : <span style="color:#ae81ff">1</span>;
-    <span style="color:#66d9ef">uint32_t</span>  PD_4      : <span style="color:#ae81ff">1</span>;
-    <span style="color:#66d9ef">uint32_t</span>  PD_5      : <span style="color:#ae81ff">1</span>;
-    <span style="color:#66d9ef">uint32_t</span>  PD_6      : <span style="color:#ae81ff">1</span>;
-    <span style="color:#66d9ef">uint32_t</span>  PD_7      : <span style="color:#ae81ff">1</span>;
-    <span style="color:#66d9ef">uint32_t</span>  PD_8      : <span style="color:#ae81ff">1</span>;
-    <span style="color:#66d9ef">uint32_t</span>  PD_9      : <span style="color:#ae81ff">1</span>;
-    <span style="color:#66d9ef">uint32_t</span>  PD_10     : <span style="color:#ae81ff">1</span>;
-    <span style="color:#66d9ef">uint32_t</span>  PD_11     : <span style="color:#ae81ff">1</span>;
-    <span style="color:#66d9ef">uint32_t</span>  PD_12     : <span style="color:#ae81ff">1</span>;
-    <span style="color:#66d9ef">uint32_t</span>  PD_13     : <span style="color:#ae81ff">1</span>;
-    <span style="color:#66d9ef">uint32_t</span>  PD_14     : <span style="color:#ae81ff">1</span>;
-    <span style="color:#66d9ef">uint32_t</span>  PD_15     : <span style="color:#ae81ff">1</span>;
-    <span style="color:#66d9ef">uint32_t</span>  PD_16     : <span style="color:#ae81ff">1</span>;
-    <span style="color:#66d9ef">uint32_t</span>  PD_17     : <span style="color:#ae81ff">1</span>;
-    <span style="color:#66d9ef">uint32_t</span>  PD_18     : <span style="color:#ae81ff">1</span>;
-    <span style="color:#66d9ef">uint32_t</span>  PD_19     : <span style="color:#ae81ff">1</span>;
-    <span style="color:#66d9ef">uint32_t</span>  PD_20     : <span style="color:#ae81ff">1</span>;
-    <span style="color:#66d9ef">uint32_t</span>  PD_21     : <span style="color:#ae81ff">1</span>;
-    <span style="color:#66d9ef">uint32_t</span>  PD_22     : <span style="color:#ae81ff">1</span>;
-    <span style="color:#66d9ef">uint32_t</span>  PD_23     : <span style="color:#ae81ff">1</span>;
-    <span style="color:#66d9ef">uint32_t</span>  PD_24     : <span style="color:#ae81ff">1</span>;
-    <span style="color:#66d9ef">uint32_t</span>  reserved  : <span style="color:#ae81ff">7</span>;
+    uint32_t  PD_0      : <span style="color:#ae81ff">1</span>;
+    uint32_t  PD_1      : <span style="color:#ae81ff">1</span>;
+    uint32_t  PD_2      : <span style="color:#ae81ff">1</span>;
+    uint32_t  PD_3      : <span style="color:#ae81ff">1</span>;
+    uint32_t  PD_4      : <span style="color:#ae81ff">1</span>;
+    uint32_t  PD_5      : <span style="color:#ae81ff">1</span>;
+    uint32_t  PD_6      : <span style="color:#ae81ff">1</span>;
+    uint32_t  PD_7      : <span style="color:#ae81ff">1</span>;
+    uint32_t  PD_8      : <span style="color:#ae81ff">1</span>;
+    uint32_t  PD_9      : <span style="color:#ae81ff">1</span>;
+    uint32_t  PD_10     : <span style="color:#ae81ff">1</span>;
+    uint32_t  PD_11     : <span style="color:#ae81ff">1</span>;
+    uint32_t  PD_12     : <span style="color:#ae81ff">1</span>;
+    uint32_t  PD_13     : <span style="color:#ae81ff">1</span>;
+    uint32_t  PD_14     : <span style="color:#ae81ff">1</span>;
+    uint32_t  PD_15     : <span style="color:#ae81ff">1</span>;
+    uint32_t  PD_16     : <span style="color:#ae81ff">1</span>;
+    uint32_t  PD_17     : <span style="color:#ae81ff">1</span>;
+    uint32_t  PD_18     : <span style="color:#ae81ff">1</span>;
+    uint32_t  PD_19     : <span style="color:#ae81ff">1</span>;
+    uint32_t  PD_20     : <span style="color:#ae81ff">1</span>;
+    uint32_t  PD_21     : <span style="color:#ae81ff">1</span>;
+    uint32_t  PD_22     : <span style="color:#ae81ff">1</span>;
+    uint32_t  PD_23     : <span style="color:#ae81ff">1</span>;
+    uint32_t  PD_24     : <span style="color:#ae81ff">1</span>;
+    uint32_t  reserved  : <span style="color:#ae81ff">7</span>;
 } PD_DATA_REG_t;
 </code></pre></div><p>And to then turn the IO pins on or off, very similar pointer-magic will be used:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c">((<span style="color:#66d9ef">volatile</span> PD_DATA_REG_t<span style="color:#f92672">*</span>)PD_DATA_REG_ADDRESS)<span style="color:#f92672">-&gt;</span>PD18 <span style="color:#f92672">=</span> true; <span style="color:#75715e">// or false
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c">((<span style="color:#66d9ef">volatile</span> PD_DATA_REG_t<span style="color:#f92672">*</span>)PD_DATA_REG_ADDRESS)<span style="color:#f92672">-&gt;</span>PD18 <span style="color:#f92672">=</span> true; <span style="color:#75715e">// or false
 </span><span style="color:#75715e"></span>((<span style="color:#66d9ef">volatile</span> PD_DATA_REG_t<span style="color:#f92672">*</span>)PD_DATA_REG_ADDRESS)<span style="color:#f92672">-&gt;</span>PD19 <span style="color:#f92672">=</span> true; <span style="color:#75715e">// or false
 </span><span style="color:#75715e"></span>((<span style="color:#66d9ef">volatile</span> PD_DATA_REG_t<span style="color:#f92672">*</span>)PD_DATA_REG_ADDRESS)<span style="color:#f92672">-&gt;</span>PD20 <span style="color:#f92672">=</span> true; <span style="color:#75715e">// or false;
 </span></code></pre></div><h1 id="creating-a-linux-kernel-module">Creating a linux kernel module</h1>
 <h2 id="a-bare-bones-linux-kernel-module">A bare bones linux kernel module</h2>
 <p>All the code that is required to set pinmodes is present, but if it&rsquo;s ran in userspace (even as superuser), it will result in a <code>segfault</code>. This is because the Linux kernel does not allow memory to be altered directly. To get around this, a kernel module will be written.</p>
 <p>A bare bones kernel module looks like this:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#75715e">// filename: mymodule.c (do not name it &#39;module.c&#39;!)
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#75715e">// filename: mymodule.c (do not name it &#39;module.c&#39;!)
 </span><span style="color:#75715e"></span>
 <span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;linux/module.h&gt;</span><span style="color:#75715e">
 </span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;linux/kernel.h&gt;</span><span style="color:#75715e">
@@ -354,7 +360,7 @@ module_init(mymodule_init);
 module_exit(mymodule_exit);
 </code></pre></div><p>Make sure to not name anything <code>module</code>. Use a custom name like <code>mymodule</code>, or it might not compile.</p>
 <p>The following <code>Makefile</code> will compile the kernel module:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-Makefile" data-lang="Makefile">obj-m <span style="color:#f92672">:=</span> mymodule.o
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-Makefile" data-lang="Makefile">obj-m <span style="color:#f92672">:=</span> mymodule.o
 
 KERNEL_VERSION <span style="color:#f92672">=</span> <span style="color:#66d9ef">$(</span>shell uname -r<span style="color:#66d9ef">)</span>
 KERNEL_DIR     <span style="color:#f92672">=</span> /usr/lib/modules/<span style="color:#66d9ef">$(</span>KERNEL_VERSION<span style="color:#66d9ef">)</span>/build/
@@ -369,18 +375,18 @@ KERNEL_DIR     <span style="color:#f92672">=</span> /usr/lib/modules/<span style
 	<span style="color:#75715e"># Delete all build files</span>
 	<span style="color:#66d9ef">$(</span>MAKE<span style="color:#66d9ef">)</span> -C <span style="color:#66d9ef">$(</span>KERNEL_DIR<span style="color:#66d9ef">)</span> M<span style="color:#f92672">=</span><span style="color:#66d9ef">$(</span>PWD<span style="color:#66d9ef">)</span> clean
 </code></pre></div><p>To then add the kernel module to the kernel, the command</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">sudo insmod mymodule.ko
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">sudo insmod mymodule.ko
 </code></pre></div><p>can be issued.</p>
 <p>After that, when the command</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">sudo dmesg
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">sudo dmesg
 </code></pre></div><p>can be executed to see the kernel logs. The new linux module should have logged a greeting. To see it happening in realtime, the <code>-w</code> option can de added to the dmesg command.</p>
 <p>To remove the kernel module from the linux kernel, the command</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">sudo rmmod mymodule
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">sudo rmmod mymodule
 </code></pre></div><p>can be used.</p>
 <h2 id="a-kernel-module-that-alters-memory">A kernel module that alters memory</h2>
 <p>To alter the MMIO registers of the PinePhone, a <code>character device</code> kernel module will be written. It will take an array of 3 characters and turn the right bits on and off using the values of the array. It will also be able to read the current state of the memory and return it in the form of a 3 character long array. All communication will happen through <code>/dev/mymodule</code>, a virtual device.</p>
 <p>All the used memory locations and structures will be put in a separate file called <code>mmio.h</code>. The new kernel module looks like this:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;linux/module.h&gt;</span><span style="color:#75715e">
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;linux/module.h&gt;</span><span style="color:#75715e">
 </span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;linux/kernel.h&gt;</span><span style="color:#75715e">
 </span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;linux/fs.h&gt;</span><span style="color:#75715e">
 </span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;linux/cdev.h&gt;</span><span style="color:#75715e">
@@ -561,11 +567,11 @@ dev_t dev_num;
 module_init(mymodule_init);
 module_exit(mymodule_exit);
 </code></pre></div><p>When this module is loaded in using</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">sudo insmod mymodule.ko
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">sudo insmod mymodule.ko
 </code></pre></div><p>it will log how to make a virtual device. After executing that command as superuser, a virtual device called <code>/dev/mymodule</code> will have been created.</p>
 <h1 id="communicating-with-the-kernel-module">Communicating with the kernel module</h1>
 <p>Communication can be done using a C or C++ program that runs in userland (as superuser):</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#75715e">// main.c
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#75715e">// main.c
 </span><span style="color:#75715e"></span>
 <span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;stdio.h&gt;</span><span style="color:#75715e">
 </span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;fcntl.h&gt;</span><span style="color:#75715e">
@@ -774,7 +780,7 @@ module_exit(mymodule_exit);
 
 
 
-<script type="text/javascript" src="/bundle.min.644292943ae47eef02fcd64b11757aeb8caeeaebf473a823b62099edccac808e8d82689359f285e5d95994e5ad5ae3b9c1ccc281eb1828e67d0ba6630f95b832.js" integrity="sha512-ZEKSlDrkfu8C/NZLEXV664yu6uv0c6gjtiCZ7cysgI6NgmiTWfKF5dlZlOWtWuO5wczCgesYKOZ9C6ZjD5W4Mg=="></script>
+<script type="text/javascript" src="/bundle.min.250eccec8a234ae0b0194ed3fed44baa4f5d4267332956cb0f92e363624a714666b7322e1a3da21cb389124adf349c467b46f9b7aab3351e3aa84dcaf55fe33a.js" integrity="sha512-JQ7M7IojSuCwGU7T/tRLqk9dQmczKVbLD5LjY2JKcUZmtzIuGj2iHLOJEkrfNJxGe0b5t6qzNR46qE3K9V/jOg=="></script>
 
 
 

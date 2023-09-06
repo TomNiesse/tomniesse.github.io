@@ -7,7 +7,18 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>&lt;a href=&#34;https://creativecommons.org/licenses/by-nc/4.0/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;CC BY-NC 4.0&lt;/a&gt;</copyright>
-    <lastBuildDate>Sun, 04 Jun 2023 11:28:55 +0200</lastBuildDate><atom:link href="https://tomniesse.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Wed, 06 Sep 2023 13:22:00 +0200</lastBuildDate><atom:link href="https://tomniesse.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Installing linux on a q8 Allwinner A13 tablet</title>
+      <link>https://tomniesse.github.io/posts/q88-tablet-allwinner-a13-embedded-linux/</link>
+      <pubDate>Wed, 06 Sep 2023 13:22:00 +0200</pubDate>
+      
+      <guid>https://tomniesse.github.io/posts/q88-tablet-allwinner-a13-embedded-linux/</guid>
+      <description>In this post, I will try to install linux on a q8 (Allwinner A13 based) tablet. Multiple people have already succeeded in running debian/arch on the tablet, so it must be possible.
+The q8 tablet The q8 tablet is a cheap chinese android tablet that runs Android 4.1.
+Looking at a page on linux-sunxi.org, I believe I have the q88 variant of the tablet. I&amp;rsquo;m not sure about this though. This blogpost will use the terms q8 and q88 interchangeably.</description>
+    </item>
+    
     <item>
       <title>Daisy chained routers and IPv6 (NAT66)</title>
       <link>https://tomniesse.github.io/posts/nat66/</link>

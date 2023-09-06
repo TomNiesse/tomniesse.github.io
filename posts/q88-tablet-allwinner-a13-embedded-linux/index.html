@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="author" content="">
+<meta name="description" content="In this post, I will try to install linux on a q8 (Allwinner A13 based) tablet. Multiple people have already succeeded in running debian/arch on the tablet, so it must be possible.
+The q8 tablet The q8 tablet is a cheap chinese android tablet that runs Android 4.1.
+Looking at a page on linux-sunxi.org, I believe I have the q88 variant of the tablet. I&amp;rsquo;m not sure about this though. This blogpost will use the terms q8 and q88 interchangeably." />
+<meta name="keywords" content=", untagged" />
+<meta name="robots" content="noodp" />
+<meta name="theme-color" content="" />
+<link rel="canonical" href="https://tomniesse.github.io/posts/q88-tablet-allwinner-a13-embedded-linux/" />
+
+
+    <title>
+        
+            Installing linux on a q8 Allwinner A13 tablet :: Tom&#39;s blog 
+        
+    </title>
+
+
+
+
+
+<link rel="stylesheet" href="/main.d0bc80ef7c45f171405c3801554202d2e5fe4f2d84ab897a14ccf3b9ea92cca6.css" integrity="sha256-0LyA73xF8XFAXDgBVUIC0uX&#43;Ty2Eq4l6FMzzueqSzKY=">
+
+
+
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="manifest" href="/site.webmanifest">
+    <link rel="mask-icon" href="/safari-pinned-tab.svg" color="">
+    <link rel="shortcut icon" href="/favicon.ico">
+    <meta name="msapplication-TileColor" content="">
+
+
+<meta itemprop="name" content="Installing linux on a q8 Allwinner A13 tablet">
+<meta itemprop="description" content="In this post, I will try to install linux on a q8 (Allwinner A13 based) tablet. Multiple people have already succeeded in running debian/arch on the tablet, so it must be possible.
+The q8 tablet The q8 tablet is a cheap chinese android tablet that runs Android 4.1.
+Looking at a page on linux-sunxi.org, I believe I have the q88 variant of the tablet. I&rsquo;m not sure about this though. This blogpost will use the terms q8 and q88 interchangeably.">
+<meta itemprop="datePublished" content="2023-09-06T13:22:00+02:00" />
+<meta itemprop="dateModified" content="2023-09-06T13:22:00+02:00" />
+<meta itemprop="wordCount" content="2939">
+<meta itemprop="image" content="https://tomniesse.github.io/"/>
+
+
+
+<meta itemprop="keywords" content="untagged," />
+
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:image" content="https://tomniesse.github.io/"/>
+
+<meta name="twitter:title" content="Installing linux on a q8 Allwinner A13 tablet"/>
+<meta name="twitter:description" content="In this post, I will try to install linux on a q8 (Allwinner A13 based) tablet. Multiple people have already succeeded in running debian/arch on the tablet, so it must be possible.
+The q8 tablet The q8 tablet is a cheap chinese android tablet that runs Android 4.1.
+Looking at a page on linux-sunxi.org, I believe I have the q88 variant of the tablet. I&rsquo;m not sure about this though. This blogpost will use the terms q8 and q88 interchangeably."/>
+
+
+
+    <meta property="og:title" content="Installing linux on a q8 Allwinner A13 tablet" />
+<meta property="og:description" content="In this post, I will try to install linux on a q8 (Allwinner A13 based) tablet. Multiple people have already succeeded in running debian/arch on the tablet, so it must be possible.
+The q8 tablet The q8 tablet is a cheap chinese android tablet that runs Android 4.1.
+Looking at a page on linux-sunxi.org, I believe I have the q88 variant of the tablet. I&rsquo;m not sure about this though. This blogpost will use the terms q8 and q88 interchangeably." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://tomniesse.github.io/posts/q88-tablet-allwinner-a13-embedded-linux/" />
+<meta property="og:image" content="https://tomniesse.github.io/"/>
+<meta property="article:published_time" content="2023-09-06T13:22:00+02:00" />
+<meta property="article:modified_time" content="2023-09-06T13:22:00+02:00" /><meta property="og:site_name" content="Tom&#39;s blog" />
+
+
+
+
+
+
+    <meta property="article:published_time" content="2023-09-06 13:22:00 &#43;0200 CEST" />
+
+
+
+
+
+
+
+
+
+
+
+    </head>
+
+    
+        <body>
+    
+    
+        <div class="container">
+            <header class="header">
+    <span class="header__inner">
+        <a href="/" style="text-decoration: none;">
+    <div class="logo">
+        
+            <span class="logo__mark">></span>
+            <span class="logo__text ">
+                Tom&#39;s blogposts</span>
+            <span class="logo__cursor" style=
+                  "
+                   
+                   ">
+            </span>
+        
+    </div>
+</a>
+
+
+        <span class="header__right">
+            
+                <nav class="menu">
+    <ul class="menu__inner"><li><a href="/posts">Blogposts</a></li>
+    </ul>
+</nav>
+
+                <span class="menu-trigger">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                        <path d="M0 0h24v24H0z" fill="none"/>
+                        <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/>
+                    </svg>
+                </span>
+            
+        </span>
+    </span>
+</header>
+
+
+            <div class="content">
+                
+  <main class="post">
+
+    <div class="post-info">
+      <p>
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-clock">
+          <circle cx="12" cy="12" r="10"></circle>
+          <polyline points="12 6 12 12 16 14"></polyline>
+        </svg>
+        14 minutes
+
+        
+      </p>
+    </div>
+
+    <article>
+      <h1 class="post-title">
+        <a href="https://tomniesse.github.io/posts/q88-tablet-allwinner-a13-embedded-linux/">Installing linux on a q8 Allwinner A13 tablet</a>
+      </h1>
+
+      
+
+      
+
+      
+
+      <div class="post-content">
+        <p>In this post, I will try to install linux on a q8 (Allwinner A13 based) tablet. Multiple people have already succeeded in running debian/arch on the tablet, so it must be possible.</p>
+<h1 id="the-q8-tablet">The q8 tablet</h1>
+<p>The <a href="https://linux-sunxi.org/Q8">q8 tablet</a> is a cheap chinese android tablet that runs Android 4.1.</p>
+<p><img src="images/booting_android.jpg" alt="The q8 tablet, starting Android 4.1"></p>
+<p>Looking at a page on <a href="https://linux-sunxi.org/Q88">linux-sunxi.org</a>, I believe I have the q88 variant of the tablet. I&rsquo;m not sure about this though. This blogpost will use the terms <code>q8</code> and <code>q88</code> interchangeably.</p>
+<p><img src="images/about_tablet.jpg" alt="The &ldquo;about tablet&rdquo; section in Android"></p>
+<p><a href="https://linux-sunxi.org/Q8">There are tablets that look similar, but have a different Allwinner SoC</a>. The one I have, happens to have an <a href="https://hackaday.com/2018/09/17/a-1-linux-capable-hand-solderable-processor/">Allwinner A13 SoC</a> inside it:</p>
+<p><img src="images/the_inside.jpg" alt="The insides of the tablet"></p>
+<p>The battery looked like it was about to explode, so I removed it. Just imagine a battery being next to the board.</p>
+<h1 id="the-process">The process</h1>
+<p>To create a new linux OS for the tablet, I followed a checklist:</p>
+<ul>
+<li>Is there a crosstool-ng defconfig for the CPU/SoC? <strong>There seems to be, <em>arm-cortex_a8-linux-gnueabi</em> exists.</strong></li>
+<li>Is there a mainline u-boot defconfig for it? Is it even supported by u-boot? <strong>It seems to be supported, <em>q8_a13_tablet_defconfig</em> exists.</strong></li>
+<li>Is there a mainline linux defconfig for it? It is even supported by linux? <strong>It seems to be supported, <em>sunxi_defconfig</em> exists.</strong>
+<ul>
+<li>If yes, does the linux source provide a <code>.dtb</code> file after I built the kernel?</li>
+</ul>
+</li>
+<li>Is there a buildroot defconfig for it? <strong>No, buildroot doesn&rsquo;t seem to support this anchient piece of technology.</strong>
+<ul>
+<li>If yes, does it provide me with an <code>.img</code> file after it&rsquo;s done building? <strong>No.</strong></li>
+</ul>
+</li>
+</ul>
+<h1 id="creating-a-cross-compiler-toolchain">Creating a cross compiler toolchain</h1>
+<p>Just like in some of my <a href="/posts/buildroot">previous posts</a>, I will once again build a cross compiler toolchain.</p>
+<h2 id="getting-crosstool-ng">Getting crosstool-NG</h2>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">git clone https://github.com/crosstool-ng/crosstool-ng
+./bootstrap <span style="color:#75715e"># crosstool-NG is cloned from github</span>
+./configure --enable-local
+make
+</code></pre></div><h2 id="creating-a-toolchain-for-the-allwinner-a13">Creating a toolchain for the Allwinner A13</h2>
+<p>The Allwinner A13 uses a Cortex A8, so the toolchain will have to support that processor type. Luckily, there is one.</p>
+<p>To build the toolchain for the Allwinner A13 Soc:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">./ct-ng arm-cortex_a8-linux-gnueabi
+./ct-ng build
+</code></pre></div><p>The folder <code>/home/$USER/x-tools/arm-cortex_a8-linux-gnueabi/</code> should now exist. To verify this:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">$ ls ~/x-tools/
+arm-cortex_a8-linux-gnueabi
+</code></pre></div><h1 id="building-u-boot">Building u-boot</h1>
+<p>In this post, the mainline u-boot will be used.</p>
+<h2 id="getting-u-boot">Getting u-boot</h2>
+<p>If it works, mainline u-boot will be used. It will be downloaded directly from github:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">git clone https://github.com/u-boot/u-boot.git
+</code></pre></div><h2 id="building-u-boot-for-the-q8-tablet">Building u-boot for the q8 tablet:</h2>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">cd u-boot
+export ARCH<span style="color:#f92672">=</span>arm
+export CROSS_COMPILE<span style="color:#f92672">=</span>/home/$USER/x-tools/arm-cortex_a8-linux-gnueabi/bin/arm-cortex_a8-linux-gnueabi-
+make q8_a13_tablet_defconfig
+make menuconfig <span style="color:#75715e"># to change the boot timeout, if desired</span>
+make
+</code></pre></div><p>The <code>u-boot</code> folder should now contain some more files. To verify:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">$ ls u-boot | grep u-boot
+u-boot
+u-boot.bin
+u-boot.cfg
+u-boot.dtb
+u-boot-dtb.bin
+u-boot-dtb.img
+u-boot.dtb.out
+u-boot.img
+u-boot.lds
+u-boot.map
+u-boot-nodtb.bin
+u-boot.srec
+u-boot-sunxi-with-spl.bin
+u-boot-sunxi-with-spl.map
+u-boot.sym
+</code></pre></div><h1 id="building-linux">Building linux</h1>
+<h2 id="getting-linux">Getting linux</h2>
+<p>To obtain linux, I download the latest available version from the <a href="https://github.com/torvalds/linux/tags">releases page at github</a> (v6.4 at time of writing):</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">wget https://github.com/torvalds/linux/archive/refs/tags/v6.4.tar.gz
+tar -xvf v6.4.tar.gz
+</code></pre></div><h2 id="building-linux-for-the-q8-tablet">Building linux for the q8 tablet</h2>
+<p>Building linux for the tablet is very straightforward and doesn&rsquo;t take very long:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">cd linux-6.4
+export ARCH<span style="color:#f92672">=</span>arm
+export CROSS_COMPILE<span style="color:#f92672">=</span>/home/$USER/x-tools/arm-cortex_a8-linux-gnueabi/bin/arm-cortex_a8-linux-gnueabi-
+make sunxi_defconfig
+make menuconfig <span style="color:#75715e"># for any desired changes</span>
+make -j<span style="color:#e6db74">`</span>nproc<span style="color:#e6db74">`</span>
+</code></pre></div><p>The folder <code>arch/arm/boot</code> should now containe a file called <code>zImage</code>. To verify:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">$ ls arch/arm/boot/ | grep Image
+Image
+zImage
+</code></pre></div><p>Both <code>Image</code> and <code>zImage</code>&hellip; Nice!</p>
+<p>Another file that needs to be present, is the <code>.dtb</code> file. This file contains a list of hardware inside the tablet.</p>
+<p>To verify:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">$ ls arch/arm/boot/dts | grep a13-q8
+sun5i-a13-q8-tablet.dtb <span style="color:#75715e"># The file I&#39;m looking for, a .dtb file</span>
+sun5i-a13-q8-tablet.dts
+</code></pre></div><h1 id="creating-a-minimal-sd-card-image">Creating a minimal SD-card image</h1>
+<p>If I read <a href="https://lists.denx.de/pipermail/u-boot/2016-September/266232.html">this mailing list</a> correctly, the Allwinner A13 can boot from an SD-card. For that to happen, u-boot needs to be flashed to an SD card in the correct way.</p>
+<p>Instead of flashing directly to an SD card, an SD card image will be created. That image will then be flashed onto an SD card. To create an SD card image, I will use <a href="https://github.com/buildroot/buildroot/blob/master/board/licheepi/genimage.cfg">an existing genimage config from buildroot</a> and edit it, so it works for the q8 tablet.</p>
+<h2 id="genimage-config">Genimage config</h2>
+<p>The genimage config file (<code>genimage.cfg</code>) looks as follows:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-json" data-lang="json"><span style="color:#960050;background-color:#1e0010">image</span> <span style="color:#960050;background-color:#1e0010">boot.vfat</span> {
+	<span style="color:#960050;background-color:#1e0010">vfat</span> <span style="color:#960050;background-color:#1e0010">{</span>
+		<span style="color:#960050;background-color:#1e0010">files</span> <span style="color:#960050;background-color:#1e0010">=</span> <span style="color:#960050;background-color:#1e0010">{</span>
+			<span style="color:#f92672">&#34;zImage&#34;</span>,
+			<span style="color:#f92672">&#34;sun5i-a13-q8-tablet.dtb&#34;</span>,
+		}
+	<span style="color:#960050;background-color:#1e0010">}</span>
+
+	<span style="color:#960050;background-color:#1e0010">size</span> <span style="color:#960050;background-color:#1e0010">=</span> <span style="color:#ae81ff">8</span><span style="color:#960050;background-color:#1e0010">M</span>
+<span style="color:#960050;background-color:#1e0010">}</span>
+
+<span style="color:#960050;background-color:#1e0010">image</span> <span style="color:#960050;background-color:#1e0010">sdcard.img</span> {
+	<span style="color:#960050;background-color:#1e0010">hdimage</span> <span style="color:#960050;background-color:#1e0010">{</span>
+	}
+
+	<span style="color:#960050;background-color:#1e0010">partition</span> <span style="color:#960050;background-color:#1e0010">u-boot</span> {
+		<span style="color:#960050;background-color:#1e0010">in-partition-table</span> <span style="color:#960050;background-color:#1e0010">=</span> <span style="color:#f92672">&#34;no&#34;</span>
+		<span style="color:#960050;background-color:#1e0010">image</span> <span style="color:#960050;background-color:#1e0010">=</span> <span style="color:#e6db74">&#34;u-boot-sunxi-with-spl.bin&#34;</span>
+		<span style="color:#960050;background-color:#1e0010">offset</span> <span style="color:#960050;background-color:#1e0010">=</span> <span style="color:#ae81ff">8</span><span style="color:#960050;background-color:#1e0010">K</span>
+		<span style="color:#960050;background-color:#1e0010">size</span> <span style="color:#960050;background-color:#1e0010">=</span> <span style="color:#ae81ff">530</span><span style="color:#960050;background-color:#1e0010">K</span> <span style="color:#960050;background-color:#1e0010">#</span> <span style="color:#960050;background-color:#1e0010">file</span> <span style="color:#960050;background-color:#1e0010">is</span> <span style="color:#ae81ff">525</span><span style="color:#960050;background-color:#1e0010">KB</span> <span style="color:#960050;background-color:#1e0010">in</span> <span style="color:#960050;background-color:#1e0010">size</span> <span style="color:#960050;background-color:#1e0010">(measured</span> <span style="color:#960050;background-color:#1e0010">in</span> <span style="color:#960050;background-color:#1e0010">KB</span>, <span style="color:#960050;background-color:#1e0010">not</span> <span style="color:#960050;background-color:#1e0010">KiB)</span>
+	}
+
+	<span style="color:#960050;background-color:#1e0010">partition</span> <span style="color:#960050;background-color:#1e0010">boot</span> {
+		<span style="color:#960050;background-color:#1e0010">partition-type</span> <span style="color:#960050;background-color:#1e0010">=</span> <span style="color:#960050;background-color:#1e0010">0xC</span>
+		<span style="color:#960050;background-color:#1e0010">bootable</span> <span style="color:#960050;background-color:#1e0010">=</span> <span style="color:#f92672">&#34;true&#34;</span>
+		<span style="color:#960050;background-color:#1e0010">image</span> <span style="color:#960050;background-color:#1e0010">=</span> <span style="color:#e6db74">&#34;boot.vfat&#34;</span>
+	}
+
+	<span style="color:#960050;background-color:#1e0010">#</span> <span style="color:#960050;background-color:#1e0010">The</span> <span style="color:#960050;background-color:#1e0010">rootfs</span> <span style="color:#960050;background-color:#1e0010">partition</span> <span style="color:#960050;background-color:#1e0010">will</span> <span style="color:#960050;background-color:#1e0010">be</span> <span style="color:#960050;background-color:#1e0010">configured</span> <span style="color:#960050;background-color:#1e0010">later</span>
+    <span style="color:#960050;background-color:#1e0010">partition</span> <span style="color:#960050;background-color:#1e0010">rootfs</span> {
+		<span style="color:#960050;background-color:#1e0010">partition-type</span> <span style="color:#960050;background-color:#1e0010">=</span> <span style="color:#960050;background-color:#1e0010">0x83</span>
+		<span style="color:#960050;background-color:#1e0010">image</span> <span style="color:#960050;background-color:#1e0010">=</span> <span style="color:#f92672">&#34;rootfs.ext4&#34;</span>
+		<span style="color:#960050;background-color:#1e0010">size</span> <span style="color:#960050;background-color:#1e0010">=</span> <span style="color:#ae81ff">0</span>
+	}
+<span style="color:#960050;background-color:#1e0010">}</span>
+</code></pre></div><p>To build the image, I copy over all the required files and start genimage:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">$ genimage --help
+genimage: command not found
+$ sudo apt install genimage
+...
+E: Unable to locate package genimage
+<span style="color:#75715e"># What? Debian unstable seems to have `genimage` in it&#39;s repo&#39;s,</span>
+<span style="color:#75715e"># why not Ubuntu?</span>
+</code></pre></div><h3 id="getting-genimage">Getting genimage</h3>
+<p>Genimage is not in the package repositories of ubuntu yet? Building it is straightforward enough:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">git clone https://github.com/pengutronix/genimage
+cd genimage
+./autogen.sh
+./configure
+make
+<span style="color:#75715e"># DO NOT EXECUTE `sudo make install`,</span>
+<span style="color:#75715e"># IT WILL CURSE YOUR GNU/Linux INSTALLATION!</span>
+cd ..
+
+<span style="color:#75715e"># To use genimage, execute the local file.</span>
+./genimage/genimage --help
+</code></pre></div><h3 id="building-the-image-using-genimage-attempt-2">Building the image using genimage (attempt #2)</h3>
+<p>First, copy the required files into a separate folder:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">mkdir genimage_input
+cp u-boot/u-boot-sunxi-with-spl.bin genimage_input
+cp linux-6.4/arch/arm/boot/zImage genimage_input
+cp linux-6.4/arch/arm/boot/dts/sun5i-a13-q8-tablet.dtb genimage_input
+touch genimage_input/rootfs.ext4 <span style="color:#75715e"># create an empty rootfs file for now</span>
+</code></pre></div><p>Then, tell genimage where to find everything and where to export everything to (this builds the actual image):</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">mkdir genimage_output
+./genimage/genimage --config genimage.cfg --rootpath genimage_output --inputpath genimage_input
+</code></pre></div><p>Genimage should have created a folder called <code>images</code>. This folder will contain a file called <code>sdcard.img</code>. To verify:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">$ ls images/
+boot.vfat  sdcard.img
+</code></pre></div><h2 id="writing-the-image-to-an-sd-card">Writing the image to an SD card</h2>
+<p>Writing this image to an SD card is no different from the way Raspberry Pi users would do this. Use your favourite tool for this. In <a href="/posts/buildroot">another blog post</a> I have already explained how this process works.</p>
+<h2 id="booting-the-tablet">Booting the tablet</h2>
+<p>Because the tablet has an Allwinner SoC, it boots just like a PinePhone (non-pro edition): Just insert the SD card and turn it on!</p>
+<p>After the tablet was powered on, u-boot immediately showed up on the screen:</p>
+<p><img src="images/first_boot.png" alt="First boot of the new OS"></p>
+<p>This tells me a few things:</p>
+<ul>
+<li>It has 512MiB RAM.</li>
+<li>It boots from an SD card, just like a Raspberry Pi/PinePhone does. If the card is removed, it boots android again (as if nothing happened).</li>
+<li>The screen works.</li>
+<li>U-boot knows where the boot partition is located: it seeks it&rsquo;s environment config (<code>uboot.env</code>) in <code>mmc0:1</code>. No changes needed there.</li>
+<li>The power and volume keys don&rsquo;t stop the u-boot autoboot.</li>
+</ul>
+<h2 id="configuring-u-boot">Configuring u-boot</h2>
+<p>U-boot does not load linux yet, because it says it&rsquo;s missing a file called <code>uboot.env</code>. U-boot will not do anything if it cannot find it&rsquo;s configuration.</p>
+<p>To fix <code>uboot.env</code> not being present, let&rsquo;s create a file called <code>boot.scr</code>.</p>
+<p>U-boot goes through a few stages when booting:</p>
+<ul>
+<li>It gives some hardware information.</li>
+<li>It looks for <code>uboot.env</code> (which doesn&rsquo;t exist in this case).</li>
+<li>It looks for <code>boot.scr</code>, a boot script (which doesn&rsquo;t yet exist in this case).</li>
+<li>It tries to boot from a network.</li>
+<li>It says it failed and hangs forever.</li>
+</ul>
+<p>Because I have no idea where the UART-pins are yet, I cannot interact with u-boot. So, I cannot create <code>uboot.env</code>. So, <code>boot.scr</code> will be created instead.</p>
+<h3 id="creating-bootscr">Creating boot.scr</h3>
+<p>To create a boot script for U-boot, a text file with some script text needs to be converted.</p>
+<p>For this project, a file called <code>boot.txt</code> is created, with the following contents:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">setenv bootargs root<span style="color:#f92672">=</span>/dev/mmcblk0p2 rootwait panic<span style="color:#f92672">=</span><span style="color:#ae81ff">10</span> console<span style="color:#f92672">=</span>/dev/ttyS0,11520 console<span style="color:#f92672">=</span>tty0
+load mmc 0:1 $kernel_addr_r zImage
+load mmc 0:1 $fdt_addr_r sun5i-a13-q8-tablet.dtb
+bootz $kernel_addr_r - $fdt_addr_r
+</code></pre></div><p>It is then converted to <code>boot.scr</code> using <a href="https://linux-sunxi.org/U-Boot#Configure_U-Boot">the following command</a>:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">mkimage -C none -A arm -T script -d boot.txt boot.scr
+</code></pre></div><p>After copying <code>boot.scr</code> to the SD card, u-boot knew what to do and stopped complaining about missing files. It then started booting linux:</p>
+<p><img src="images/uboot_starting_kernel.png" alt="U-boot loading linux"></p>
+<h3 id="linux-or-not">Linux! Or not.</h3>
+<p>But after that, nothing. No kernel output, no logs, nothing. Just an empty screen.</p>
+<p><img src="images/no_linux.jpg" alt="Expecting linux? Too bad!"></p>
+<p>In fact, the whole tablet just turned off.</p>
+<p>Even with external power applied (faking the presence of a battery), the device turns off. This happens after about 1 second after linux is loaded.</p>
+<p><img src="images/external_power.jpg" alt="Expecting linux with external power? Too bad!"></p>
+<p>This variant of the q8 tablet has it&rsquo;s wifi chip wired differently. So, as soon as the wifi chip gets powered, the tablet turns off.</p>
+<p><a href="https://groups.google.com/g/linux-sunxi/c/LaLUHF3jjUo">Someone else figured out a solution to this problem</a>. Maybe that will work? The post speaks of disabling LDO3 (and thus disabling wifi and usb). To test this, the LDO3 entries in <code>u-boot/arch/arm/dts/sun5i-reference-design-tablet.dtsi</code> were removed (make sure to make a backup!).</p>
+<p>After that, a new <code>.dtb</code> file was created:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">make dtbs <span style="color:#75715e"># with u-boot source as $PWD</span>
+</code></pre></div><p>After booting, it turns out the user was onto something. The tablet doesn&rsquo;t immediately turn off anymore. Instead, the screen only displays white lines, after which the tablet reboots.</p>
+<p><img src="images/lines_in_screen.png" alt="Expecting image? Too bad!"></p>
+<h3 id="switching-to-linux-sunxi">Switching to <code>linux-sunxi</code></h3>
+<p>Many years ago, there was a linux-fork called <code>linux-sunxi</code> and a u-boot fork called <code>u-boot-sunxi</code>. These forks still exist and are widely used today. In recent years, most of the the <code>linux-sunxi</code> drivers have been merged into the mainline linux kernel.</p>
+<p>As seen earlier, the mainline version of u-boot supports the Allwinner A13 SoC now. The mainline linux version however, still crashes (the screen?) when it boots.</p>
+<p>So, there is a chance that <code>linux-sunxi</code> works. After downloading <a href="https://github.com/linux-sunxi/linux-sunxi/releases/tag/v5.8">release version 5.8</a> (latest version at time of writing) and repeating exactly the same steps as before, it worked! The linux kernel logs were shown:</p>
+<p><img src="images/linux_logs.png" alt="Linux logs being displayed on the screen!"></p>
+<h2 id="can-linux-mount-a-rootfs-and-start-an-init">Can Linux mount a rootfs and start an init?</h2>
+<p>Linux now starts and prints logs to the tablet&rsquo;s display, but it panics. This was expected, since the <code>genimage.cfg</code> does not yet contain a rootfs configuration.</p>
+<p>To test if any rootfs can be mounted at all, a second partition was added to the SD card, containing a <a href="https://sd-card-images.johang.se/boards/a13_olinuxino.html">rootfs from the A13 OLinuXino board</a>. Although the rootfs is not made for this tablet, it displayed the Debian CLI login:</p>
+<p><img src="images/debian_login.jpg" alt="Debian CLI login being shown"></p>
+<p>The same trick worked for <a href="https://archlinuxarm.org/platforms/armv7/allwinner/a10-olinuxino-lime">Arch</a> as well:</p>
+<p><img src="images/arch_login.png" alt="Arch CLI login being shown"></p>
+<h1 id="a-rootfs-with-a-gui">A rootfs with a GUI</h1>
+<p>All of these CLI logins are fun and all, but how about something with graphics?</p>
+<p>Ubuntu MATE has a <a href="https://releases.ubuntu-mate.org/jammy/armhf/">32-bit armhf image</a>, meant for Raspberry Pi&rsquo;s. Merging Ubuntu MATE&rsquo;s userland and <code>linux-sunxi</code>, reveals that the tablet can run a desktop.</p>
+<p><img src="images/ubuntu_mate_loading.jpg" alt="Ubuntu MATE loading"></p>
+<p>Although the tablet is slow, it eventually (after about 4 to 5 minutes) started the Ubuntu MATE setup:</p>
+<p><img src="images/ubuntu_mate_welcome.jpg" alt="Ubuntu MATE welcome"></p>
+<h2 id="why-does-this-work">Why does this work?</h2>
+<p>Why does an OS, created for the Raspberry Pi, work on this tablet? The tablet and the Raspberry Pi 2 share a similar architecture: ARMv7. So, both SoC&rsquo;s are able to run 32 bit ARM code.</p>
+<p>Also, the <a href="https://wiki.installgentoo.com/index.php/Interjection">copypasta</a> is correct:</p>
+<blockquote>
+<p><em>What you&rsquo;re referring to as Linux, is in fact, GNU/Linux. Many computer users run a modified version of the GNU system every day, without realizing it. Through a peculiar turn of events, the version of GNU which is widely used today is often called &ldquo;Linux&rdquo;, and many of its users are not aware that it is basically the GNU system, developed by the GNU Project.</em></p>
+</blockquote>
+<p>Linux is just a kernel. When people talk about &ldquo;linux&rdquo;, they really mean the (GNU) userland binaries that they are interacting with.</p>
+<p>You can get away with a lot of &ldquo;ugly&rdquo; solutions to create an OS (like the one described in this post), because &ldquo;Linux&rdquo; is not an entire OS. This project uses <a href="https://github.com/linux-sunxi/linux-sunxi">linux-sunxi</a> instead of <a href="https://github.com/raspberrypi/linux">raspberrypi/linux</a>, but the userland binaries remain the same. They will work with many versions of linux (the kernel!).</p>
+<p>However, this method should <em>not</em> be used in production. In a production environment, just use yocto or buildroot to create a fully compatible image for the hardware.</p>
+<h1 id="the-touchscreen-doesnt-work">The touchscreen doesn&rsquo;t work</h1>
+<p>The tablet did not respond to the touch screen when clicked or dragged. Looking at <code>u-boot/arch/arm/dts/sun5i-reference-design-tablet.dtsi</code>, it quickly became clear why this is the case:</p>
+<p><img src="images/touchscreen_disabled.png" alt="The touchscreen is disabled"></p>
+<p>The touch screen is disabled, because these tablets <a href="https://linux-sunxi.org/Touchscreen">often have different types of touch screens</a>. The tablet I have says <code>FYX00109</code> the cable.</p>
+<h2 id="figuring-out-which-touch-screen-the-tablet-has">Figuring out which touch screen the tablet has</h2>
+<p>To figure out which screen the tablet uses, Android 4.1 was started again.</p>
+<p>Inside an adb shell, <code>lsmod</code> will give a list of active linux modules:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">root@android:/ # lsmod
+8188eu 784805 0 - Live 0xbf160000
+sun4i_vibrator 2459 0 - Live 0xbf15c000
+rtl8150 10305 0 - Live 0xbf155000
+mcs7830 7581 0 - Live 0xbf14f000
+qf9700 9152 0 - Live 0xbf148000
+asix 24601 0 - Live 0xbf13c000
+cedarx 9351 0 - Live 0xbf135000
+mali 151260 4 - Live 0xbf103000
+da311 29089 0 - Live 0xbf0f6000
+ump 49518 9 mali, Live 0xbf0e2000
+gslX680 94888 0 - Live 0xbf0c5000
+sun5i_csi0 30454 0 - Live 0xbf0b8000
+gc0329 18132 0 - Live 0xbf09e000
+gc0309 17436 0 - Live 0xbf095000
+siv121du 18993 0 - Live 0xbf08c000
+siv121d 14194 0 - Live 0xbf084000
+gc0308 18464 0 - Live 0xbf07b000
+camera_auto_detect 14914 7 sun5i_csi0,gc0329,gc0309,siv121du,siv121d,gc0308, Live 0xbf04f000
+videobuf_dma_contig 6251 1 sun5i_csi0, Live 0xbf04a000
+videobuf_core 20242 2 sun5i_csi0,videobuf_dma_contig, Live 0xbf040000
+nand 225024 10 - Live 0xbf000000
+</code></pre></div><p>To figure out which driver is responsible for the touch screen, I started to unload modules (using <code>rmmod</code>) until the touch screen didn&rsquo;t respond anymore. In this tablet, it was the <code>gslX680</code> module. This means, <a href="https://linux-sunxi.org/Touchscreen">according to the linux-sunxi.org website</a>, that this tablet has a Silead gsl1680 touch screen.</p>
+<p>According to the <a href="http://dl.linux-sunxi.org/touchscreen/GSL1680.pdf">datasheet</a> for the touch screen, the <code>reg</code> entry in de <code>.dts</code> files has to be set to <code>0x40</code>. Let&rsquo;s edit <code>u-boot/arch/arm/dts/sun5i-reference-design-tablet.dtsi</code> again, <a href="http://lists.infradead.org/pipermail/linux-arm-kernel/2016-October/464186.html">to enable the <code>gsl1680</code> driver</a>:</p>
+<p><img src="images/touchscreen_enabled.png" alt="The touchscreen is enabled"></p>
+<p>A <code>compatible</code> entry was added to tell linux that the <code>gsl1680</code> driver will work with the touch screen in the tablet. Also, the <code>status</code> was changed from <code>disabled</code> to <code>okay</code>. The rest of the <code>.dts</code> file was left as-is.</p>
+<p>Also, a kernel module was enabled (<a href="https://www.linuxquestions.org/questions/linux-from-scratch-13/lfs-direct-firmware-load-failed-error-2-a-4175587686/#post5594478">as a module, not built into the kernel!</a>):</p>
+<p><img src="images/silead_enabled.png" alt="The touchscreen driver is enabled"></p>
+<p>And sure enough, in the linux logs, the driver can find the touch screen (please excuse the poor camera image, I still haven&rsquo;t taken the time to find the UART pins on this thing):</p>
+<p><img src="images/touchscreen_found.png" alt="The touchscreen is found"></p>
+<p>However, as seen in the logs, it requires a file called <code>silead/gsl1680.fw</code>. The original android OS uses a similar firmware file. Luckily, the firmware for this touch screen can be found <a href="https://github.com/onitake/gsl-firmware/blob/master/firmware/linux/silead/gsl1680-a082-q8-700.fw">on github</a>. Renaming this firmware file to <code>gsl1680.fw</code> and placing it in <code>&lt;sdcard&gt;/lib/firmware/silead/</code> resulted in the driver being loaded correctly. After that, the cursor moved!</p>
+<p><img src="images/the_cursor_moved.jpg" alt="The cursor moved when the screen was touched"></p>
+<p>The cursor only seems to stay in the upper left corner though, so some sort of calibration must be applied before it&rsquo;s usable.</p>
+<h2 id="calibrating-the-screen">Calibrating the screen</h2>
+<p>To <a href="https://wiki.ubuntu.com/X/InputCoordinateTransformation">manually calibrate the touch screen</a>, a <a href="https://en.wikipedia.org/wiki/Transformation_matrix#Affine_transformations">transformation matrix</a> can be applied to the touch screen input. This is usually done by creating an X.org configuration file. On the internet, people specify names of their input devices. But, I have no idea what this touch screen is called. So, this config file just calibrates all touch screens.</p>
+<p>The <code>&lt;SD card rootfs&gt;/etc/X11/xorg.conf.d/99-touchscreen.conf</code> file contains the following configuration:</p>
+<pre><code class="language-conf" data-lang="conf">Section &quot;InputClass&quot;
+	Identifier &quot;evdev touchscreen catchall&quot;
+	MatchIsTouchscreen &quot;on&quot;
+	MatchDevicePath &quot;/dev/input/event*&quot;
+	Driver &quot;evdev&quot;
+	Option &quot;TransformationMatrix&quot; &quot;4 0 0 0 7 0 0 0 1&quot;
+EndSection
+</code></pre><h1 id="distro-hopping">Distro-hopping</h1>
+<h2 id="ubuntu-mate">Ubuntu MATE</h2>
+<p>After the touch screen was calibrated, the Ubuntu MATE installer would go to the next page. The setup process went fine, until a username had to be entered. Ubuntu MATE doesn&rsquo;t have a pop-up keyboard, like android does. So, this became an impossible task:</p>
+<p><img src="images/no_keyboard.jpg" alt="Expecting keyboard? Too bad!"></p>
+<p>It seems that in this version of Ubuntu MATE, <a href="https://ubuntu-mate.community/t/solved-suggestion-on-screen-keyboard-for-ubuntu-mate-installation/1868/6">it is impossible to enable the on screen keyboard during setup</a>.</p>
+<h2 id="raspberry-pi-os">Raspberry Pi OS</h2>
+<p>As much as I would have liked to run Ubuntu MATE on the tablet, the OS would not let itself be configured, not even when booted from a Raspberry Pi 3 (X.org did not start for whatever reason). Raspberry Pi OS might work better, since it&rsquo;s pre-configured. This way, the OS is already configured by <code>rpi-imager</code>. It should boot straight to the desktop.</p>
+<p>And so it does, but something is off:</p>
+<p><img src="images/pi_os_desktop.jpg" alt="Expecting menu bar? Too bad!"></p>
+<p>The top bar, along with the application menu is missing. It appeared, then crashed and disappeared forever.</p>
+<p>The only application  can be started is the file manager:</p>
+<p><img src="images/pi_os_pcmanfm.jpg" alt="At least the file manager works"></p>
+<p>Maybe another userland works better&hellip;</p>
+<h2 id="kali-linux">Kali linux</h2>
+<p>As much as I would have liked to run Ubuntu MATE or Raspberry Pi OS on the tablet, both desktops are not usable. So, the next userland is kali linux. Maybe this GUI is usable.</p>
+<p>And so it is! Finally, an OS that understands my needs! It has an option for an on screen keyboard everywhere!</p>
+<h3 id="login-screen">Login screen</h3>
+<p><img src="images/kali_login.jpg" alt="Kali linux login screen with on screen keyboard"></p>
+<h3 id="desktop">Desktop</h3>
+<p><img src="images/kali_desktop.jpg" alt="Kali linux desktop"></p>
+<h3 id="screenshots-from-the-device-itself">Screenshots from the device itself</h3>
+<h4 id="notepad-and-keyboard">Notepad and keyboard</h4>
+<p>With the convinience of an on screen keyboard, screenshots can be made on the device!</p>
+<p><img src="images/kali_desktop_screenshot.png" alt="Kali linux desktop"></p>
+<h4 id="firefox">Firefox</h4>
+<p>Starting firefox slows the tablet down very much, to the point where it&rsquo;s almost unusable.</p>
+<p><img src="images/kali_firefox.png" alt="Firefox on a q8 tablet"></p>
+<h4 id="task-manager">Task manager</h4>
+<p>As seen in task manager, the SoC has some troubles with a &ldquo;modern&rdquo; OS. The task manager program used around 30% of the CPU. Another 20% of the CPU was used by the screenshot program.</p>
+<p><img src="images/kali_taskmanager.png" alt="~30% cpu usage, only by opening task manager"></p>
+<p>I did not expect it to use so little memory. Nowadays, RAM quickly goes up to 1GiB or more.</p>
+<h2 id="video-playback">Video playback</h2>
+<p>To see how well the tablet can play a video file, I downloaded a 360p version of the famous music video. Below is a <code>gif</code> of how that went (the tablet did it&rsquo;s best):</p>
+<p><img src="images/video_playback.gif" alt="I tried so hard, and got so far, but in the end, it doesn&rsquo;t even matter!"></p>
+<h1 id="conclusion">Conclusion</h1>
+<p>It is possible to run linux(-sunxi) and a graphical desktop on an old Allwinner A13 tablet, but it&rsquo;s very slow.</p>
+<p>Also, this tablet variant has a problem where it shuts down as soon as the wifi card is enabled. In the future I might try to fix this issue. But, seeing how slow the tablet is, I think it&rsquo;s not really worth the effort.</p>
+<h1 id="attachments">Attachments</h1>
+<p>I will not share any SD card images, but I will leave the <a href="attachments/genimage.cfg"><code>genimage.cfg</code></a> config file and the <a href="attachments/create_image.sh"><code>create_image.sh</code></a> script here. Richt clicking the links and choosing <code>save as</code> will probably work. All the (other) required input files will not be shared.</p>
+
+      </div>
+    </article>
+
+    <hr />
+
+    <div class="post-info">
+      
+    <p>
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-tag meta-icon"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7" y2="7"></line></svg>
+
+        <span class="tag"><a href="https://tomniesse.github.io/tags/untagged/">untagged</a></span>
+        
+    </p>
+
+      
+
+      <p>
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+          <polyline points="14 2 14 8 20 8"></polyline>
+          <line x1="16" y1="13" x2="8" y2="13"></line>
+          <line x1="16" y1="17" x2="8" y2="17"></line>
+          <polyline points="10 9 9 9 8 9"></polyline>
+        </svg>
+        2939 Words
+      </p>
+
+      <p>
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-calendar">
+          <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+          <line x1="16" y1="2" x2="16" y2="6"></line>
+          <line x1="8" y1="2" x2="8" y2="6"></line>
+          <line x1="3" y1="10" x2="21" y2="10"></line>
+        </svg>
+        
+          2023-09-06 13:22
+        
+
+         
+          
+        
+      </p>
+    </div>
+      <hr />
+      <div class="sharing-buttons">
+        
+<a class="resp-sharing-button__link" href="https://facebook.com/sharer/sharer.php?u=https%3a%2f%2ftomniesse.github.io%2fposts%2fq88-tablet-allwinner-a13-embedded-linux%2f" target="_blank" rel="noopener" aria-label="" title="Share on facebook">
+  <div class="resp-sharing-button resp-sharing-button--facebook resp-sharing-button--small"><div aria-hidden="true" class="resp-sharing-button__icon resp-sharing-button__icon--solid">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>
+    </div>
+  </div>
+</a>
+
+
+<a class="resp-sharing-button__link" href="https://twitter.com/intent/tweet/?url=https%3a%2f%2ftomniesse.github.io%2fposts%2fq88-tablet-allwinner-a13-embedded-linux%2f" target="_blank" rel="noopener" aria-label="" title="Share on twitter">
+  <div class="resp-sharing-button resp-sharing-button--twitter resp-sharing-button--small">
+      <div aria-hidden="true" class="resp-sharing-button__icon resp-sharing-button__icon--solid">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"></path></svg>
+    </div>
+  </div>
+</a>
+
+
+<a class="resp-sharing-button__link" href="https://www.tumblr.com/widgets/share/tool?posttype=link&amp;title=Installing%20linux%20on%20a%20q8%20Allwinner%20A13%20tablet&amp;caption=Installing%20linux%20on%20a%20q8%20Allwinner%20A13%20tablet&amp;canonicalUrl=https%3a%2f%2ftomniesse.github.io%2fposts%2fq88-tablet-allwinner-a13-embedded-linux%2f" target="_blank" rel="noopener" aria-label="" title="Share on tumblr">
+  <div class="resp-sharing-button resp-sharing-button--tumblr resp-sharing-button--small">
+    <div aria-hidden="true" class="resp-sharing-button__icon resp-sharing-button__icon--solid">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" stroke="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.563 24c-5.093 0-7.031-3.756-7.031-6.411V9.747H5.116V6.648c3.63-1.313 4.512-4.596 4.71-6.469C9.84.051 9.941 0 9.999 0h3.517v6.114h4.801v3.633h-4.82v7.47c.016 1.001.375 2.371 2.207 2.371h.09c.631-.02 1.486-.205 1.936-.419l1.156 3.425c-.436.636-2.4 1.374-4.156 1.404h-.178l.011.002z"/></svg>
+    </div>
+  </div>
+</a>
+
+
+<a class="resp-sharing-button__link" href="mailto:?subject=Installing%20linux%20on%20a%20q8%20Allwinner%20A13%20tablet&amp;body=https%3a%2f%2ftomniesse.github.io%2fposts%2fq88-tablet-allwinner-a13-embedded-linux%2f" target="_self" rel="noopener" aria-label="" title="Share via email">
+  <div class="resp-sharing-button resp-sharing-button--email resp-sharing-button--small"><div aria-hidden="true" class="resp-sharing-button__icon resp-sharing-button__icon--solid">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+    </div>
+  </div>
+</a>
+
+
+<a class="resp-sharing-button__link" href="https://pinterest.com/pin/create/button/?url=https%3a%2f%2ftomniesse.github.io%2fposts%2fq88-tablet-allwinner-a13-embedded-linux%2f&amp;media=https%3a%2f%2ftomniesse.github.io%2fposts%2fq88-tablet-allwinner-a13-embedded-linux%2f;description=Installing%20linux%20on%20a%20q8%20Allwinner%20A13%20tablet" target="_blank" rel="noopener" aria-label="" title="Share on pinterest">
+  <div class="resp-sharing-button resp-sharing-button--pinterest resp-sharing-button--small"><div aria-hidden="true" class="resp-sharing-button__icon resp-sharing-button__icon--solid">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12.017 0C5.396 0 .029 5.367.029 11.987c0 5.079 3.158 9.417 7.618 11.162-.105-.949-.199-2.403.041-3.439.219-.937 1.406-5.957 1.406-5.957s-.359-.72-.359-1.781c0-1.663.967-2.911 2.168-2.911 1.024 0 1.518.769 1.518 1.688 0 1.029-.653 2.567-.992 3.992-.285 1.193.6 2.165 1.775 2.165 2.128 0 3.768-2.245 3.768-5.487 0-2.861-2.063-4.869-5.008-4.869-3.41 0-5.409 2.562-5.409 5.199 0 1.033.394 2.143.889 2.741.099.12.112.225.085.345-.09.375-.293 1.199-.334 1.363-.053.225-.172.271-.401.165-1.495-.69-2.433-2.878-2.433-4.646 0-3.776 2.748-7.252 7.92-7.252 4.158 0 7.392 2.967 7.392 6.923 0 4.135-2.607 7.462-6.233 7.462-1.214 0-2.354-.629-2.758-1.379l-.749 2.848c-.269 1.045-1.004 2.352-1.498 3.146 1.123.345 2.306.535 3.55.535 6.607 0 11.985-5.365 11.985-11.987C23.97 5.39 18.592.026 11.985.026L12.017 0z"/></svg>
+    </div>
+  </div>
+</a>
+
+
+<a class="resp-sharing-button__link" href="https://www.linkedin.com/shareArticle?mini=true&amp;url=https%3a%2f%2ftomniesse.github.io%2fposts%2fq88-tablet-allwinner-a13-embedded-linux%2f&amp;title=Installing%20linux%20on%20a%20q8%20Allwinner%20A13%20tablet&amp;summary=Installing%20linux%20on%20a%20q8%20Allwinner%20A13%20tablet&amp;source=https%3a%2f%2ftomniesse.github.io%2fposts%2fq88-tablet-allwinner-a13-embedded-linux%2f" target="_blank" rel="noopener" aria-label="" title="Share on linkedin">
+  <div class="resp-sharing-button resp-sharing-button--linkedin resp-sharing-button--small"><div aria-hidden="true" class="resp-sharing-button__icon resp-sharing-button__icon--solid">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg>
+    </div>
+  </div>
+</a>
+
+
+<a class="resp-sharing-button__link" href="https://reddit.com/submit/?url=https%3a%2f%2ftomniesse.github.io%2fposts%2fq88-tablet-allwinner-a13-embedded-linux%2f&amp;resubmit=true&amp;title=Installing%20linux%20on%20a%20q8%20Allwinner%20A13%20tablet" target="_blank" rel="noopener" aria-label="" title="Share on reddit">
+  <div class="resp-sharing-button resp-sharing-button--reddit resp-sharing-button--small"><div aria-hidden="true" class="resp-sharing-button__icon resp-sharing-button__icon--solid">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0zm5.01 4.744c.688 0 1.25.561 1.25 1.249a1.25 1.25 0 0 1-2.498.056l-2.597-.547-.8 3.747c1.824.07 3.48.632 4.674 1.488.308-.309.73-.491 1.207-.491.968 0 1.754.786 1.754 1.754 0 .716-.435 1.333-1.01 1.614a3.111 3.111 0 0 1 .042.52c0 2.694-3.13 4.87-7.004 4.87-3.874 0-7.004-2.176-7.004-4.87 0-.183.015-.366.043-.534A1.748 1.748 0 0 1 4.028 12c0-.968.786-1.754 1.754-1.754.463 0 .898.196 1.207.49 1.207-.883 2.878-1.43 4.744-1.487l.885-4.182a.342.342 0 0 1 .14-.197.35.35 0 0 1 .238-.042l2.906.617a1.214 1.214 0 0 1 1.108-.701zM9.25 12C8.561 12 8 12.562 8 13.25c0 .687.561 1.248 1.25 1.248.687 0 1.248-.561 1.248-1.249 0-.688-.561-1.249-1.249-1.249zm5.5 0c-.687 0-1.248.561-1.248 1.25 0 .687.561 1.248 1.249 1.248.688 0 1.249-.561 1.249-1.249 0-.687-.562-1.249-1.25-1.249zm-5.466 3.99a.327.327 0 0 0-.231.094.33.33 0 0 0 0 .463c.842.842 2.484.913 2.961.913.477 0 2.105-.056 2.961-.913a.361.361 0 0 0 .029-.463.33.33 0 0 0-.464 0c-.547.533-1.684.73-2.512.73-.828 0-1.979-.196-2.512-.73a.326.326 0 0 0-.232-.095z"/></svg>
+    </div>
+  </div>
+</a>
+
+
+<a class="resp-sharing-button__link" href="https://www.xing.com/app/user?op=share;url=https%3a%2f%2ftomniesse.github.io%2fposts%2fq88-tablet-allwinner-a13-embedded-linux%2f;title=Installing%20linux%20on%20a%20q8%20Allwinner%20A13%20tablet" target="_blank" rel="noopener" aria-label="" title="Share on xing">
+  <div class="resp-sharing-button resp-sharing-button--xing resp-sharing-button--small"><div aria-hidden="true" class="resp-sharing-button__icon resp-sharing-button__icon--solid">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M18.188 0c-.517 0-.741.325-.927.66 0 0-7.455 13.224-7.702 13.657.015.024 4.919 9.023 4.919 9.023.17.308.436.66.967.66h3.454c.211 0 .375-.078.463-.22.089-.151.089-.346-.009-.536l-4.879-8.916c-.004-.006-.004-.016 0-.022L22.139.756c.095-.191.097-.387.006-.535C22.056.078 21.894 0 21.686 0h-3.498zM3.648 4.74c-.211 0-.385.074-.473.216-.09.149-.078.339.02.531l2.34 4.05c.004.01.004.016 0 .021L1.86 16.051c-.099.188-.093.381 0 .529.085.142.239.234.45.234h3.461c.518 0 .766-.348.945-.667l3.734-6.609-2.378-4.155c-.172-.315-.434-.659-.962-.659H3.648v.016z"/></svg>
+    </div>
+  </div>
+</a>
+
+
+<a class="resp-sharing-button__link" href="whatsapp://send?text=Installing%20linux%20on%20a%20q8%20Allwinner%20A13%20tablet%20https%3a%2f%2ftomniesse.github.io%2fposts%2fq88-tablet-allwinner-a13-embedded-linux%2f" target="_blank" rel="noopener" aria-label="" title="Share on whatsapp">
+  <div class="resp-sharing-button resp-sharing-button--whatsapp resp-sharing-button--small"><div aria-hidden="true" class="resp-sharing-button__icon resp-sharing-button__icon--solid">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" stroke="none" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+    </div>
+  </div>
+</a>
+
+
+<a class="resp-sharing-button__link" href="https://news.ycombinator.com/submitlink?u=https%3a%2f%2ftomniesse.github.io%2fposts%2fq88-tablet-allwinner-a13-embedded-linux%2f&amp;t=Installing%20linux%20on%20a%20q8%20Allwinner%20A13%20tablet" target="_blank" rel="noopener" aria-label="" title="Share on hacker news">
+  <div class="resp-sharing-button resp-sharing-button--hackernews resp-sharing-button--small"><div aria-hidden="true" class="resp-sharing-button__icon resp-sharing-button__icon--solid">
+			<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M0 24V0h24v24H0zM6.951 5.896l4.112 7.708v5.064h1.583v-4.972l4.148-7.799h-1.749l-2.457 4.875c-.372.745-.688 1.434-.688 1.434s-.297-.708-.651-1.434L8.831 5.896h-1.88z"/></svg>
+    </div>
+  </div>
+</a>
+
+
+<a class="resp-sharing-button__link" href="https://telegram.me/share/url?text=Installing%20linux%20on%20a%20q8%20Allwinner%20A13%20tablet&amp;url=https%3a%2f%2ftomniesse.github.io%2fposts%2fq88-tablet-allwinner-a13-embedded-linux%2f" target="_blank" rel="noopener" aria-label="" title="Share on telegram">
+  <div class="resp-sharing-button resp-sharing-button--telegram resp-sharing-button--small"><div aria-hidden="true" class="resp-sharing-button__icon resp-sharing-button__icon--solid">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+    </div>
+  </div>
+</a>
+
+      </div>
+
+    
+    <div class="pagination">
+        
+        <div class="pagination__title">
+            <span class="pagination__title-h">Read other posts</span>
+            <hr />
+        </div>
+        
+
+        <div class="pagination__buttons">
+            
+
+            
+            <span class="button next">
+                <a href="https://tomniesse.github.io/posts/nat66/">
+                    <span class="button__text">Daisy chained routers and IPv6 (NAT66)</span>
+                    <span class="button__icon">→</span>
+                </a>
+            </span>
+            
+        </div>
+    </div>
+
+
+    
+
+    
+
+  </main>
+
+            </div>
+
+            
+                <footer class="footer">
+    
+    
+</footer>
+
+            
+        </div>
+
+        
+
+
+
+<script type="text/javascript" src="/bundle.min.250eccec8a234ae0b0194ed3fed44baa4f5d4267332956cb0f92e363624a714666b7322e1a3da21cb389124adf349c467b46f9b7aab3351e3aa84dcaf55fe33a.js" integrity="sha512-JQ7M7IojSuCwGU7T/tRLqk9dQmczKVbLD5LjY2JKcUZmtzIuGj2iHLOJEkrfNJxGe0b5t6qzNR46qE3K9V/jOg=="></script>
+
+
+
+    </body>
+</html>

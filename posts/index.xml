@@ -6,8 +6,350 @@
         <generator>Hugo -- gohugo.io</generator>
         <language>en-us</language>
         <copyright>&lt;a href=&#34;https://creativecommons.org/licenses/by-nc/4.0/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;CC BY-NC 4.0&lt;/a&gt;</copyright>
-        <lastBuildDate>Sun, 04 Jun 2023 11:28:55 +0200</lastBuildDate>
+        <lastBuildDate>Wed, 06 Sep 2023 13:22:00 +0200</lastBuildDate>
         <atom:link href="https://tomniesse.github.io/posts/index.xml" rel="self" type="application/rss+xml" />
+        
+        <item>
+            <title>Installing linux on a q8 Allwinner A13 tablet</title>
+            <link>https://tomniesse.github.io/posts/q88-tablet-allwinner-a13-embedded-linux/</link>
+            <pubDate>Wed, 06 Sep 2023 13:22:00 +0200</pubDate>
+            
+            <guid>https://tomniesse.github.io/posts/q88-tablet-allwinner-a13-embedded-linux/</guid>
+            <description>In this post, I will try to install linux on a q8 (Allwinner A13 based) tablet. Multiple people have already succeeded in running debian/arch on the tablet, so it must be possible.
+The q8 tablet The q8 tablet is a cheap chinese android tablet that runs Android 4.1.
+Looking at a page on linux-sunxi.org, I believe I have the q88 variant of the tablet. I&amp;rsquo;m not sure about this though. This blogpost will use the terms q8 and q88 interchangeably.</description>
+            <content type="html"><![CDATA[<p>In this post, I will try to install linux on a q8 (Allwinner A13 based) tablet. Multiple people have already succeeded in running debian/arch on the tablet, so it must be possible.</p>
+<h1 id="the-q8-tablet">The q8 tablet</h1>
+<p>The <a href="https://linux-sunxi.org/Q8">q8 tablet</a> is a cheap chinese android tablet that runs Android 4.1.</p>
+<p><img src="images/booting_android.jpg" alt="The q8 tablet, starting Android 4.1"></p>
+<p>Looking at a page on <a href="https://linux-sunxi.org/Q88">linux-sunxi.org</a>, I believe I have the q88 variant of the tablet. I&rsquo;m not sure about this though. This blogpost will use the terms <code>q8</code> and <code>q88</code> interchangeably.</p>
+<p><img src="images/about_tablet.jpg" alt="The &ldquo;about tablet&rdquo; section in Android"></p>
+<p><a href="https://linux-sunxi.org/Q8">There are tablets that look similar, but have a different Allwinner SoC</a>. The one I have, happens to have an <a href="https://hackaday.com/2018/09/17/a-1-linux-capable-hand-solderable-processor/">Allwinner A13 SoC</a> inside it:</p>
+<p><img src="images/the_inside.jpg" alt="The insides of the tablet"></p>
+<p>The battery looked like it was about to explode, so I removed it. Just imagine a battery being next to the board.</p>
+<h1 id="the-process">The process</h1>
+<p>To create a new linux OS for the tablet, I followed a checklist:</p>
+<ul>
+<li>Is there a crosstool-ng defconfig for the CPU/SoC? <strong>There seems to be, <em>arm-cortex_a8-linux-gnueabi</em> exists.</strong></li>
+<li>Is there a mainline u-boot defconfig for it? Is it even supported by u-boot? <strong>It seems to be supported, <em>q8_a13_tablet_defconfig</em> exists.</strong></li>
+<li>Is there a mainline linux defconfig for it? It is even supported by linux? <strong>It seems to be supported, <em>sunxi_defconfig</em> exists.</strong>
+<ul>
+<li>If yes, does the linux source provide a <code>.dtb</code> file after I built the kernel?</li>
+</ul>
+</li>
+<li>Is there a buildroot defconfig for it? <strong>No, buildroot doesn&rsquo;t seem to support this anchient piece of technology.</strong>
+<ul>
+<li>If yes, does it provide me with an <code>.img</code> file after it&rsquo;s done building? <strong>No.</strong></li>
+</ul>
+</li>
+</ul>
+<h1 id="creating-a-cross-compiler-toolchain">Creating a cross compiler toolchain</h1>
+<p>Just like in some of my <a href="/posts/buildroot">previous posts</a>, I will once again build a cross compiler toolchain.</p>
+<h2 id="getting-crosstool-ng">Getting crosstool-NG</h2>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">git clone https://github.com/crosstool-ng/crosstool-ng
+./bootstrap <span style="color:#75715e"># crosstool-NG is cloned from github</span>
+./configure --enable-local
+make
+</code></pre></div><h2 id="creating-a-toolchain-for-the-allwinner-a13">Creating a toolchain for the Allwinner A13</h2>
+<p>The Allwinner A13 uses a Cortex A8, so the toolchain will have to support that processor type. Luckily, there is one.</p>
+<p>To build the toolchain for the Allwinner A13 Soc:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">./ct-ng arm-cortex_a8-linux-gnueabi
+./ct-ng build
+</code></pre></div><p>The folder <code>/home/$USER/x-tools/arm-cortex_a8-linux-gnueabi/</code> should now exist. To verify this:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">$ ls ~/x-tools/
+arm-cortex_a8-linux-gnueabi
+</code></pre></div><h1 id="building-u-boot">Building u-boot</h1>
+<p>In this post, the mainline u-boot will be used.</p>
+<h2 id="getting-u-boot">Getting u-boot</h2>
+<p>If it works, mainline u-boot will be used. It will be downloaded directly from github:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">git clone https://github.com/u-boot/u-boot.git
+</code></pre></div><h2 id="building-u-boot-for-the-q8-tablet">Building u-boot for the q8 tablet:</h2>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">cd u-boot
+export ARCH<span style="color:#f92672">=</span>arm
+export CROSS_COMPILE<span style="color:#f92672">=</span>/home/$USER/x-tools/arm-cortex_a8-linux-gnueabi/bin/arm-cortex_a8-linux-gnueabi-
+make q8_a13_tablet_defconfig
+make menuconfig <span style="color:#75715e"># to change the boot timeout, if desired</span>
+make
+</code></pre></div><p>The <code>u-boot</code> folder should now contain some more files. To verify:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">$ ls u-boot | grep u-boot
+u-boot
+u-boot.bin
+u-boot.cfg
+u-boot.dtb
+u-boot-dtb.bin
+u-boot-dtb.img
+u-boot.dtb.out
+u-boot.img
+u-boot.lds
+u-boot.map
+u-boot-nodtb.bin
+u-boot.srec
+u-boot-sunxi-with-spl.bin
+u-boot-sunxi-with-spl.map
+u-boot.sym
+</code></pre></div><h1 id="building-linux">Building linux</h1>
+<h2 id="getting-linux">Getting linux</h2>
+<p>To obtain linux, I download the latest available version from the <a href="https://github.com/torvalds/linux/tags">releases page at github</a> (v6.4 at time of writing):</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">wget https://github.com/torvalds/linux/archive/refs/tags/v6.4.tar.gz
+tar -xvf v6.4.tar.gz
+</code></pre></div><h2 id="building-linux-for-the-q8-tablet">Building linux for the q8 tablet</h2>
+<p>Building linux for the tablet is very straightforward and doesn&rsquo;t take very long:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">cd linux-6.4
+export ARCH<span style="color:#f92672">=</span>arm
+export CROSS_COMPILE<span style="color:#f92672">=</span>/home/$USER/x-tools/arm-cortex_a8-linux-gnueabi/bin/arm-cortex_a8-linux-gnueabi-
+make sunxi_defconfig
+make menuconfig <span style="color:#75715e"># for any desired changes</span>
+make -j<span style="color:#e6db74">`</span>nproc<span style="color:#e6db74">`</span>
+</code></pre></div><p>The folder <code>arch/arm/boot</code> should now containe a file called <code>zImage</code>. To verify:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">$ ls arch/arm/boot/ | grep Image
+Image
+zImage
+</code></pre></div><p>Both <code>Image</code> and <code>zImage</code>&hellip; Nice!</p>
+<p>Another file that needs to be present, is the <code>.dtb</code> file. This file contains a list of hardware inside the tablet.</p>
+<p>To verify:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">$ ls arch/arm/boot/dts | grep a13-q8
+sun5i-a13-q8-tablet.dtb <span style="color:#75715e"># The file I&#39;m looking for, a .dtb file</span>
+sun5i-a13-q8-tablet.dts
+</code></pre></div><h1 id="creating-a-minimal-sd-card-image">Creating a minimal SD-card image</h1>
+<p>If I read <a href="https://lists.denx.de/pipermail/u-boot/2016-September/266232.html">this mailing list</a> correctly, the Allwinner A13 can boot from an SD-card. For that to happen, u-boot needs to be flashed to an SD card in the correct way.</p>
+<p>Instead of flashing directly to an SD card, an SD card image will be created. That image will then be flashed onto an SD card. To create an SD card image, I will use <a href="https://github.com/buildroot/buildroot/blob/master/board/licheepi/genimage.cfg">an existing genimage config from buildroot</a> and edit it, so it works for the q8 tablet.</p>
+<h2 id="genimage-config">Genimage config</h2>
+<p>The genimage config file (<code>genimage.cfg</code>) looks as follows:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-json" data-lang="json"><span style="color:#960050;background-color:#1e0010">image</span> <span style="color:#960050;background-color:#1e0010">boot.vfat</span> {
+	<span style="color:#960050;background-color:#1e0010">vfat</span> <span style="color:#960050;background-color:#1e0010">{</span>
+		<span style="color:#960050;background-color:#1e0010">files</span> <span style="color:#960050;background-color:#1e0010">=</span> <span style="color:#960050;background-color:#1e0010">{</span>
+			<span style="color:#f92672">&#34;zImage&#34;</span>,
+			<span style="color:#f92672">&#34;sun5i-a13-q8-tablet.dtb&#34;</span>,
+		}
+	<span style="color:#960050;background-color:#1e0010">}</span>
+
+	<span style="color:#960050;background-color:#1e0010">size</span> <span style="color:#960050;background-color:#1e0010">=</span> <span style="color:#ae81ff">8</span><span style="color:#960050;background-color:#1e0010">M</span>
+<span style="color:#960050;background-color:#1e0010">}</span>
+
+<span style="color:#960050;background-color:#1e0010">image</span> <span style="color:#960050;background-color:#1e0010">sdcard.img</span> {
+	<span style="color:#960050;background-color:#1e0010">hdimage</span> <span style="color:#960050;background-color:#1e0010">{</span>
+	}
+
+	<span style="color:#960050;background-color:#1e0010">partition</span> <span style="color:#960050;background-color:#1e0010">u-boot</span> {
+		<span style="color:#960050;background-color:#1e0010">in-partition-table</span> <span style="color:#960050;background-color:#1e0010">=</span> <span style="color:#f92672">&#34;no&#34;</span>
+		<span style="color:#960050;background-color:#1e0010">image</span> <span style="color:#960050;background-color:#1e0010">=</span> <span style="color:#e6db74">&#34;u-boot-sunxi-with-spl.bin&#34;</span>
+		<span style="color:#960050;background-color:#1e0010">offset</span> <span style="color:#960050;background-color:#1e0010">=</span> <span style="color:#ae81ff">8</span><span style="color:#960050;background-color:#1e0010">K</span>
+		<span style="color:#960050;background-color:#1e0010">size</span> <span style="color:#960050;background-color:#1e0010">=</span> <span style="color:#ae81ff">530</span><span style="color:#960050;background-color:#1e0010">K</span> <span style="color:#960050;background-color:#1e0010">#</span> <span style="color:#960050;background-color:#1e0010">file</span> <span style="color:#960050;background-color:#1e0010">is</span> <span style="color:#ae81ff">525</span><span style="color:#960050;background-color:#1e0010">KB</span> <span style="color:#960050;background-color:#1e0010">in</span> <span style="color:#960050;background-color:#1e0010">size</span> <span style="color:#960050;background-color:#1e0010">(measured</span> <span style="color:#960050;background-color:#1e0010">in</span> <span style="color:#960050;background-color:#1e0010">KB</span>, <span style="color:#960050;background-color:#1e0010">not</span> <span style="color:#960050;background-color:#1e0010">KiB)</span>
+	}
+
+	<span style="color:#960050;background-color:#1e0010">partition</span> <span style="color:#960050;background-color:#1e0010">boot</span> {
+		<span style="color:#960050;background-color:#1e0010">partition-type</span> <span style="color:#960050;background-color:#1e0010">=</span> <span style="color:#960050;background-color:#1e0010">0xC</span>
+		<span style="color:#960050;background-color:#1e0010">bootable</span> <span style="color:#960050;background-color:#1e0010">=</span> <span style="color:#f92672">&#34;true&#34;</span>
+		<span style="color:#960050;background-color:#1e0010">image</span> <span style="color:#960050;background-color:#1e0010">=</span> <span style="color:#e6db74">&#34;boot.vfat&#34;</span>
+	}
+
+	<span style="color:#960050;background-color:#1e0010">#</span> <span style="color:#960050;background-color:#1e0010">The</span> <span style="color:#960050;background-color:#1e0010">rootfs</span> <span style="color:#960050;background-color:#1e0010">partition</span> <span style="color:#960050;background-color:#1e0010">will</span> <span style="color:#960050;background-color:#1e0010">be</span> <span style="color:#960050;background-color:#1e0010">configured</span> <span style="color:#960050;background-color:#1e0010">later</span>
+    <span style="color:#960050;background-color:#1e0010">partition</span> <span style="color:#960050;background-color:#1e0010">rootfs</span> {
+		<span style="color:#960050;background-color:#1e0010">partition-type</span> <span style="color:#960050;background-color:#1e0010">=</span> <span style="color:#960050;background-color:#1e0010">0x83</span>
+		<span style="color:#960050;background-color:#1e0010">image</span> <span style="color:#960050;background-color:#1e0010">=</span> <span style="color:#f92672">&#34;rootfs.ext4&#34;</span>
+		<span style="color:#960050;background-color:#1e0010">size</span> <span style="color:#960050;background-color:#1e0010">=</span> <span style="color:#ae81ff">0</span>
+	}
+<span style="color:#960050;background-color:#1e0010">}</span>
+</code></pre></div><p>To build the image, I copy over all the required files and start genimage:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">$ genimage --help
+genimage: command not found
+$ sudo apt install genimage
+...
+E: Unable to locate package genimage
+<span style="color:#75715e"># What? Debian unstable seems to have `genimage` in it&#39;s repo&#39;s,</span>
+<span style="color:#75715e"># why not Ubuntu?</span>
+</code></pre></div><h3 id="getting-genimage">Getting genimage</h3>
+<p>Genimage is not in the package repositories of ubuntu yet? Building it is straightforward enough:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">git clone https://github.com/pengutronix/genimage
+cd genimage
+./autogen.sh
+./configure
+make
+<span style="color:#75715e"># DO NOT EXECUTE `sudo make install`,</span>
+<span style="color:#75715e"># IT WILL CURSE YOUR GNU/Linux INSTALLATION!</span>
+cd ..
+
+<span style="color:#75715e"># To use genimage, execute the local file.</span>
+./genimage/genimage --help
+</code></pre></div><h3 id="building-the-image-using-genimage-attempt-2">Building the image using genimage (attempt #2)</h3>
+<p>First, copy the required files into a separate folder:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">mkdir genimage_input
+cp u-boot/u-boot-sunxi-with-spl.bin genimage_input
+cp linux-6.4/arch/arm/boot/zImage genimage_input
+cp linux-6.4/arch/arm/boot/dts/sun5i-a13-q8-tablet.dtb genimage_input
+touch genimage_input/rootfs.ext4 <span style="color:#75715e"># create an empty rootfs file for now</span>
+</code></pre></div><p>Then, tell genimage where to find everything and where to export everything to (this builds the actual image):</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">mkdir genimage_output
+./genimage/genimage --config genimage.cfg --rootpath genimage_output --inputpath genimage_input
+</code></pre></div><p>Genimage should have created a folder called <code>images</code>. This folder will contain a file called <code>sdcard.img</code>. To verify:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">$ ls images/
+boot.vfat  sdcard.img
+</code></pre></div><h2 id="writing-the-image-to-an-sd-card">Writing the image to an SD card</h2>
+<p>Writing this image to an SD card is no different from the way Raspberry Pi users would do this. Use your favourite tool for this. In <a href="/posts/buildroot">another blog post</a> I have already explained how this process works.</p>
+<h2 id="booting-the-tablet">Booting the tablet</h2>
+<p>Because the tablet has an Allwinner SoC, it boots just like a PinePhone (non-pro edition): Just insert the SD card and turn it on!</p>
+<p>After the tablet was powered on, u-boot immediately showed up on the screen:</p>
+<p><img src="images/first_boot.png" alt="First boot of the new OS"></p>
+<p>This tells me a few things:</p>
+<ul>
+<li>It has 512MiB RAM.</li>
+<li>It boots from an SD card, just like a Raspberry Pi/PinePhone does. If the card is removed, it boots android again (as if nothing happened).</li>
+<li>The screen works.</li>
+<li>U-boot knows where the boot partition is located: it seeks it&rsquo;s environment config (<code>uboot.env</code>) in <code>mmc0:1</code>. No changes needed there.</li>
+<li>The power and volume keys don&rsquo;t stop the u-boot autoboot.</li>
+</ul>
+<h2 id="configuring-u-boot">Configuring u-boot</h2>
+<p>U-boot does not load linux yet, because it says it&rsquo;s missing a file called <code>uboot.env</code>. U-boot will not do anything if it cannot find it&rsquo;s configuration.</p>
+<p>To fix <code>uboot.env</code> not being present, let&rsquo;s create a file called <code>boot.scr</code>.</p>
+<p>U-boot goes through a few stages when booting:</p>
+<ul>
+<li>It gives some hardware information.</li>
+<li>It looks for <code>uboot.env</code> (which doesn&rsquo;t exist in this case).</li>
+<li>It looks for <code>boot.scr</code>, a boot script (which doesn&rsquo;t yet exist in this case).</li>
+<li>It tries to boot from a network.</li>
+<li>It says it failed and hangs forever.</li>
+</ul>
+<p>Because I have no idea where the UART-pins are yet, I cannot interact with u-boot. So, I cannot create <code>uboot.env</code>. So, <code>boot.scr</code> will be created instead.</p>
+<h3 id="creating-bootscr">Creating boot.scr</h3>
+<p>To create a boot script for U-boot, a text file with some script text needs to be converted.</p>
+<p>For this project, a file called <code>boot.txt</code> is created, with the following contents:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">setenv bootargs root<span style="color:#f92672">=</span>/dev/mmcblk0p2 rootwait panic<span style="color:#f92672">=</span><span style="color:#ae81ff">10</span> console<span style="color:#f92672">=</span>/dev/ttyS0,11520 console<span style="color:#f92672">=</span>tty0
+load mmc 0:1 $kernel_addr_r zImage
+load mmc 0:1 $fdt_addr_r sun5i-a13-q8-tablet.dtb
+bootz $kernel_addr_r - $fdt_addr_r
+</code></pre></div><p>It is then converted to <code>boot.scr</code> using <a href="https://linux-sunxi.org/U-Boot#Configure_U-Boot">the following command</a>:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">mkimage -C none -A arm -T script -d boot.txt boot.scr
+</code></pre></div><p>After copying <code>boot.scr</code> to the SD card, u-boot knew what to do and stopped complaining about missing files. It then started booting linux:</p>
+<p><img src="images/uboot_starting_kernel.png" alt="U-boot loading linux"></p>
+<h3 id="linux-or-not">Linux! Or not.</h3>
+<p>But after that, nothing. No kernel output, no logs, nothing. Just an empty screen.</p>
+<p><img src="images/no_linux.jpg" alt="Expecting linux? Too bad!"></p>
+<p>In fact, the whole tablet just turned off.</p>
+<p>Even with external power applied (faking the presence of a battery), the device turns off. This happens after about 1 second after linux is loaded.</p>
+<p><img src="images/external_power.jpg" alt="Expecting linux with external power? Too bad!"></p>
+<p>This variant of the q8 tablet has it&rsquo;s wifi chip wired differently. So, as soon as the wifi chip gets powered, the tablet turns off.</p>
+<p><a href="https://groups.google.com/g/linux-sunxi/c/LaLUHF3jjUo">Someone else figured out a solution to this problem</a>. Maybe that will work? The post speaks of disabling LDO3 (and thus disabling wifi and usb). To test this, the LDO3 entries in <code>u-boot/arch/arm/dts/sun5i-reference-design-tablet.dtsi</code> were removed (make sure to make a backup!).</p>
+<p>After that, a new <code>.dtb</code> file was created:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">make dtbs <span style="color:#75715e"># with u-boot source as $PWD</span>
+</code></pre></div><p>After booting, it turns out the user was onto something. The tablet doesn&rsquo;t immediately turn off anymore. Instead, the screen only displays white lines, after which the tablet reboots.</p>
+<p><img src="images/lines_in_screen.png" alt="Expecting image? Too bad!"></p>
+<h3 id="switching-to-linux-sunxi">Switching to <code>linux-sunxi</code></h3>
+<p>Many years ago, there was a linux-fork called <code>linux-sunxi</code> and a u-boot fork called <code>u-boot-sunxi</code>. These forks still exist and are widely used today. In recent years, most of the the <code>linux-sunxi</code> drivers have been merged into the mainline linux kernel.</p>
+<p>As seen earlier, the mainline version of u-boot supports the Allwinner A13 SoC now. The mainline linux version however, still crashes (the screen?) when it boots.</p>
+<p>So, there is a chance that <code>linux-sunxi</code> works. After downloading <a href="https://github.com/linux-sunxi/linux-sunxi/releases/tag/v5.8">release version 5.8</a> (latest version at time of writing) and repeating exactly the same steps as before, it worked! The linux kernel logs were shown:</p>
+<p><img src="images/linux_logs.png" alt="Linux logs being displayed on the screen!"></p>
+<h2 id="can-linux-mount-a-rootfs-and-start-an-init">Can Linux mount a rootfs and start an init?</h2>
+<p>Linux now starts and prints logs to the tablet&rsquo;s display, but it panics. This was expected, since the <code>genimage.cfg</code> does not yet contain a rootfs configuration.</p>
+<p>To test if any rootfs can be mounted at all, a second partition was added to the SD card, containing a <a href="https://sd-card-images.johang.se/boards/a13_olinuxino.html">rootfs from the A13 OLinuXino board</a>. Although the rootfs is not made for this tablet, it displayed the Debian CLI login:</p>
+<p><img src="images/debian_login.jpg" alt="Debian CLI login being shown"></p>
+<p>The same trick worked for <a href="https://archlinuxarm.org/platforms/armv7/allwinner/a10-olinuxino-lime">Arch</a> as well:</p>
+<p><img src="images/arch_login.png" alt="Arch CLI login being shown"></p>
+<h1 id="a-rootfs-with-a-gui">A rootfs with a GUI</h1>
+<p>All of these CLI logins are fun and all, but how about something with graphics?</p>
+<p>Ubuntu MATE has a <a href="https://releases.ubuntu-mate.org/jammy/armhf/">32-bit armhf image</a>, meant for Raspberry Pi&rsquo;s. Merging Ubuntu MATE&rsquo;s userland and <code>linux-sunxi</code>, reveals that the tablet can run a desktop.</p>
+<p><img src="images/ubuntu_mate_loading.jpg" alt="Ubuntu MATE loading"></p>
+<p>Although the tablet is slow, it eventually (after about 4 to 5 minutes) started the Ubuntu MATE setup:</p>
+<p><img src="images/ubuntu_mate_welcome.jpg" alt="Ubuntu MATE welcome"></p>
+<h2 id="why-does-this-work">Why does this work?</h2>
+<p>Why does an OS, created for the Raspberry Pi, work on this tablet? The tablet and the Raspberry Pi 2 share a similar architecture: ARMv7. So, both SoC&rsquo;s are able to run 32 bit ARM code.</p>
+<p>Also, the <a href="https://wiki.installgentoo.com/index.php/Interjection">copypasta</a> is correct:</p>
+<blockquote>
+<p><em>What you&rsquo;re referring to as Linux, is in fact, GNU/Linux. Many computer users run a modified version of the GNU system every day, without realizing it. Through a peculiar turn of events, the version of GNU which is widely used today is often called &ldquo;Linux&rdquo;, and many of its users are not aware that it is basically the GNU system, developed by the GNU Project.</em></p>
+</blockquote>
+<p>Linux is just a kernel. When people talk about &ldquo;linux&rdquo;, they really mean the (GNU) userland binaries that they are interacting with.</p>
+<p>You can get away with a lot of &ldquo;ugly&rdquo; solutions to create an OS (like the one described in this post), because &ldquo;Linux&rdquo; is not an entire OS. This project uses <a href="https://github.com/linux-sunxi/linux-sunxi">linux-sunxi</a> instead of <a href="https://github.com/raspberrypi/linux">raspberrypi/linux</a>, but the userland binaries remain the same. They will work with many versions of linux (the kernel!).</p>
+<p>However, this method should <em>not</em> be used in production. In a production environment, just use yocto or buildroot to create a fully compatible image for the hardware.</p>
+<h1 id="the-touchscreen-doesnt-work">The touchscreen doesn&rsquo;t work</h1>
+<p>The tablet did not respond to the touch screen when clicked or dragged. Looking at <code>u-boot/arch/arm/dts/sun5i-reference-design-tablet.dtsi</code>, it quickly became clear why this is the case:</p>
+<p><img src="images/touchscreen_disabled.png" alt="The touchscreen is disabled"></p>
+<p>The touch screen is disabled, because these tablets <a href="https://linux-sunxi.org/Touchscreen">often have different types of touch screens</a>. The tablet I have says <code>FYX00109</code> the cable.</p>
+<h2 id="figuring-out-which-touch-screen-the-tablet-has">Figuring out which touch screen the tablet has</h2>
+<p>To figure out which screen the tablet uses, Android 4.1 was started again.</p>
+<p>Inside an adb shell, <code>lsmod</code> will give a list of active linux modules:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">root@android:/ # lsmod
+8188eu 784805 0 - Live 0xbf160000
+sun4i_vibrator 2459 0 - Live 0xbf15c000
+rtl8150 10305 0 - Live 0xbf155000
+mcs7830 7581 0 - Live 0xbf14f000
+qf9700 9152 0 - Live 0xbf148000
+asix 24601 0 - Live 0xbf13c000
+cedarx 9351 0 - Live 0xbf135000
+mali 151260 4 - Live 0xbf103000
+da311 29089 0 - Live 0xbf0f6000
+ump 49518 9 mali, Live 0xbf0e2000
+gslX680 94888 0 - Live 0xbf0c5000
+sun5i_csi0 30454 0 - Live 0xbf0b8000
+gc0329 18132 0 - Live 0xbf09e000
+gc0309 17436 0 - Live 0xbf095000
+siv121du 18993 0 - Live 0xbf08c000
+siv121d 14194 0 - Live 0xbf084000
+gc0308 18464 0 - Live 0xbf07b000
+camera_auto_detect 14914 7 sun5i_csi0,gc0329,gc0309,siv121du,siv121d,gc0308, Live 0xbf04f000
+videobuf_dma_contig 6251 1 sun5i_csi0, Live 0xbf04a000
+videobuf_core 20242 2 sun5i_csi0,videobuf_dma_contig, Live 0xbf040000
+nand 225024 10 - Live 0xbf000000
+</code></pre></div><p>To figure out which driver is responsible for the touch screen, I started to unload modules (using <code>rmmod</code>) until the touch screen didn&rsquo;t respond anymore. In this tablet, it was the <code>gslX680</code> module. This means, <a href="https://linux-sunxi.org/Touchscreen">according to the linux-sunxi.org website</a>, that this tablet has a Silead gsl1680 touch screen.</p>
+<p>According to the <a href="http://dl.linux-sunxi.org/touchscreen/GSL1680.pdf">datasheet</a> for the touch screen, the <code>reg</code> entry in de <code>.dts</code> files has to be set to <code>0x40</code>. Let&rsquo;s edit <code>u-boot/arch/arm/dts/sun5i-reference-design-tablet.dtsi</code> again, <a href="http://lists.infradead.org/pipermail/linux-arm-kernel/2016-October/464186.html">to enable the <code>gsl1680</code> driver</a>:</p>
+<p><img src="images/touchscreen_enabled.png" alt="The touchscreen is enabled"></p>
+<p>A <code>compatible</code> entry was added to tell linux that the <code>gsl1680</code> driver will work with the touch screen in the tablet. Also, the <code>status</code> was changed from <code>disabled</code> to <code>okay</code>. The rest of the <code>.dts</code> file was left as-is.</p>
+<p>Also, a kernel module was enabled (<a href="https://www.linuxquestions.org/questions/linux-from-scratch-13/lfs-direct-firmware-load-failed-error-2-a-4175587686/#post5594478">as a module, not built into the kernel!</a>):</p>
+<p><img src="images/silead_enabled.png" alt="The touchscreen driver is enabled"></p>
+<p>And sure enough, in the linux logs, the driver can find the touch screen (please excuse the poor camera image, I still haven&rsquo;t taken the time to find the UART pins on this thing):</p>
+<p><img src="images/touchscreen_found.png" alt="The touchscreen is found"></p>
+<p>However, as seen in the logs, it requires a file called <code>silead/gsl1680.fw</code>. The original android OS uses a similar firmware file. Luckily, the firmware for this touch screen can be found <a href="https://github.com/onitake/gsl-firmware/blob/master/firmware/linux/silead/gsl1680-a082-q8-700.fw">on github</a>. Renaming this firmware file to <code>gsl1680.fw</code> and placing it in <code>&lt;sdcard&gt;/lib/firmware/silead/</code> resulted in the driver being loaded correctly. After that, the cursor moved!</p>
+<p><img src="images/the_cursor_moved.jpg" alt="The cursor moved when the screen was touched"></p>
+<p>The cursor only seems to stay in the upper left corner though, so some sort of calibration must be applied before it&rsquo;s usable.</p>
+<h2 id="calibrating-the-screen">Calibrating the screen</h2>
+<p>To <a href="https://wiki.ubuntu.com/X/InputCoordinateTransformation">manually calibrate the touch screen</a>, a <a href="https://en.wikipedia.org/wiki/Transformation_matrix#Affine_transformations">transformation matrix</a> can be applied to the touch screen input. This is usually done by creating an X.org configuration file. On the internet, people specify names of their input devices. But, I have no idea what this touch screen is called. So, this config file just calibrates all touch screens.</p>
+<p>The <code>&lt;SD card rootfs&gt;/etc/X11/xorg.conf.d/99-touchscreen.conf</code> file contains the following configuration:</p>
+<pre><code class="language-conf" data-lang="conf">Section &quot;InputClass&quot;
+	Identifier &quot;evdev touchscreen catchall&quot;
+	MatchIsTouchscreen &quot;on&quot;
+	MatchDevicePath &quot;/dev/input/event*&quot;
+	Driver &quot;evdev&quot;
+	Option &quot;TransformationMatrix&quot; &quot;4 0 0 0 7 0 0 0 1&quot;
+EndSection
+</code></pre><h1 id="distro-hopping">Distro-hopping</h1>
+<h2 id="ubuntu-mate">Ubuntu MATE</h2>
+<p>After the touch screen was calibrated, the Ubuntu MATE installer would go to the next page. The setup process went fine, until a username had to be entered. Ubuntu MATE doesn&rsquo;t have a pop-up keyboard, like android does. So, this became an impossible task:</p>
+<p><img src="images/no_keyboard.jpg" alt="Expecting keyboard? Too bad!"></p>
+<p>It seems that in this version of Ubuntu MATE, <a href="https://ubuntu-mate.community/t/solved-suggestion-on-screen-keyboard-for-ubuntu-mate-installation/1868/6">it is impossible to enable the on screen keyboard during setup</a>.</p>
+<h2 id="raspberry-pi-os">Raspberry Pi OS</h2>
+<p>As much as I would have liked to run Ubuntu MATE on the tablet, the OS would not let itself be configured, not even when booted from a Raspberry Pi 3 (X.org did not start for whatever reason). Raspberry Pi OS might work better, since it&rsquo;s pre-configured. This way, the OS is already configured by <code>rpi-imager</code>. It should boot straight to the desktop.</p>
+<p>And so it does, but something is off:</p>
+<p><img src="images/pi_os_desktop.jpg" alt="Expecting menu bar? Too bad!"></p>
+<p>The top bar, along with the application menu is missing. It appeared, then crashed and disappeared forever.</p>
+<p>The only application  can be started is the file manager:</p>
+<p><img src="images/pi_os_pcmanfm.jpg" alt="At least the file manager works"></p>
+<p>Maybe another userland works better&hellip;</p>
+<h2 id="kali-linux">Kali linux</h2>
+<p>As much as I would have liked to run Ubuntu MATE or Raspberry Pi OS on the tablet, both desktops are not usable. So, the next userland is kali linux. Maybe this GUI is usable.</p>
+<p>And so it is! Finally, an OS that understands my needs! It has an option for an on screen keyboard everywhere!</p>
+<h3 id="login-screen">Login screen</h3>
+<p><img src="images/kali_login.jpg" alt="Kali linux login screen with on screen keyboard"></p>
+<h3 id="desktop">Desktop</h3>
+<p><img src="images/kali_desktop.jpg" alt="Kali linux desktop"></p>
+<h3 id="screenshots-from-the-device-itself">Screenshots from the device itself</h3>
+<h4 id="notepad-and-keyboard">Notepad and keyboard</h4>
+<p>With the convinience of an on screen keyboard, screenshots can be made on the device!</p>
+<p><img src="images/kali_desktop_screenshot.png" alt="Kali linux desktop"></p>
+<h4 id="firefox">Firefox</h4>
+<p>Starting firefox slows the tablet down very much, to the point where it&rsquo;s almost unusable.</p>
+<p><img src="images/kali_firefox.png" alt="Firefox on a q8 tablet"></p>
+<h4 id="task-manager">Task manager</h4>
+<p>As seen in task manager, the SoC has some troubles with a &ldquo;modern&rdquo; OS. The task manager program used around 30% of the CPU. Another 20% of the CPU was used by the screenshot program.</p>
+<p><img src="images/kali_taskmanager.png" alt="~30% cpu usage, only by opening task manager"></p>
+<p>I did not expect it to use so little memory. Nowadays, RAM quickly goes up to 1GiB or more.</p>
+<h2 id="video-playback">Video playback</h2>
+<p>To see how well the tablet can play a video file, I downloaded a 360p version of the famous music video. Below is a <code>gif</code> of how that went (the tablet did it&rsquo;s best):</p>
+<p><img src="images/video_playback.gif" alt="I tried so hard, and got so far, but in the end, it doesn&rsquo;t even matter!"></p>
+<h1 id="conclusion">Conclusion</h1>
+<p>It is possible to run linux(-sunxi) and a graphical desktop on an old Allwinner A13 tablet, but it&rsquo;s very slow.</p>
+<p>Also, this tablet variant has a problem where it shuts down as soon as the wifi card is enabled. In the future I might try to fix this issue. But, seeing how slow the tablet is, I think it&rsquo;s not really worth the effort.</p>
+<h1 id="attachments">Attachments</h1>
+<p>I will not share any SD card images, but I will leave the <a href="attachments/genimage.cfg"><code>genimage.cfg</code></a> config file and the <a href="attachments/create_image.sh"><code>create_image.sh</code></a> script here. Richt clicking the links and choosing <code>save as</code> will probably work. All the (other) required input files will not be shared.</p>
+]]></content>
+        </item>
         
         <item>
             <title>Daisy chained routers and IPv6 (NAT66)</title>
@@ -68,7 +410,7 @@ The issue I recently bought a cheap second hand router. I did this to split the 
 <h1 id="building-a-lokinet-server-container">Building a lokinet server container</h1>
 <p>Below is a <code>Dockerfile</code> that creates a container with lokinet inside.<br>
 The goal of this container is to provide a lokinet service with a permanent <code>.loki</code> address.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-Dockerfile" data-lang="Dockerfile"><span style="color:#66d9ef">FROM</span><span style="color:#e6db74"> ubuntu:latest</span><span style="color:#960050;background-color:#1e0010">
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-Dockerfile" data-lang="Dockerfile"><span style="color:#66d9ef">FROM</span><span style="color:#e6db74"> ubuntu:latest</span><span style="color:#960050;background-color:#1e0010">
 </span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">RUN</span> apt update<span style="color:#960050;background-color:#1e0010">
 </span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">RUN</span> apt upgrade<span style="color:#960050;background-color:#1e0010">
 </span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">RUN</span> echo <span style="color:#e6db74">&#34;resolvconf resolvconf/linkify-resolvconf boolean false&#34;</span> | debconf-set-selections<span style="color:#960050;background-color:#1e0010">
@@ -103,7 +445,7 @@ The goal of this container is to provide a lokinet service with a permanent <cod
 <li><code>tiredofit/nginx-php-fpm</code>: to run a webserver, which can host a simple website.</li>
 <li><code>containrrr/watchtower</code>: to automatically keep all containers up to date.</li>
 </ul>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yml" data-lang="yml"><span style="color:#f92672">version</span>: <span style="color:#e6db74">&#34;3.3&#34;</span>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yml" data-lang="yml"><span style="color:#f92672">version</span>: <span style="color:#e6db74">&#34;3.3&#34;</span>
 <span style="color:#f92672">services</span>:
   <span style="color:#f92672">lokinet</span>:
     <span style="color:#f92672">build</span>: <span style="color:#ae81ff">lokinet</span>
@@ -137,9 +479,9 @@ The goal of this container is to provide a lokinet service with a permanent <cod
 <p>When running the command <code>docker-compose up --build</code>, all the configured containers will start running.</p>
 <h1 id="getting-the-loki-address">Getting the loki address</h1>
 <p>The <code>lokinet</code> container contains a script that can give the current <code>.loki</code> address. First, access the container using the following command:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">docker exec -it &lt;container id&gt; /bin/bash
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">docker exec -it &lt;container id&gt; /bin/bash
 </code></pre></div><p>Then, from inside the container, execute the script:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh">/get_loki_address.sh
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh">/get_loki_address.sh
 </code></pre></div><p>Now the <code>.loki</code> address will be shown. If a client connects to this <code>.loki</code> address, the website will be shown.</p>
 <h1 id="debugging">Debugging</h1>
 <p>If the <code>.loki</code> address cannot be reached after a few minutes, try removing the <code>./lokinet/var_lib_lokinet/nodedb</code> directory and the <code>./lokinet/var_lib_lokinet/profiles.dat</code> and restart the container(s).</p>
@@ -168,7 +510,7 @@ If the air is directed away from the print, ABS will print just fine.</p>
 <p>After applying duct tape to my own printer, I got similar results: it produced a good print!<br>
 However, it also melted all the duct tape. This made a big mess.</p>
 <p><a href="images/ducttape_solution.jpg"><img src="images/ducttape_solution.jpg" alt="The duct tape solution"></a></p>
-<h1 id="adding-the-new-airflow-cover-to-the-printer">Adding the new airflow cover to the printer</h1>
+<h1 id="adding-a-new-airflow-cover-to-the-printer">Adding a new airflow cover to the printer</h1>
 <p>Because duct tape was not a long term solution, I created a new part for the Ender 3 v1. The stl file is <a href="https://www.thingiverse.com/thing:5631450">hosted on thingiverse</a>.</p>
 <p>The designed cover was first printed in PLA. This went as well as one would expect: it melted pretty quickly during printing.<br>
 It held up just long enough to print another cover (made out of ABS).</p>
@@ -230,11 +572,11 @@ Not very interesting.</p>
 <p>For this OS, a new toolchain using glibc will be used. This is because uClibc creates lots of segfaults (probably while resolving libraries).</p>
 <h2 id="creating-a-new-toolchain-configuration">Creating a new toolchain configuration</h2>
 <p>First, a new toolchain configuration is created inside the crosstool-NG folder:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">./ct-ng distclean
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">./ct-ng distclean
 ./ct-ng aarch64-rpi4-linux-gnu
 </code></pre></div><h2 id="making-a-few-changes-to-the-toolchain-configuration">Making a few changes to the toolchain configuration</h2>
 <p>Then, the toolchain options are changed using:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">./ct-ng menuconfig
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">./ct-ng menuconfig
 </code></pre></div><p>The following options were changed:</p>
 <ul>
 <li>Under <code>C compiler</code>, the option <code>Version of gcc</code> is set to the second to latest option (<code>10.3.0</code> at time of writing)</li>
@@ -244,7 +586,7 @@ Not very interesting.</p>
 <h2 id="building-the-new-toolchain">Building the new toolchain</h2>
 <p><em>If <code>~/x-tools/</code> already contains a toolchain with the same name; move, rename or delete that toolchain. If it is not dealt with, the wrong linux headers might still be present and the target OS will fail to run. crosstool-NG will not build a shiny new toolchain automatically.</em></p>
 <p>To then build the new toolchain, execute the build command:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">./ct-ng build -j<span style="color:#e6db74">`</span>nproc<span style="color:#e6db74">`</span>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">./ct-ng build -j<span style="color:#e6db74">`</span>nproc<span style="color:#e6db74">`</span>
 </code></pre></div><h1 id="creating-a-new-buildroot-os">Creating a new Buildroot OS</h1>
 <p>The previous post describes how to make a Buildroot OS using uClibc. Because this does not apply here anymore, a completely new Buildroot OS will be created.</p>
 <h2 id="creating-a-new-configuration">Creating a new configuration</h2>
@@ -346,7 +688,7 @@ Not very interesting.</p>
 <li>Disable automatic network setup</li>
 </ul>
 <p>To make sure these changes are always present in the target OS, the following will be appended to <code>/path/to/buildroot-&lt;VERSION_GOES_HERE&gt;/board/raspberrypi/post-build.sh</code>:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#75715e"># Make sure device firmware is being loaded during boot</span>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#75715e"># Make sure device firmware is being loaded during boot</span>
 cp package/busybox/S10mdev <span style="color:#e6db74">${</span>TARGET_DIR<span style="color:#e6db74">}</span>/etc/init.d/S10mdev
 chmod <span style="color:#ae81ff">755</span> <span style="color:#e6db74">${</span>TARGET_DIR<span style="color:#e6db74">}</span>/etc/init.d/S10mdev
 chmod +x <span style="color:#e6db74">${</span>TARGET_DIR<span style="color:#e6db74">}</span>/etc/init.d/S10mdev
@@ -380,7 +722,7 @@ rm <span style="color:#e6db74">${</span>TARGET_DIR<span style="color:#e6db74">}<
 <p>Compiling can only be done against the <code>sysroot</code> directory, while the target OS is stored in the <code>target</code> directory. For this reason, Allegro5 must be installed to both directories to compile and run Dune Dynasty correctly.</p>
 <h3 id="creating-a-toolchain-for-both-allegro5-and-dune-dynasty">Creating a toolchain for both Allegro5 and Dune Dynasty</h3>
 <p>A file called <code>Toolchain-raspberrypi4_64.cmake</code> is created inside the <code>/path/to/buildroot-&lt;VERSION_GOES_HERE&gt;/board/raspberrypi</code>, with the following contents:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#75715e">#############</span>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#75715e">#############</span>
 <span style="color:#75715e"># Set target OS</span>
 <span style="color:#75715e">#############</span>
 
@@ -432,7 +774,7 @@ set<span style="color:#f92672">(</span>ENV<span style="color:#f92672">{</span>PK
 </code></pre></div><p>This toolchain file is used by Allegro5 and Dune Dynasty to cross-compile and link to the target Buildroot OS.</p>
 <h3 id="automate-the-installation-of-allegro5-and-dune-dynasty">Automate the installation of Allegro5 and Dune Dynasty</h3>
 <p>To make sure Allegro5 and Dune Dynasty are added to the target OS after Buildroot is done creating it, the following is appended to <code>/path/to/buildroot-&lt;VERSION_GOES_HERE&gt;/board/raspberrypi/post-build.sh</code>:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#75715e"># Add Allegro5 and Dune Dynasty to the target rootfs</span>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#75715e"># Add Allegro5 and Dune Dynasty to the target rootfs</span>
 
 <span style="color:#75715e"># Create a temporary download directory</span>
 rm -rf tmp
@@ -471,23 +813,23 @@ DESTDIR<span style="color:#f92672">=</span><span style="color:#e6db74">${</span>
 cd ../../../
 </code></pre></div><h2 id="creating-a-new-buildroot-os-1">Creating a new Buildroot OS</h2>
 <p>To then create a new OS, the make command is executed within Buildroot:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">make clean
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">make clean
 make
 </code></pre></div><p>After Buildroot is done, a file called <code>rootfs.tar.gz</code> is created inside the <code>/path/to/buildroot-&lt;VERSION_GOES_HERE&gt;/output/images</code> directory. This is the entire OS, minus the kernel.</p>
 <h1 id="compiling-the-linux-kernel">Compiling the linux kernel</h1>
 <p>While Buildroot is doing it&rsquo;s thing, a linux kernel can be compiled. There exists a <a href="https://github.com/raspberrypi/linux">github repository</a> containing a complete kernel source for the Raspberry Pi. This source will be used to create a kernel.</p>
 <h2 id="downloading-the-source">Downloading the source</h2>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">git clone https://github.com/raspberrypi/linux
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">git clone https://github.com/raspberrypi/linux
 git checkout rpi-5.10.y <span style="color:#75715e"># version 5.10.y matches the one from the toolchain</span>
 git checkout d261fd9f97da8b6b3ed1fa613cc3fd6abb41f0be <span style="color:#75715e"># known working commit for the paranoid (optional)</span>
 cd linux
 </code></pre></div><h2 id="configuring-the-source">Configuring the source</h2>
 <p>To see all available default configurations:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">ls arch/arm64/configs/
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">ls arch/arm64/configs/
 </code></pre></div><p>To pick the one for the Raspberry Pi 4:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">ARCH<span style="color:#f92672">=</span>arm64 CROSS_COMPILE<span style="color:#f92672">=</span>~/x-tools/aarch64-rpi4-linux-gnu/bin/aarch64-rpi4-linux-gnu- make bcm2711_defconfig
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">ARCH<span style="color:#f92672">=</span>arm64 CROSS_COMPILE<span style="color:#f92672">=</span>~/x-tools/aarch64-rpi4-linux-gnu/bin/aarch64-rpi4-linux-gnu- make bcm2711_defconfig
 </code></pre></div><h2 id="compiling">Compiling</h2>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">ARCH<span style="color:#f92672">=</span>arm64 CROSS_COMPILE<span style="color:#f92672">=</span>~/x-tools/aarch64-rpi4-linux-gnu/bin/aarch64-rpi4-linux-gnu- make clean
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">ARCH<span style="color:#f92672">=</span>arm64 CROSS_COMPILE<span style="color:#f92672">=</span>~/x-tools/aarch64-rpi4-linux-gnu/bin/aarch64-rpi4-linux-gnu- make clean
 ARCH<span style="color:#f92672">=</span>arm64 CROSS_COMPILE<span style="color:#f92672">=</span>~/x-tools/aarch64-rpi4-linux-gnu/bin/aarch64-rpi4-linux-gnu- make -j<span style="color:#e6db74">`</span>nproc<span style="color:#e6db74">`</span>
 ARCH<span style="color:#f92672">=</span>arm64 CROSS_COMPILE<span style="color:#f92672">=</span>~/x-tools/aarch64-rpi4-linux-gnu/bin/aarch64-rpi4-linux-gnu- make modules -j<span style="color:#e6db74">`</span>nproc<span style="color:#e6db74">`</span>
 </code></pre></div><p>After the compiling process is done, there should be a file called <code>Image</code> inside the <code>/path/to/linux/arch/arm64/boot</code> directory.</p>
@@ -495,7 +837,7 @@ ARCH<span style="color:#f92672">=</span>arm64 CROSS_COMPILE<span style="color:#f
 <p>Buildroot is done, Linux is compiled. Everything can now be put inside of a system image. This process will be automated using a file called <code>build_image.sh</code>.</p>
 <h2 id="creating-raspberry-pi-4-boot-configuration-configtxt">Creating Raspberry Pi 4 boot configuration (config.txt)</h2>
 <p>Before <code>build_image.sh</code> can do it&rsquo;s thing, a file called <code>config.txt</code> will be created in the root directory of the project. The file will have the following contents:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-ini" data-lang="ini"><span style="color:#75715e"># Enable 64 bit mode</span>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-ini" data-lang="ini"><span style="color:#75715e"># Enable 64 bit mode</span>
 <span style="color:#a6e22e">arm_64bit</span><span style="color:#f92672">=</span><span style="color:#e6db74">1</span>
 
 <span style="color:#75715e"># Make the raspberry Pi 4 start the linux binary called &#34;Image&#34;</span>
@@ -529,10 +871,10 @@ ARCH<span style="color:#f92672">=</span>arm64 CROSS_COMPILE<span style="color:#f
 <span style="color:#75715e"># Enable audio</span>
 <span style="color:#a6e22e">dtparam</span><span style="color:#f92672">=</span><span style="color:#e6db74">audio=on</span>
 </code></pre></div><h2 id="creating-raspberry-pi-4-boot-configuration-cmdlinetxt">Creating Raspberry Pi 4 boot configuration (cmdline.txt)</h2>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">rng_core.default_quality<span style="color:#f92672">=</span><span style="color:#ae81ff">100</span> dwc_otg.lpm_enable<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span> console<span style="color:#f92672">=</span>tty1 root<span style="color:#f92672">=</span>/dev/mmcblk0p2 rootfstype<span style="color:#f92672">=</span>ext4 rootwait quiet
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">rng_core.default_quality<span style="color:#f92672">=</span><span style="color:#ae81ff">100</span> dwc_otg.lpm_enable<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span> console<span style="color:#f92672">=</span>tty1 root<span style="color:#f92672">=</span>/dev/mmcblk0p2 rootfstype<span style="color:#f92672">=</span>ext4 rootwait quiet
 </code></pre></div><h2 id="creating-the-build-script">Creating the build script</h2>
 <p>The file <code>build_image.sh</code> is created inside the root directory of the project, and has the following contents:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#75715e">#########################################</span>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#75715e">#########################################</span>
 <span style="color:#75715e"># Create a system image called &#34;system.img&#34;</span>
 <span style="color:#75715e">#########################################</span>
 
@@ -623,7 +965,7 @@ sudo rm -rf ./target_mnt
 </code></pre></div><p>The system should now be ready to run Dune Dynasty. Flash the system.img file to any Raspberry Pi 4&rsquo;s SD card and see the OS in action!</p>
 <h1 id="debugging">Debugging</h1>
 <p>If the system does not boot into ratpoison automatically, the game can be started manually, using the following commands:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#75715e"># start X.org (will start one xterm window for now)</span>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#75715e"># start X.org (will start one xterm window for now)</span>
 xinit
 <span style="color:#75715e"># start twm window manager</span>
 exec twm &amp;
@@ -640,14 +982,14 @@ export LD_LIBRARY_PATH<span style="color:#f92672">=</span><span style="color:#e6
 <p>Buildroot must be done building before Allegro5 is built; Allegro5 cannot compile against an incomplete OS.</p>
 <h3 id="downloading-the-source-files">Downloading the source files</h3>
 <p>To download and extract the Allegro5 library source file, the following commands are executed:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">wget https://github.com/liballeg/allegro5/releases/download/5.2.7.0/allegro-5.2.7.0.tar.gz
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">wget https://github.com/liballeg/allegro5/releases/download/5.2.7.0/allegro-5.2.7.0.tar.gz
 tar -xvf allegro-5.2.7.0.tar.gz
 rm -rf allegro-5.2.7.0.tar.gz
 cd allegro-5.2.7.0/
 </code></pre></div><h3 id="configuring-cmake">Configuring CMake</h3>
 <p>In the folder <code>allegro-5.2.7.0/cmake</code> are a bunch of files related to CMake. Within the list of files there is a file called <a href="https://github.com/liballeg/allegro5/blob/master/cmake/Toolchain-raspberrypi.cmake">Toolchain-raspberrypi.cmake</a>. This file contains configuration that tells CMake how to build the library for the first Raspberry Pi. The first Raspberry Pi is 32 bit and the toolchain does <em>not</em> have multilib support enabled. Therefor, a new toolchain must be created.</p>
 <p>A custom file called <code>Toolchain-raspberrypi4_64.cmake</code> will be created and placed inside the <code>allegro-5.2.7.0/cmake</code> directory. The file will contain the following contents:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#75715e">#############</span>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#75715e">#############</span>
 <span style="color:#75715e"># Set target OS</span>
 <span style="color:#75715e">#############</span>
 
@@ -686,7 +1028,7 @@ set<span style="color:#f92672">(</span>CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY<sp
 set<span style="color:#f92672">(</span>CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY<span style="color:#f92672">)</span>
 set<span style="color:#f92672">(</span>CMAKE_FINE_ROOT_PATH_MODE_PACKAGE ONLY<span style="color:#f92672">)</span>
 </code></pre></div><p>When the following commands are then executed, the Allegro library will be built:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#75715e"># create a build directory and go into it, to separate source code from binaries</span>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#75715e"># create a build directory and go into it, to separate source code from binaries</span>
 mkdir build/
 cd build/
 
@@ -700,18 +1042,18 @@ cmake -DCMAKE_TOOLCHAIN_FILE<span style="color:#f92672">=</span>cmake/Toolchain-
 make -j<span style="color:#e6db74">`</span>nproc<span style="color:#e6db74">`</span>
 </code></pre></div><h3 id="manually-installing-allegro5-to-the-target-buildroot-os">Manually installing Allegro5 to the target Buildroot OS</h3>
 <p>After Allegro5 is done compiling, it can be installed to the target OS using the environment variable <code>DESTDIR</code>:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#75715e"># dune dynasty will compile against this sysroot, it cannot compile against target</span>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#75715e"># dune dynasty will compile against this sysroot, it cannot compile against target</span>
 DESTDIR<span style="color:#f92672">=</span>path/to/buildroot-&lt;VERSION_GOES_HERE&gt;/output/host/&lt;COMPILING_TOOLCHAIN_GOES_HERE&gt;/sysroot make install
 <span style="color:#75715e"># install to target OS as well</span>
 DESTDIR<span style="color:#f92672">=</span>path/to/buildroot-&lt;VERSION_GOES_HERE&gt;/output/target/ make install
 </code></pre></div><h2 id="manually-compiling-dune-dynasty-against-the-target-buildroot-os">Manually compiling Dune Dynasty against the target Buildroot OS</h2>
 <p>It it assumed that Allegro5 was installed to the target Buildroot OS. If it&rsquo;s not, this has to be done before continuing.</p>
 <p>First, download and extract the game:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">wget https://versaweb.dl.sourceforge.net/project/dunedynasty/dunedynasty-1.5/dunedynasty-1.5.7.tar.gz
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">wget https://versaweb.dl.sourceforge.net/project/dunedynasty/dunedynasty-1.5/dunedynasty-1.5.7.tar.gz
 tar -xvf dunedynasty-1.5.7.tar.gz
 rm -rf dunedynasty-1.5.7.tar.gz
 </code></pre></div><p>Then, create a toolchain file in the <code>dunedynasty-1.5.7/cmake</code> directory, called <code>Toolchain-raspberrypi4_64.cmake</code>. The toolchain is almost the same as the one from Allegro5, but with some extra configuration at the bottom:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#75715e">#############</span>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#75715e">#############</span>
 <span style="color:#75715e"># Set target OS</span>
 <span style="color:#75715e">#############</span>
 set<span style="color:#f92672">(</span>CMAKE_SYSTEM_NAME Linux<span style="color:#f92672">)</span>
@@ -758,7 +1100,7 @@ set<span style="color:#f92672">(</span>ENV<span style="color:#f92672">{</span>PK
 set<span style="color:#f92672">(</span>ENV<span style="color:#f92672">{</span>PKG_CONFIG_PATH<span style="color:#f92672">}</span> <span style="color:#e6db74">${</span>PKG_CONFIG_LIBDIR<span style="color:#e6db74">}</span><span style="color:#f92672">)</span>
 set<span style="color:#f92672">(</span>ENV<span style="color:#f92672">{</span>PKG_CONFIG_SYSROOT_DIR<span style="color:#f92672">}</span> <span style="color:#e6db74">${</span>CMAKE_SYSROOT<span style="color:#e6db74">}</span><span style="color:#f92672">)</span>
 </code></pre></div><p>To then compile the game, create a directory called <code>build</code>, go into it and compile everything:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#75715e"># go inside a build directory to separate binaries from source code</span>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#75715e"># go inside a build directory to separate binaries from source code</span>
 mkdir build/
 cd build/
 
@@ -769,7 +1111,7 @@ cmake -DCMAKE_TOOLCHAIN_FILE<span style="color:#f92672">=</span>../cmake/Toolcha
 make -j<span style="color:#e6db74">`</span>nproc<span style="color:#e6db74">`</span>
 </code></pre></div><h3 id="installing-the-game-to-the-target-sysroot">Installing the game to the target sysroot</h3>
 <p>Installing the binaries to the target sysroot is exactly the same process as installing Allegro5:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">sudo DESTDIR<span style="color:#f92672">=</span>path/to/buildroot-&lt;VERSION_GOES_HERE&gt;/output/target/ make install <span style="color:#75715e"># install to target OS</span>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">sudo DESTDIR<span style="color:#f92672">=</span>path/to/buildroot-&lt;VERSION_GOES_HERE&gt;/output/target/ make install <span style="color:#75715e"># install to target OS</span>
 </code></pre></div>]]></content>
         </item>
         
@@ -834,7 +1176,7 @@ All configurations and build commands are documented on this page.</p>
 <h3 id="wpa_supplicantconf">wpa_supplicant.conf</h3>
 <p>The tool <code>wpa_supplicant</code> is often used to connect to networks, but it can also be configured to act as an access point. In order to do this, it needs a configuration file called <code>wpa_supplicant.conf</code>.</p>
 <p>To create a wireless access point on the target system, create a file called <code>wpa_supplicant.conf</code> and place it in <code>buildroot-&lt;VERSION_GOES_HERE&gt;/board/raspberrypi/</code>. The file has the following contents:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">network<span style="color:#f92672">={</span>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">network<span style="color:#f92672">={</span>
     ssid<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;buildrootAP&#34;</span>  <span style="color:#75715e"># network name</span>
     psk<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;welcome01&#34;</span>     <span style="color:#75715e"># network password</span>
     mode<span style="color:#f92672">=</span><span style="color:#ae81ff">2</span>              <span style="color:#75715e"># act as an access point</span>
@@ -854,7 +1196,7 @@ All configurations and build commands are documented on this page.</p>
 <h3 id="interfaces">interfaces</h3>
 <p>Another common file found in Linux-based operating systems is a file called <code>interfaces</code>. This file often contains configurations regarding IP addressing of certain interfaces.</p>
 <p>To create interface configuration for the target system, create a file called <code>interfaces</code> and place it in <code>buildroot-&lt;VERSION_GOES_HERE&gt;/board/raspberrypi/</code>. The file is to contain the following configuration:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">auto lo
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">auto lo
 iface lo inet loopback
 auto eth0
 iface eth0 inet dhcp
@@ -874,7 +1216,7 @@ iface default inet dhcp
 </code></pre></div><h3 id="dhcpdconf">dhcpd.conf</h3>
 <p>Almost every modern router has a DHCP server built in. So, the target system should also have one.</p>
 <p>To configure the DHCP server on the target system, create a file called <code>dhcpd.conf</code> and place it in <code>buildroot-&lt;VERSION_GOES_HERE&gt;/board/raspberrypi/</code>. The file is to have the following contents:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">ddns-update-style none;
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">ddns-update-style none;
 default-lease-time 600;
 max-lease-time 7200;
 authoritative;
@@ -890,16 +1232,16 @@ subnet 192.168.200.0 netmask 255.255.255.0 <span style="color:#f92672">{</span>
 <span style="color:#f92672">}</span>
 </code></pre></div><h3 id="sysctlconf">sysctl.conf</h3>
 <p>To allow packages to flow from one linux network interface to another, a file called <code>sysctl.conf</code> has to be created and placed in <code>buildroot-&lt;VERSION_GOES_HERE&gt;/board/raspberrypi/</code>. The file is to have the following contents:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">net.ipv4.ip_forward <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">net.ipv4.ip_forward <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>
 </code></pre></div><h3 id="s02procps">S02procps</h3>
 <p>To activate the above configuration file (<code>sysctl.conf</code>) when the target OS boots, a startup/service file called <code>S02procps</code> is created and placed in <code>buildroot-&lt;VERSION_GOES_HERE&gt;/board/raspberrypi/</code>. The file will have the following contents:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh"><span style="color:#75715e">#! /bin/sh
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh"><span style="color:#75715e">#! /bin/sh
 </span><span style="color:#75715e"></span><span style="color:#66d9ef">if</span> <span style="color:#f92672">[</span> <span style="color:#e6db74">&#34;</span>$1<span style="color:#e6db74">&#34;</span> <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;start&#34;</span> <span style="color:#f92672">]</span>; <span style="color:#66d9ef">then</span>
     sysctl -p
 <span style="color:#66d9ef">fi</span>
 </code></pre></div><h3 id="s99firewall">S99firewall</h3>
 <p>To configure firewall settings when the target OS boots, a service will be created. The file will be called <code>s99firewall</code> and placed in <code>buildroot-&lt;VERSION_GOES_HERE&gt;/board/raspberrypi/</code>. The file will have the following contents:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh"><span style="color:#75715e">#! /bin/sh
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh"><span style="color:#75715e">#! /bin/sh
 </span><span style="color:#75715e"></span><span style="color:#66d9ef">if</span> <span style="color:#f92672">[</span> <span style="color:#e6db74">&#34;</span>$1<span style="color:#e6db74">&#34;</span> <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;start&#34;</span> <span style="color:#f92672">]</span>; <span style="color:#66d9ef">then</span>
     iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
     iptables -P FORWARD DROP
@@ -911,7 +1253,7 @@ subnet 192.168.200.0 netmask 255.255.255.0 <span style="color:#f92672">{</span>
 <span style="color:#66d9ef">fi</span>
 </code></pre></div><h2 id="copying-all-files-to-the-target-system">Copying all files to the target system</h2>
 <p>To automatically copy all configuration files and services into the target system after it has been built, the following lines will be appended to <code>buildroot-&lt;VERSION_GOES_HERE&gt;/board/raspberrypi/post-build.sh</code>:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#75715e"># copy configuration files</span>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#75715e"># copy configuration files</span>
 cp board/raspberrypi/interfaces <span style="color:#e6db74">${</span>TARGET_DIR<span style="color:#e6db74">}</span>/etc/network/interfaces
 cp board/raspberrypi/wpa_supplicant.conf <span style="color:#e6db74">${</span>TARGET_DIR<span style="color:#e6db74">}</span>/etc/wpa_supplicant.conf
 cp board/raspberrypi/dhcpd.conf <span style="color:#e6db74">${</span>TARGET_DIR<span style="color:#e6db74">}</span>/etc/dhcp/dhcpd.conf
@@ -960,7 +1302,7 @@ If a monitor is connected to the <code>HDMI0</code> port of the Raspberry Pi 4, 
 <p>A Dockerfile is a configuration script for any given container. The Dockerfile contains all the commands needed to configure an entire container (virtual machine). This chapter explains how a Dockerfile is made. All commands one would normally insert into a system are now stored in a Dockerfile.</p>
 <h2 id="the-syntax">The syntax</h2>
 <p>Dockerfiles have the following syntax (where everything including and between the <code>&lt;</code> and <code>&gt;</code> is to be replaced):</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-Dockerfile" data-lang="Dockerfile"><span style="color:#75715e"># this is a comment</span><span style="color:#960050;background-color:#1e0010">
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-Dockerfile" data-lang="Dockerfile"><span style="color:#75715e"># this is a comment</span><span style="color:#960050;background-color:#1e0010">
 </span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">FROM</span><span style="color:#e6db74"> &lt;existing container&gt;      # use someone else&#39;s already existing container to get started more quickly</span><span style="color:#960050;background-color:#1e0010">
 </span><span style="color:#960050;background-color:#1e0010">
 </span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">RUN</span> &lt;command&gt;                  <span style="color:#75715e"># run a command inside the container (configure phase)</span><span style="color:#960050;background-color:#1e0010">
@@ -972,7 +1314,7 @@ If a monitor is connected to the <code>HDMI0</code> port of the Raspberry Pi 4, 
 </span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">CMD</span> [<span style="color:#e6db74">&#34;&lt;/path/to/binary&gt;&#34;</span>, <span style="color:#960050;background-color:#1e0010">&lt;optional</span> <span style="color:#960050;background-color:#1e0010">argument</span> <span style="color:#ae81ff">1</span><span style="color:#960050;background-color:#1e0010">&gt;</span>, <span style="color:#960050;background-color:#1e0010">&lt;optional</span> <span style="color:#960050;background-color:#1e0010">argument</span> <span style="color:#ae81ff">2</span><span style="color:#960050;background-color:#1e0010">&gt;</span>]<span style="color:#960050;background-color:#1e0010">
 </span></code></pre></div><h2 id="a-real-world-example">A real world example</h2>
 <p>In real life, a Dockerfile contains many more calls to <code>RUN</code> before the container is configured. In the example below, a gitea server is created within a Dockerfile:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-Dockerfile" data-lang="Dockerfile"><span style="color:#75715e"># use alpine linux</span><span style="color:#960050;background-color:#1e0010">
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-Dockerfile" data-lang="Dockerfile"><span style="color:#75715e"># use alpine linux</span><span style="color:#960050;background-color:#1e0010">
 </span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">FROM</span><span style="color:#e6db74"> alpine:latest</span><span style="color:#960050;background-color:#1e0010">
 </span><span style="color:#960050;background-color:#1e0010">
 </span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#75715e"># install gitea</span><span style="color:#960050;background-color:#1e0010">
@@ -988,7 +1330,7 @@ If a monitor is connected to the <code>HDMI0</code> port of the Raspberry Pi 4, 
 <h1 id="creating-a-docker-compose-configuration">Creating a docker-compose configuration</h1>
 <h2 id="the-syntax-1">The syntax</h2>
 <p>A configuration for docker-compose is to be called <code>docker-compose.yml</code> and it has the following syntax:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yml" data-lang="yml"><span style="color:#f92672">version</span>: <span style="color:#e6db74">&#39;3&#39;</span>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yml" data-lang="yml"><span style="color:#f92672">version</span>: <span style="color:#e6db74">&#39;3&#39;</span>
 <span style="color:#f92672">services</span>:
   <span style="color:#75715e"># a container which is built using a dockerfile</span>
   <span style="color:#f92672">a_service</span>:
@@ -1010,7 +1352,7 @@ If a monitor is connected to the <code>HDMI0</code> port of the Raspberry Pi 4, 
       - <span style="color:#ae81ff">variable=value</span>
 </code></pre></div><h2 id="a-real-world-example-1">A real world example</h2>
 <p>First, the minimal configuration is created to create a gitea server:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yml" data-lang="yml"><span style="color:#f92672">version</span>: <span style="color:#e6db74">&#39;3&#39;</span>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yml" data-lang="yml"><span style="color:#f92672">version</span>: <span style="color:#e6db74">&#39;3&#39;</span>
 <span style="color:#f92672">services</span>:
   <span style="color:#f92672">gitea</span>:
     <span style="color:#f92672">build</span>: <span style="color:#ae81ff">./ </span> <span style="color:#75715e"># The Dockerfile is located in the same directory as this file</span>
@@ -1025,7 +1367,7 @@ If a monitor is connected to the <code>HDMI0</code> port of the Raspberry Pi 4, 
 <p>Normally, when no volumes are created, each container forgets what it was doing when it stops running. This is not very desireable. When there is a power outage for example, each container would have to be re-configured. When volumes are present in <code>docker-compose.yml</code>, Docker will automatically restore all files in the volumes based on the files from the host OS. This would mean that the gitea server will restore the files for <code>/var/lib/gitea</code> (where the git repositories are located) as well as <code>/etc/gitea</code> (where the configuration files are stored). All the other files in the container (like the binaries in <code>/usr/bin</code>) do not have to be restored, and thus do not need a volume.</p>
 <h1 id="starting-the-container">Starting the container</h1>
 <p>To start the docker container, the following command is executed:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#75715e"># build and start all containers</span>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#75715e"># build and start all containers</span>
 docker-compose up --build
 </code></pre></div><p>The gitea Docker container will now be built and run. The build process will only happen once. Next time the container is run, it will start without having to be built. The <code>--build</code> option can therefore be left out if a container is already built.</p>
 <h2 id="testing-the-container">Testing the container</h2>
@@ -1034,7 +1376,7 @@ docker-compose up --build
 <h2 id="adding-another-container">Adding another container</h2>
 <p>By default, gitea is set to use a <code>SQLite3</code> SQL server. This SQL server is very lightweight, but can only handle one connection at a time. This would mean that gitea would stop working if multiple users started using it. This is not very desireable.</p>
 <p>For this reason, another container will be created in the <code>docker-compose.yml</code>. This container will contain a complete MySQL server. The <code>docker-compose.yml</code> file will now look as follows:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yml" data-lang="yml"><span style="color:#f92672">version</span>: <span style="color:#e6db74">&#39;3&#39;</span>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yml" data-lang="yml"><span style="color:#f92672">version</span>: <span style="color:#e6db74">&#39;3&#39;</span>
 <span style="color:#f92672">services</span>:
   <span style="color:#75715e"># build gitea using a Dockerfile</span>
   <span style="color:#f92672">gitea</span>:
@@ -1059,7 +1401,7 @@ docker-compose up --build
       <span style="color:#f92672">MYSQL_DATABASE</span>: <span style="color:#ae81ff">example_database</span>
 </code></pre></div><p>A docker container containing a mariadb database server is now added to the list of containers. Another volume is created to make sure that all database related files are transferable to another computer at a later time.</p>
 <p>When the containers are now (re) started using the command</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#75715e"># build and start all containers</span>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#75715e"># build and start all containers</span>
 docker-compose up --build
 </code></pre></div><p>the gitea container as well as a mariadb server is started.</p>
 <h2 id="communication-between-containers">Communication between containers</h2>
@@ -1070,9 +1412,9 @@ docker-compose up --build
 <p>After all configurations are saved, the gitea server is operational and can be used to store projects.</p>
 <h1 id="docker-images">Docker images</h1>
 <p>For most containers on Docker Hub, the needed docker-compose configuration is given. For some images however, only a command to start a container is given. An example of this is an unofficial <a href="https://hub.docker.com/r/creativitykills/nginx-php-server">nginx and php image</a>. At the time of writing, the description contains the following command to start the container:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">docker run -d -p 4488:80 --name<span style="color:#f92672">=</span>testapp -v $PWD:/var/www creativitykills/nginx-php-server
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">docker run -d -p 4488:80 --name<span style="color:#f92672">=</span>testapp -v $PWD:/var/www creativitykills/nginx-php-server
 </code></pre></div><p>The options can be &ldquo;converted&rdquo; into a service and added to <code>docker-compose.yml</code> as follows:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yml" data-lang="yml"><span style="color:#f92672">version</span>: <span style="color:#e6db74">&#39;3&#39;</span>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yml" data-lang="yml"><span style="color:#f92672">version</span>: <span style="color:#e6db74">&#39;3&#39;</span>
 <span style="color:#f92672">services</span>:
   <span style="color:#f92672">nginx_php</span>:
     <span style="color:#f92672">image</span>: <span style="color:#ae81ff">creativitykills/nginx-php-server</span>
@@ -1125,24 +1467,24 @@ What is Buildroot? Buildroot, just like the yocto project, is a set of tools to 
 <p>If the kernel is compiled using <code>arm-none-eabi-gcc</code> and the rest of the system is compiled using <code>aarch64-linux-gnu-gcc</code>, the system will not run. To ensure that the system runs (well) on the target board, a cross-compiling toolchain will be set up. This toolchain contains a cross-compiling <code>gcc</code>, <code>ld</code> and other tools that would normally be used to (cross-)compile a program or OS. The tools in the toolchain will be used to compile the whole system.</p>
 <p>In this post, <a href="https://crosstool-ng.github.io">crosstool-NG</a> is used.</p>
 <h2 id="downloading">Downloading</h2>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">git clone https://github.com/crosstool-ng/crosstool-ng
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">git clone https://github.com/crosstool-ng/crosstool-ng
 </code></pre></div><h2 id="compiling">Compiling</h2>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">./bootstrap <span style="color:#75715e"># only if crosstool-NG is cloned from github</span>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">./bootstrap <span style="color:#75715e"># only if crosstool-NG is cloned from github</span>
 ./configure --enable-local
 make
 </code></pre></div><h2 id="configuring-a-cross-compiling-toolchain">Configuring a cross-compiling toolchain</h2>
 <p>The command</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">./ct-ng list-samples
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">./ct-ng list-samples
 </code></pre></div><p>will give a list of possible targets to compile for. The entry <code>aarch64-rpi4-linux-gnu</code> is used by executing the following command:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">./ct-ng aarch64-rpi4-linux-gnu
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">./ct-ng aarch64-rpi4-linux-gnu
 </code></pre></div><p>Because the GNU C library is quite big compared to something like uClibc, the <code>.config</code> file will be edited to use uClibc instead of the GNU C library. The goal is to make the target system a little smaller in disk size. The <code>.config</code> file is edited using the following command:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">./ct-ng menuconfig
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">./ct-ng menuconfig
 </code></pre></div><p>The following changes were made inside the menuconfig menu:</p>
 <ul>
 <li>Under <code>C library</code>, the option <code>C library</code> is changed to <code>uClibc</code></li>
 </ul>
 <p>Then the menuconfig is exited and restarted to reload all options:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">./ct-ng menuconfig
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">./ct-ng menuconfig
 </code></pre></div><ul>
 <li>Under <code>C library</code>, the option <code>Add support for locales</code> is enabled</li>
 <li>Under <code>C library</code>, the option <code>Add support for IPv6</code> is enabled</li>
@@ -1156,11 +1498,11 @@ make
 </ul>
 <h2 id="building-the-toolchain">Building the toolchain</h2>
 <p>After the toolchain is configured, it can be built using the following command:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">./ct-ng build -j<span style="color:#e6db74">`</span>nproc<span style="color:#e6db74">`</span>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">./ct-ng build -j<span style="color:#e6db74">`</span>nproc<span style="color:#e6db74">`</span>
 </code></pre></div><p>This build process will take a <em>long</em> time. Therefore, it should <em>not</em> be done in a (misconfigured) VM, but on a pc with lots of cores and/or threads. This can reduce the build time from a day to a few hours (maybe even less).</p>
 <h2 id="checking-if-the-toolchain-works">Checking if the toolchain works</h2>
 <p>After crosstool-NG is done creating a toolchain, a folder called <code>x-tools</code> can be found in the home-directory of the current user (<code>/home/$USER/x-tools</code>). Inside the <code>x-tools</code> directory, all cross-compiling toolchains can be found. To test if the new toolchain is the right version, the following command is executed inside <code>/home/$USER/x-tools/aarch64-rpi4-linux-uclibc/bin</code>:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">toolchain-gcc -v
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">toolchain-gcc -v
 <span style="color:#75715e"># or, if the &#34;Tuple&#39;s alias&#34; option was not set when configuring the toolchain:</span>
 aarch64-rpi4-linux-uclibc-gcc -v
 </code></pre></div><p>The executed binary states that it is version <code>10.3.0</code>, just like the version that was specified in the menuconfig of crosstool-NG. For now, it is assumed that the binary will cross-compile without errors.</p>
@@ -1169,15 +1511,15 @@ aarch64-rpi4-linux-uclibc-gcc -v
 <p>To get started, Buildroot can be downloaded from the <a href="https://buildroot.org/download.html">Buildroot website</a>. There are two download options to choose from; &ldquo;LTS&rdquo; or &ldquo;stable&rdquo;. For newer devices, the stable option is a good option. For this blog, the stable <em>.tar.gz</em> archive is used.</p>
 <h2 id="extracting">Extracting</h2>
 <p>To extract the <em>.tar.gz</em> file, the following command can be executed:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">tar -xvf buildroot-&lt;VERSION_GOES_HERE&gt;.tar.gz
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">tar -xvf buildroot-&lt;VERSION_GOES_HERE&gt;.tar.gz
 </code></pre></div><h2 id="initial-setup">Initial setup</h2>
 <p>To view the target devices Buildroot can build systems for, the following command can be executed:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">make list-defconfigs
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">make list-defconfigs
 </code></pre></div><p>To configure Buildroot to build for the Raspberry Pi 4 (64 bit), the following command can be issued from the Buildroot directory:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">make raspberrypi4_64_defconfig
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">make raspberrypi4_64_defconfig
 </code></pre></div><p>To then configure the system, run the following command:</p>
 <h2 id="configuring-the-target-system">Configuring the target system</h2>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">make menuconfig
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">make menuconfig
 </code></pre></div><p>For this post, the following changed were made to the configuration:</p>
 <ul>
 <li>Under <code>Build options</code>, the option <code>Enable compiler cache</code> is enabled</li>
@@ -1200,12 +1542,12 @@ aarch64-rpi4-linux-uclibc-gcc -v
 <li>Under <code>System configuration</code>, the option <code>/dev management</code> is set to <code>Dynamic using devtmpfs + mdev</code> (to load drivers automatically when the target device boots)</li>
 </ul>
 <p>Most linux desktops use <code>udev</code> to manage device drivers, but because this system uses <code>BusyBox</code> as init system, so <code>mdev</code> is used. To enable <code>mdev</code> at boot, the file <code>buildroot-&lt;VERSION_GOES_HERE&gt;/board/raspberrypi/post-build.sh</code> needs the following extra lines at the bottom, leaving the rest of the file as is:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">cp package/busybox/S10mdev <span style="color:#e6db74">${</span>TARGET_DIR<span style="color:#e6db74">}</span>/etc/init.d/S10mdev
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">cp package/busybox/S10mdev <span style="color:#e6db74">${</span>TARGET_DIR<span style="color:#e6db74">}</span>/etc/init.d/S10mdev
 chmod <span style="color:#ae81ff">755</span> <span style="color:#e6db74">${</span>TARGET_DIR<span style="color:#e6db74">}</span>/etc/init.d/S10mdev
 cp package/busybox/mdev.conf <span style="color:#e6db74">${</span>TARGET_DIR<span style="color:#e6db74">}</span>/etc/mdev.conf
 </code></pre></div><h2 id="building">Building</h2>
 <p>To build the embedded OS, the following command can be executed:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">make clean <span style="color:#f92672">&amp;&amp;</span> make
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">make clean <span style="color:#f92672">&amp;&amp;</span> make
 </code></pre></div><p>The reason for the <code>make clean</code> part is that Buildroot remembers <em>a lot</em>, and will sometimes refuse to build (correctly) because of a cached configuration.</p>
 <h2 id="after-compiling">After compiling</h2>
 <p>When buildroot is done compiling, a file called <code>rootfs.tar.gz</code> can be found in the <code>output/images</code> folder. This is the entire embedded OS, minus the bootloader. The bootloader will be compiled manually.</p>
@@ -1215,34 +1557,34 @@ The files, <code>start4.elf</code> and <code>fixup4.dat</code> are needed later.
 <h2 id="converting-the-linux-image-into-a-uimage">Converting the linux Image into a uImage</h2>
 <p>Buildroot created a file called <code>Image</code>. However, the U-boot bootloader (which wil be built in the next chapter) cannot boot this image file as it is. In order for U-boot to boot the kernel, the image file has to be converted to a U-boot image (<code>uImage</code>).</p>
 <p>To convert the linux image into a uImage, the package <code>u-boot-tools</code> (or <code>uboot-tools</code>) is required. Then the <code>Image</code> file can be converted using the following command:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">mkimage -n <span style="color:#e6db74">&#39;Linux kernel&#39;</span> -A arm64 -O linux -C none -T kernel -a 0x00080000 -e 0x00080000 -d arch/arm64/boot/Image uImage
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">mkimage -n <span style="color:#e6db74">&#39;Linux kernel&#39;</span> -A arm64 -O linux -C none -T kernel -a 0x00080000 -e 0x00080000 -d arch/arm64/boot/Image uImage
 </code></pre></div><p>A file called <code>uImage</code> will now be created. This file contains the entire linux kernel binary, including some extra header stuff that <code>u-boot-tools</code> added. This file is the kernel which runs the system.</p>
 <h1 id="adding-a-bootloader-u-boot">Adding a bootloader (U-boot)</h1>
 <p>Although Buildroot can include the U-boot bootloader (among others) by enabling some settings, it might be nice to go a little more in depth to learn how U-boot actually works.</p>
 <h2 id="downloading-u-boot">Downloading U-boot</h2>
 <p>The U-boot bootloader can be downloaded from <a href="https://github.com/u-boot/u-boot">github</a>.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">git clone https://github.com/u-boot/u-boot
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">git clone https://github.com/u-boot/u-boot
 cd u-boot/
 </code></pre></div><h2 id="configuring-the-u-boot-source">Configuring the U-boot source</h2>
 <p>To see which default configurations U-boot has, execute the following command:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">ls configs
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">ls configs
 <span style="color:#75715e"># or, to only see raspberry pi entries</span>
 ls configs | grep rpi
 </code></pre></div><p>To create a basic configuration for the Raspberry Pi 4, the following command can be executed:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">ARCH<span style="color:#f92672">=</span>arm64 CROSS_COMPILE<span style="color:#f92672">=</span>~/x-tools/aarch64-rpi4-linux-uclibc/bin/aarch64-rpi4-linux-uclibc- make rpi_4_defconfig
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">ARCH<span style="color:#f92672">=</span>arm64 CROSS_COMPILE<span style="color:#f92672">=</span>~/x-tools/aarch64-rpi4-linux-uclibc/bin/aarch64-rpi4-linux-uclibc- make rpi_4_defconfig
 </code></pre></div><p>To then further configure the source, the <code>make menuconfig</code> command can be given:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">ARCH<span style="color:#f92672">=</span>arm64 CROSS_COMPILE<span style="color:#f92672">=</span>~/x-tools/aarch64-rpi4-linux-uclibc/bin/aarch64-rpi4-linux-uclibc- make menuconfig
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">ARCH<span style="color:#f92672">=</span>arm64 CROSS_COMPILE<span style="color:#f92672">=</span>~/x-tools/aarch64-rpi4-linux-uclibc/bin/aarch64-rpi4-linux-uclibc- make menuconfig
 </code></pre></div><p>In this post, the autoboot timer is changed from <code>2</code> to <code>0</code> for production-builds. This option can be changed in the following region:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">Boot options -&gt;
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">Boot options -&gt;
     Autoboot options -&gt;
         delay in seconds before automatically booting
 </code></pre></div><p>For test builds, it is recommended to leave this value as is.</p>
 <h2 id="compiling-u-boot">Compiling U-boot</h2>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">ARCH<span style="color:#f92672">=</span>arm64 CROSS_COMPILE<span style="color:#f92672">=</span>~/x-tools/aarch64-rpi4-linux-uclibc/bin/aarch64-rpi4-linux-uclibc- make -j<span style="color:#e6db74">`</span>nproc<span style="color:#e6db74">`</span>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">ARCH<span style="color:#f92672">=</span>arm64 CROSS_COMPILE<span style="color:#f92672">=</span>~/x-tools/aarch64-rpi4-linux-uclibc/bin/aarch64-rpi4-linux-uclibc- make -j<span style="color:#e6db74">`</span>nproc<span style="color:#e6db74">`</span>
 </code></pre></div><p>The compile process will not take long. After the compilation is complete, a file called <code>u-boot.bin</code> (the U-boot binary) will exist.</p>
 <h2 id="creating-raspberry-pi-boot-configuration">Creating Raspberry Pi boot configuration</h2>
 <p>Normally, the Raspberry Pi 4 boots a file called <code>kernel.img</code> (sometimes <code>kernel&lt;version number here&gt;.img</code>). In this post, the Raspberry Pi 4 should start the U-boot bootloader instead of the kernel. This can be done by creating a file called <code>config.txt</code> with the following content:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#75715e"># Enable UART communication</span>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#75715e"># Enable UART communication</span>
 enable_uart<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span>
 
 <span style="color:#75715e"># Enable 64 bit mode</span>
@@ -1266,7 +1608,7 @@ kernel<span style="color:#f92672">=</span>u-boot.bin
 </code></pre></div><h2 id="creating-a-u-boot-boot-script">Creating a U-boot boot script</h2>
 <p>By default, when the U-boot bootloader starts up, it will look for a file called <code>boot.scr</code>. The <code>boot.scr</code> file is a boot script. This script will be used to load the kernel (<code>uImage</code>) and device tree (<code>bcm2711-rpi-4-b.dtb</code>) into memory and boot the system.</p>
 <p>To create a bootscript, a file called <code>boot.txt</code> is created. This file will be converted to <code>boot.scr</code> and contains the following:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">sleep <span style="color:#ae81ff">1</span> <span style="color:#75715e"># some SD cards are slow and will fail to list files in time</span>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">sleep <span style="color:#ae81ff">1</span> <span style="color:#75715e"># some SD cards are slow and will fail to list files in time</span>
 
 echo +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 echo +-----------------------------------------------------------+
@@ -1286,50 +1628,50 @@ load mmc <span style="color:#ae81ff">0</span> $fdt_addr_r bcm2711-rpi-4-b.dtb
 echo ++++ Starting system ++++++++++++++++++++++++++++++++++++++++
 bootm $kernel_addr_r - $fdt_addr_r
 </code></pre></div><p>The <code>boot.txt</code> file is then converted to <code>boot.scr</code> using the following command:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">mkimage -A arm64 -O linux -T script -C none -a <span style="color:#ae81ff">0</span> -e <span style="color:#ae81ff">0</span> -n <span style="color:#e6db74">&#34;bootscript&#34;</span> -d boot.txt boot.scr
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">mkimage -A arm64 -O linux -T script -C none -a <span style="color:#ae81ff">0</span> -e <span style="color:#ae81ff">0</span> -n <span style="color:#e6db74">&#34;bootscript&#34;</span> -d boot.txt boot.scr
 </code></pre></div><h1 id="creating-a-system-image">Creating a system image</h1>
 <h2 id="creating-an-image-file">Creating an image file</h2>
 <p>To create partitions, the program <code>parted</code> will be used. There will be two partitions: a boot partition called <code>BOOT</code> and a root partition called <code>ROOTFS</code>. The boot partition will have a fat16 filesystem and the root filesystem will use the ext4 filesystem.</p>
 <p>To prevent disks from being destroyed, a virtual disk image will be created using dd:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#75715e"># create a file called `system.img` with a size of 600MiB</span>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#75715e"># create a file called `system.img` with a size of 600MiB</span>
 dd <span style="color:#66d9ef">if</span><span style="color:#f92672">=</span>/dev/zero of<span style="color:#f92672">=</span>system.img bs<span style="color:#f92672">=</span>1MiB count<span style="color:#f92672">=</span><span style="color:#ae81ff">600</span> status<span style="color:#f92672">=</span>progress
 </code></pre></div><p>Then, this virtual disk image will be partitioned using <code>parted</code>:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">parted system.img
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">parted system.img
 </code></pre></div><p>Within <code>parted</code>, run the <code>mklabel</code> command and set the partition table type to <code>msdos</code>:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#f92672">(</span>parted<span style="color:#f92672">)</span> mklabel msdos
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#f92672">(</span>parted<span style="color:#f92672">)</span> mklabel msdos
 </code></pre></div><p>Then create the boot and root partitions:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#f92672">(</span>parted<span style="color:#f92672">)</span> mkpart primary fat16 2048s 30MiB
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#f92672">(</span>parted<span style="color:#f92672">)</span> mkpart primary fat16 2048s 30MiB
 <span style="color:#f92672">(</span>parted<span style="color:#f92672">)</span> mkpart primary ext4 30MiB 100%
 <span style="color:#f92672">(</span>parted<span style="color:#f92672">)</span> set <span style="color:#ae81ff">1</span> boot on
 <span style="color:#f92672">(</span>parted<span style="color:#f92672">)</span> print
 </code></pre></div><p>When done, exit parted by entering <code>quit</code>:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#f92672">(</span>parted<span style="color:#f92672">)</span> quit
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#f92672">(</span>parted<span style="color:#f92672">)</span> quit
 </code></pre></div><h2 id="partitioning-the-system-image">Partitioning the system image</h2>
 <p>First, mount the virtual disk image as follows:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#75715e"># Create a variable for the mount drive path</span>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#75715e"># Create a variable for the mount drive path</span>
 SYSTEM_IMAGE<span style="color:#f92672">=</span><span style="color:#e6db74">`</span>sudo losetup -Pf system.img --show<span style="color:#e6db74">`</span>
 </code></pre></div><p>Normally, disk devices in linux have paths like <code>/dev/sda</code>, <code>/dev/sdb</code>, <code>/dev/mmcblk0</code>, etc. This virtual device will have the path <code>/dev/loop0</code>. Multiple virtual devices can be mounted. The next mounted virtual disks will have the path <code>/dev/loop1</code>, <code>/dev/loop2</code>, <code>/dev/loop3</code>, etc.</p>
 <p>In this post, the path to the virtual disk is stored in the <code>SYSTEM_IMAGE</code> variable. To view the path to the virtual disk device, run the following command:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">echo $SYSTEM_IMAGE
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">echo $SYSTEM_IMAGE
 </code></pre></div><p>Then, partition it using the following command:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#75715e"># Create actual partitions for boot and rootfs now</span>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#75715e"># Create actual partitions for boot and rootfs now</span>
 sudo mkfs.vfat -n BOOT <span style="color:#e6db74">`</span>echo <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">${</span>SYSTEM_IMAGE<span style="color:#e6db74">}</span><span style="color:#e6db74">p1&#34;</span><span style="color:#e6db74">`</span>   <span style="color:#75715e"># Create a fat16 partition for boot files</span>
 sudo mkfs.ext4 -L ROOTFS <span style="color:#e6db74">`</span>echo <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">${</span>SYSTEM_IMAGE<span style="color:#e6db74">}</span><span style="color:#e6db74">p2&#34;</span><span style="color:#e6db74">`</span> <span style="color:#75715e"># Create an ext4 partition for rootfs files</span>
 </code></pre></div><h2 id="mounting-the-partitions">Mounting the partitions</h2>
 <p>To mount the system image, use the following commands to mount the virtual disk image to a folder called <code>target_mnt</code>:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">mkdir ./target_mnt
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">mkdir ./target_mnt
 sudo mount <span style="color:#e6db74">`</span>echo <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">${</span>SYSTEM_IMAGE<span style="color:#e6db74">}</span><span style="color:#e6db74">p2&#34;</span><span style="color:#e6db74">`</span> ./target_mnt
 sudo mkdir ./target_mnt/boot
 sudo mount <span style="color:#e6db74">`</span>echo <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">${</span>SYSTEM_IMAGE<span style="color:#e6db74">}</span><span style="color:#e6db74">p1&#34;</span><span style="color:#e6db74">`</span> ./target_mnt/boot
 </code></pre></div><h2 id="copying-boot-files">Copying boot files</h2>
 <p>First, all required firmware files will be copied from the buildroot output folder to the boot folder:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">sudo cp ./buildroot-&lt;VERSION_GOES_HERE&gt;/output/images/bcm2711-rpi-4-b.dtb ./target_mnt/boot/
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">sudo cp ./buildroot-&lt;VERSION_GOES_HERE&gt;/output/images/bcm2711-rpi-4-b.dtb ./target_mnt/boot/
 sudo cp ./buildroot-&lt;VERSION_GOES_HERE&gt;/output/images/rpi-firmware/start4.elf ./target_mnt/boot/
 sudo cp ./buildroot-&lt;VERSION_GOES_HERE&gt;/output/images/rpi-firmware/fixup4.dat ./target_mnt/boot/
 </code></pre></div><p>Then, the kernel is copied to the boot folder:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">sudo cp ./buildroot-&lt;VERSION_GOES_HERE&gt;/output/images/uImage ./target_mnt/boot/
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">sudo cp ./buildroot-&lt;VERSION_GOES_HERE&gt;/output/images/uImage ./target_mnt/boot/
 </code></pre></div><p>After that, the bootloader and related configurations are copied to the boot folder:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#75715e"># Copy the bootloader</span>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#75715e"># Copy the bootloader</span>
 sudo cp ./u-boot/u-boot.bin ./target_mnt/boot/
 
 <span style="color:#75715e"># Copy config.txt, to the Raspberry Pi boots U-boot</span>
@@ -1338,18 +1680,18 @@ sudo cp ./u-boot/config.txt ./target_mnt/boot/
 <span style="color:#75715e"># Copy boot.scr, this bootscript starts the embedded OS</span>
 sudo cp ./u-boot/boot.scr ./target_mnt/boot/
 </code></pre></div><h2 id="extracting-the-root-filesystem-to-the-rootfs-partition">Extracting the root filesystem to the <code>ROOTFS</code> partition</h2>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">cd ./target_mnt
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">cd ./target_mnt
 sudo tar -xvf ../buildroot-&lt;VERSION_GOES_HERE&gt;/output/images/rootfs.tar.gz .
 cd ../
 </code></pre></div><h2 id="unmounting-the-image">Unmounting the image</h2>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">sudo sync
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">sudo sync
 sudo umount ./target_mnt/boot -l
 sudo umount ./target_mnt -l
 sudo losetup -D
 sudo rm -rf ./target_mnt
 </code></pre></div><h1 id="flashing-the-virtual-disk-image-to-an-sd">Flashing the virtual disk image to an SD</h1>
 <p>The <code>system.img</code> file (which now contains the entire embedded OS) can be flashed to an SD card using <code>dd</code> as follows:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">sudo dd <span style="color:#66d9ef">if</span><span style="color:#f92672">=</span>system.img of<span style="color:#f92672">=</span>/dev/YOUR_DEVICE_GOES_HERE bs<span style="color:#f92672">=</span>1MiB status<span style="color:#f92672">=</span>progress
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">sudo dd <span style="color:#66d9ef">if</span><span style="color:#f92672">=</span>system.img of<span style="color:#f92672">=</span>/dev/YOUR_DEVICE_GOES_HERE bs<span style="color:#f92672">=</span>1MiB status<span style="color:#f92672">=</span>progress
 sudo sync
 </code></pre></div><p>Since <code>system.img</code> is an image file the flashing process is exactly the same as all other &ldquo;Raspberry Pi Linux distro&rsquo;s&rdquo;.<br>
 Therefore, if <code>dd</code> seems too scary, the following tools can be used to flash the <code>system.img</code> file:<br>
@@ -1393,7 +1735,7 @@ audio, keyboard, mouse, joystick, and graphics hardware via OpenGL and Direct3D.
 <h2 id="creating-a-window-that-opens-and-closes">Creating a window that opens and closes</h2>
 <p>Before any drawing can begin, a window and renderer have to be created. After the program window opens and closes without errors, other elements can be created.</p>
 <p>Code:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;stddef.h&gt;</span><span style="color:#75715e">
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;stddef.h&gt;</span><span style="color:#75715e">
 </span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;stdlib.h&gt;</span><span style="color:#75715e">
 </span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;stdio.h&gt;</span><span style="color:#75715e">
 </span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;stdbool.h&gt;</span><span style="color:#75715e">
@@ -1464,7 +1806,7 @@ audio, keyboard, mouse, joystick, and graphics hardware via OpenGL and Direct3D.
     <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">0</span>;
 }
 </code></pre></div><p>Makefile to create the binary:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-Makefile" data-lang="Makefile">CC <span style="color:#f92672">=</span> gcc
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-Makefile" data-lang="Makefile">CC <span style="color:#f92672">=</span> gcc
 CFLAGS <span style="color:#f92672">=</span> -std<span style="color:#f92672">=</span>c99 -Wall -Wextra -Wconversion -Ofast -Wpedantic -Werror <span style="color:#ae81ff">\
 </span><span style="color:#ae81ff"></span>         <span style="color:#e6db74">`</span>sdl2-config --cflags<span style="color:#e6db74">`</span> -lSDL2 -lSDL2_ttf -lSDL2_image -lSDL2_mixer -lm
 
@@ -1476,7 +1818,7 @@ CFLAGS <span style="color:#f92672">=</span> -std<span style="color:#f92672">=</s
 <h2 id="small-code-examples">Small code examples</h2>
 <h3 id="drawing-a-line">Drawing a line</h3>
 <p>To draw a line over the whole window, the following code can be used:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#75715e">// Get begin and end values for the line
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#75715e">// Get begin and end values for the line
 </span><span style="color:#75715e"></span><span style="color:#66d9ef">int</span> x_start <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
 <span style="color:#66d9ef">int</span> y_start <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
 <span style="color:#66d9ef">int</span> x_end, y_end;
@@ -1492,7 +1834,7 @@ CFLAGS <span style="color:#f92672">=</span> -std<span style="color:#f92672">=</s
 <p><a href="images/sdl2_line_wide.png"><img src="images/sdl2_line_wide.png" alt="SDL2 wide line"></a></p>
 <h2 id="drawing-a-rectangle">Drawing a rectangle</h2>
 <p>Drawing a rectangle is something SDL2 can do by itself. It can either draw only the outline or fill it in with a color.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-C" data-lang="C"><span style="color:#75715e">// Set draw color
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-C" data-lang="C"><span style="color:#75715e">// Set draw color
 </span><span style="color:#75715e"></span>SDL_SetRenderDrawColor(renderer, <span style="color:#ae81ff">255</span>, <span style="color:#ae81ff">255</span>, <span style="color:#ae81ff">255</span>, SDL_ALPHA_OPAQUE);
 
 <span style="color:#75715e">// Create a rectangle
@@ -1509,7 +1851,7 @@ example_rectangle.x <span style="color:#f92672">=</span> <span style="color:#ae8
 </span></code></pre></div><p><a href="images/sdl2_rectangle.png"><img src="images/sdl2_rectangle.png" alt="SDL2 rectangle"></a></p>
 <h2 id="drawing-a-circle">Drawing a circle</h2>
 <p>Drawing a circle is not something SDL2 can do by itself, but it can be done using a function and a custom datatype:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#75715e">// Create a datatype called &#34;SDL_Circle&#34;
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#75715e">// Create a datatype called &#34;SDL_Circle&#34;
 </span><span style="color:#75715e"></span><span style="color:#66d9ef">typedef</span> <span style="color:#66d9ef">struct</span> {
 	<span style="color:#66d9ef">int</span> x, y, r;	<span style="color:#75715e">// point x, point y, radius
 </span><span style="color:#75715e"></span>} SDL_Circle;
@@ -1545,7 +1887,7 @@ circle.r <span style="color:#f92672">=</span> <span style="color:#ae81ff">240</s
 <p><a href="images/sdl2_circle.png"><img src="images/sdl2_circle.png" alt="SDL2 circle"></a></p>
 <h2 id="drawing-an-image">Drawing an image</h2>
 <p>SDL2 can draw images as sprites:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#75715e">// Enable support for JPG, PNG and/or TIF before creating the window
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#75715e">// Enable support for JPG, PNG and/or TIF before creating the window
 </span><span style="color:#75715e"></span>IMG_Init(IMG_INIT_JPG<span style="color:#f92672">|</span>IMG_INIT_PNG<span style="color:#f92672">|</span>IMG_INIT_TIF);
 
 <span style="color:#75715e">// Import image files before running the main loop
@@ -1565,7 +1907,7 @@ SDL_RenderCopyEx(renderer, example_texture, NULL, <span style="color:#f92672">&a
 <p><a href="images/sdl2_image_rendering.png"><img src="images/sdl2_image_rendering.png" alt="SDL2 image rendering"></a></p>
 <h2 id="playing-audio">Playing audio</h2>
 <p>To play audio, the following code can be used:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#75715e">// Initialize audio before the main loop
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#75715e">// Initialize audio before the main loop
 </span><span style="color:#75715e"></span><span style="color:#66d9ef">int</span> number_of_channels <span style="color:#f92672">=</span> <span style="color:#ae81ff">50</span>;    <span style="color:#75715e">// SDL2 will play max 50 audio clips at the same time
 </span><span style="color:#75715e"></span>
 <span style="color:#66d9ef">if</span>(Mix_OpenAudio(<span style="color:#ae81ff">44100</span>, AUDIO_S16SYS, <span style="color:#ae81ff">2</span>, <span style="color:#ae81ff">512</span>) <span style="color:#f92672">&lt;</span> <span style="color:#ae81ff">0</span>) {
@@ -1588,11 +1930,11 @@ SDL_RenderCopyEx(renderer, example_texture, NULL, <span style="color:#f92672">&a
 </code></pre></div><h2 id="rendering-text">Rendering text</h2>
 <p>To render text in SDL2, a font file with the extension <em>.ttf</em> is needed. It is to be placed in the same directory as the binary, or in a subdirectory within the project.</p>
 <p>First, enable font support and load a font by running the code below:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c">TTF_Init();
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c">TTF_Init();
 <span style="color:#66d9ef">int</span> font_size <span style="color:#f92672">=</span> <span style="color:#ae81ff">16</span>;
 TTF_Font<span style="color:#f92672">*</span> font <span style="color:#f92672">=</span> TTF_OpenFont(<span style="color:#e6db74">&#34;path/to/font-file.ttf&#34;</span>, font_size);
 </code></pre></div><p>Then, to render text on the screen using this font, the following function can be used:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#66d9ef">void</span> <span style="color:#a6e22e">text_render</span>(SDL_Renderer<span style="color:#f92672">*</span> renderer, TTF_Font<span style="color:#f92672">*</span> font, <span style="color:#66d9ef">char</span><span style="color:#f92672">*</span> message, <span style="color:#66d9ef">int</span> position_x, <span style="color:#66d9ef">int</span> position_y, <span style="color:#66d9ef">int</span> rotation_angle, <span style="color:#66d9ef">bool</span> center, SDL_Color<span style="color:#f92672">*</span> text_color) {
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#66d9ef">void</span> <span style="color:#a6e22e">text_render</span>(SDL_Renderer<span style="color:#f92672">*</span> renderer, TTF_Font<span style="color:#f92672">*</span> font, <span style="color:#66d9ef">char</span><span style="color:#f92672">*</span> message, <span style="color:#66d9ef">int</span> position_x, <span style="color:#66d9ef">int</span> position_y, <span style="color:#66d9ef">int</span> rotation_angle, <span style="color:#66d9ef">bool</span> center, SDL_Color<span style="color:#f92672">*</span> text_color) {
     <span style="color:#75715e">// Declare variables that will contain text size values generated by TTF_SizeText()
 </span><span style="color:#75715e"></span>    <span style="color:#66d9ef">int</span> text_width;
     <span style="color:#66d9ef">int</span> text_height;
@@ -1623,7 +1965,7 @@ TTF_Font<span style="color:#f92672">*</span> font <span style="color:#f92672">=<
     SDL_DestroyTexture(message_texture);
 }
 </code></pre></div><p>The function can now be called somewhere in <code>main()</code>:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#75715e">// Define a text color
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#75715e">// Define a text color
 </span><span style="color:#75715e"></span>SDL_Color color;
 color.r <span style="color:#f92672">=</span> <span style="color:#ae81ff">255</span>;               <span style="color:#75715e">// red
 </span><span style="color:#75715e"></span>color.g <span style="color:#f92672">=</span> <span style="color:#ae81ff">100</span>;               <span style="color:#75715e">// green
@@ -1685,7 +2027,7 @@ Using the user manual of the phone&rsquo;s processor (Allwinner A64), a kernel m
 <p>For this project, only the user manual will be used, as it contains all the required information.</p>
 <h2 id="finding-the-right-registers">Finding the right registers</h2>
 <p>Chapter 3.21 (page 376) of the <a href="https://linux-sunxi.org/images/b/b4/Allwinner_A64_User_Manual_V1.1.pdf">user manual</a> contains information about some of the registers in the A64 SoC. At the top of the page, the following text can be read:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">The chip has 7 ports for multi-functional input/out pins. They are shown below:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">The chip has 7 ports for multi-functional input/out pins. They are shown below:
 - Port B(PB): 10 input/output port
 - Port C(PC): 17 input/output port
 - Port D(PD): 25 input/output port
@@ -1763,32 +2105,32 @@ Using the user manual of the phone&rsquo;s processor (Allwinner A64), a kernel m
 </table>
 <p>A 3 bit value controls pin modes in register <code>PD_CFG2_REG</code>. Let&rsquo;s set some pin modes using the C language</p>
 <p>The C language has a datatype called <code>struct</code>, which can be used to &ldquo;convert&rdquo; the table into the following code:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#66d9ef">typedef</span> <span style="color:#66d9ef">struct</span> {
-    <span style="color:#66d9ef">uint32_t</span> PD_16    : <span style="color:#ae81ff">3</span>;
-    <span style="color:#66d9ef">uint32_t</span> reserved : <span style="color:#ae81ff">1</span>;
-    <span style="color:#66d9ef">uint32_t</span> PD_17    : <span style="color:#ae81ff">3</span>;
-    <span style="color:#66d9ef">uint32_t</span> reserved : <span style="color:#ae81ff">1</span>;
-    <span style="color:#66d9ef">uint32_t</span> PD_18    : <span style="color:#ae81ff">3</span>;
-    <span style="color:#66d9ef">uint32_t</span> reserved : <span style="color:#ae81ff">1</span>;
-    <span style="color:#66d9ef">uint32_t</span> PD_19    : <span style="color:#ae81ff">3</span>;
-    <span style="color:#66d9ef">uint32_t</span> reserved : <span style="color:#ae81ff">1</span>;
-    <span style="color:#66d9ef">uint32_t</span> PD_20    : <span style="color:#ae81ff">3</span>;
-    <span style="color:#66d9ef">uint32_t</span> reserved : <span style="color:#ae81ff">1</span>;
-    <span style="color:#66d9ef">uint32_t</span> PD_21    : <span style="color:#ae81ff">3</span>;
-    <span style="color:#66d9ef">uint32_t</span> reserved : <span style="color:#ae81ff">1</span>;
-    <span style="color:#66d9ef">uint32_t</span> PD_22    : <span style="color:#ae81ff">3</span>;
-    <span style="color:#66d9ef">uint32_t</span> reserved : <span style="color:#ae81ff">1</span>;
-    <span style="color:#66d9ef">uint32_t</span> PD_23    : <span style="color:#ae81ff">3</span>;
-    <span style="color:#66d9ef">uint32_t</span> reserved : <span style="color:#ae81ff">1</span>;
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#66d9ef">typedef</span> <span style="color:#66d9ef">struct</span> {
+    uint32_t PD_16    : <span style="color:#ae81ff">3</span>;
+    uint32_t reserved : <span style="color:#ae81ff">1</span>;
+    uint32_t PD_17    : <span style="color:#ae81ff">3</span>;
+    uint32_t reserved : <span style="color:#ae81ff">1</span>;
+    uint32_t PD_18    : <span style="color:#ae81ff">3</span>;
+    uint32_t reserved : <span style="color:#ae81ff">1</span>;
+    uint32_t PD_19    : <span style="color:#ae81ff">3</span>;
+    uint32_t reserved : <span style="color:#ae81ff">1</span>;
+    uint32_t PD_20    : <span style="color:#ae81ff">3</span>;
+    uint32_t reserved : <span style="color:#ae81ff">1</span>;
+    uint32_t PD_21    : <span style="color:#ae81ff">3</span>;
+    uint32_t reserved : <span style="color:#ae81ff">1</span>;
+    uint32_t PD_22    : <span style="color:#ae81ff">3</span>;
+    uint32_t reserved : <span style="color:#ae81ff">1</span>;
+    uint32_t PD_23    : <span style="color:#ae81ff">3</span>;
+    uint32_t reserved : <span style="color:#ae81ff">1</span>;
 } PD_CFG2_REG_t;
 </code></pre></div><p>The <code>struct</code> will ensure that the right bits are set in memory, without having to set individual bits.</p>
 <h3 id="memory-location">Memory location</h3>
 <p>In the above table, an offset of <code>0x74</code> can be seen. The memory address of this MMIO register will be <code>PIO</code> (<code>0x01C20800</code>) + <code>0x74</code>. In code, this could look as follows:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#75715e">#define PIO 0x01C20800
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#75715e">#define PIO 0x01C20800
 </span><span style="color:#75715e">#define PD_CFG2_REG_ADDRESS (PIO + 0x74)
 </span></code></pre></div><h2 id="altering-the-memory">Altering the memory</h2>
 <p>The code to alter a piece of memory looks a bit magical, but it works quite well:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#75715e">#define MODE_OUTPUT   0x1
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#75715e">#define MODE_OUTPUT   0x1
 </span><span style="color:#75715e">#define MODE_DISABLED 0x7 </span><span style="color:#75715e">// default
 </span><span style="color:#75715e"></span>
 ((<span style="color:#66d9ef">volatile</span> PD_CFG2_REG_t<span style="color:#f92672">*</span>)PD_CFG2_REG_ADDRESS)<span style="color:#f92672">-&gt;</span>PD18 <span style="color:#f92672">=</span> MODE_OUTPUT;
@@ -1802,46 +2144,46 @@ Using the user manual of the phone&rsquo;s processor (Allwinner A64), a kernel m
 </ul>
 <h2 id="turning-the-io-pins-on-or-off">Turning the IO pins on or off</h2>
 <p>The method that is used to set the pin modes will be used to turn the IO pins on or off as well. The required table is found in chapter 3.21.2.23 (page 388) of the <a href="https://linux-sunxi.org/images/b/b4/Allwinner_A64_User_Manual_V1.1.pdf">user manual</a> and the <code>struct</code> and <code>address</code> will be as follows:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#75715e">#define PIO 0x01C20800                      </span><span style="color:#75715e">// same PIO address as the configure code uses
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#75715e">#define PIO 0x01C20800                      </span><span style="color:#75715e">// same PIO address as the configure code uses
 </span><span style="color:#75715e"></span><span style="color:#75715e">#define PD_DATA_REG_ADDRESS (PIO + 0x7C)    </span><span style="color:#75715e">// this time the offset is 0x7C
 </span><span style="color:#75715e"></span>
 <span style="color:#66d9ef">typedef</span> <span style="color:#66d9ef">struct</span> {
-    <span style="color:#66d9ef">uint32_t</span>  PD_0      : <span style="color:#ae81ff">1</span>;
-    <span style="color:#66d9ef">uint32_t</span>  PD_1      : <span style="color:#ae81ff">1</span>;
-    <span style="color:#66d9ef">uint32_t</span>  PD_2      : <span style="color:#ae81ff">1</span>;
-    <span style="color:#66d9ef">uint32_t</span>  PD_3      : <span style="color:#ae81ff">1</span>;
-    <span style="color:#66d9ef">uint32_t</span>  PD_4      : <span style="color:#ae81ff">1</span>;
-    <span style="color:#66d9ef">uint32_t</span>  PD_5      : <span style="color:#ae81ff">1</span>;
-    <span style="color:#66d9ef">uint32_t</span>  PD_6      : <span style="color:#ae81ff">1</span>;
-    <span style="color:#66d9ef">uint32_t</span>  PD_7      : <span style="color:#ae81ff">1</span>;
-    <span style="color:#66d9ef">uint32_t</span>  PD_8      : <span style="color:#ae81ff">1</span>;
-    <span style="color:#66d9ef">uint32_t</span>  PD_9      : <span style="color:#ae81ff">1</span>;
-    <span style="color:#66d9ef">uint32_t</span>  PD_10     : <span style="color:#ae81ff">1</span>;
-    <span style="color:#66d9ef">uint32_t</span>  PD_11     : <span style="color:#ae81ff">1</span>;
-    <span style="color:#66d9ef">uint32_t</span>  PD_12     : <span style="color:#ae81ff">1</span>;
-    <span style="color:#66d9ef">uint32_t</span>  PD_13     : <span style="color:#ae81ff">1</span>;
-    <span style="color:#66d9ef">uint32_t</span>  PD_14     : <span style="color:#ae81ff">1</span>;
-    <span style="color:#66d9ef">uint32_t</span>  PD_15     : <span style="color:#ae81ff">1</span>;
-    <span style="color:#66d9ef">uint32_t</span>  PD_16     : <span style="color:#ae81ff">1</span>;
-    <span style="color:#66d9ef">uint32_t</span>  PD_17     : <span style="color:#ae81ff">1</span>;
-    <span style="color:#66d9ef">uint32_t</span>  PD_18     : <span style="color:#ae81ff">1</span>;
-    <span style="color:#66d9ef">uint32_t</span>  PD_19     : <span style="color:#ae81ff">1</span>;
-    <span style="color:#66d9ef">uint32_t</span>  PD_20     : <span style="color:#ae81ff">1</span>;
-    <span style="color:#66d9ef">uint32_t</span>  PD_21     : <span style="color:#ae81ff">1</span>;
-    <span style="color:#66d9ef">uint32_t</span>  PD_22     : <span style="color:#ae81ff">1</span>;
-    <span style="color:#66d9ef">uint32_t</span>  PD_23     : <span style="color:#ae81ff">1</span>;
-    <span style="color:#66d9ef">uint32_t</span>  PD_24     : <span style="color:#ae81ff">1</span>;
-    <span style="color:#66d9ef">uint32_t</span>  reserved  : <span style="color:#ae81ff">7</span>;
+    uint32_t  PD_0      : <span style="color:#ae81ff">1</span>;
+    uint32_t  PD_1      : <span style="color:#ae81ff">1</span>;
+    uint32_t  PD_2      : <span style="color:#ae81ff">1</span>;
+    uint32_t  PD_3      : <span style="color:#ae81ff">1</span>;
+    uint32_t  PD_4      : <span style="color:#ae81ff">1</span>;
+    uint32_t  PD_5      : <span style="color:#ae81ff">1</span>;
+    uint32_t  PD_6      : <span style="color:#ae81ff">1</span>;
+    uint32_t  PD_7      : <span style="color:#ae81ff">1</span>;
+    uint32_t  PD_8      : <span style="color:#ae81ff">1</span>;
+    uint32_t  PD_9      : <span style="color:#ae81ff">1</span>;
+    uint32_t  PD_10     : <span style="color:#ae81ff">1</span>;
+    uint32_t  PD_11     : <span style="color:#ae81ff">1</span>;
+    uint32_t  PD_12     : <span style="color:#ae81ff">1</span>;
+    uint32_t  PD_13     : <span style="color:#ae81ff">1</span>;
+    uint32_t  PD_14     : <span style="color:#ae81ff">1</span>;
+    uint32_t  PD_15     : <span style="color:#ae81ff">1</span>;
+    uint32_t  PD_16     : <span style="color:#ae81ff">1</span>;
+    uint32_t  PD_17     : <span style="color:#ae81ff">1</span>;
+    uint32_t  PD_18     : <span style="color:#ae81ff">1</span>;
+    uint32_t  PD_19     : <span style="color:#ae81ff">1</span>;
+    uint32_t  PD_20     : <span style="color:#ae81ff">1</span>;
+    uint32_t  PD_21     : <span style="color:#ae81ff">1</span>;
+    uint32_t  PD_22     : <span style="color:#ae81ff">1</span>;
+    uint32_t  PD_23     : <span style="color:#ae81ff">1</span>;
+    uint32_t  PD_24     : <span style="color:#ae81ff">1</span>;
+    uint32_t  reserved  : <span style="color:#ae81ff">7</span>;
 } PD_DATA_REG_t;
 </code></pre></div><p>And to then turn the IO pins on or off, very similar pointer-magic will be used:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c">((<span style="color:#66d9ef">volatile</span> PD_DATA_REG_t<span style="color:#f92672">*</span>)PD_DATA_REG_ADDRESS)<span style="color:#f92672">-&gt;</span>PD18 <span style="color:#f92672">=</span> true; <span style="color:#75715e">// or false
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c">((<span style="color:#66d9ef">volatile</span> PD_DATA_REG_t<span style="color:#f92672">*</span>)PD_DATA_REG_ADDRESS)<span style="color:#f92672">-&gt;</span>PD18 <span style="color:#f92672">=</span> true; <span style="color:#75715e">// or false
 </span><span style="color:#75715e"></span>((<span style="color:#66d9ef">volatile</span> PD_DATA_REG_t<span style="color:#f92672">*</span>)PD_DATA_REG_ADDRESS)<span style="color:#f92672">-&gt;</span>PD19 <span style="color:#f92672">=</span> true; <span style="color:#75715e">// or false
 </span><span style="color:#75715e"></span>((<span style="color:#66d9ef">volatile</span> PD_DATA_REG_t<span style="color:#f92672">*</span>)PD_DATA_REG_ADDRESS)<span style="color:#f92672">-&gt;</span>PD20 <span style="color:#f92672">=</span> true; <span style="color:#75715e">// or false;
 </span></code></pre></div><h1 id="creating-a-linux-kernel-module">Creating a linux kernel module</h1>
 <h2 id="a-bare-bones-linux-kernel-module">A bare bones linux kernel module</h2>
 <p>All the code that is required to set pinmodes is present, but if it&rsquo;s ran in userspace (even as superuser), it will result in a <code>segfault</code>. This is because the Linux kernel does not allow memory to be altered directly. To get around this, a kernel module will be written.</p>
 <p>A bare bones kernel module looks like this:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#75715e">// filename: mymodule.c (do not name it &#39;module.c&#39;!)
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#75715e">// filename: mymodule.c (do not name it &#39;module.c&#39;!)
 </span><span style="color:#75715e"></span>
 <span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;linux/module.h&gt;</span><span style="color:#75715e">
 </span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;linux/kernel.h&gt;</span><span style="color:#75715e">
@@ -1862,7 +2204,7 @@ module_init(mymodule_init);
 module_exit(mymodule_exit);
 </code></pre></div><p>Make sure to not name anything <code>module</code>. Use a custom name like <code>mymodule</code>, or it might not compile.</p>
 <p>The following <code>Makefile</code> will compile the kernel module:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-Makefile" data-lang="Makefile">obj-m <span style="color:#f92672">:=</span> mymodule.o
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-Makefile" data-lang="Makefile">obj-m <span style="color:#f92672">:=</span> mymodule.o
 
 KERNEL_VERSION <span style="color:#f92672">=</span> <span style="color:#66d9ef">$(</span>shell uname -r<span style="color:#66d9ef">)</span>
 KERNEL_DIR     <span style="color:#f92672">=</span> /usr/lib/modules/<span style="color:#66d9ef">$(</span>KERNEL_VERSION<span style="color:#66d9ef">)</span>/build/
@@ -1877,18 +2219,18 @@ KERNEL_DIR     <span style="color:#f92672">=</span> /usr/lib/modules/<span style
 	<span style="color:#75715e"># Delete all build files</span>
 	<span style="color:#66d9ef">$(</span>MAKE<span style="color:#66d9ef">)</span> -C <span style="color:#66d9ef">$(</span>KERNEL_DIR<span style="color:#66d9ef">)</span> M<span style="color:#f92672">=</span><span style="color:#66d9ef">$(</span>PWD<span style="color:#66d9ef">)</span> clean
 </code></pre></div><p>To then add the kernel module to the kernel, the command</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">sudo insmod mymodule.ko
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">sudo insmod mymodule.ko
 </code></pre></div><p>can be issued.</p>
 <p>After that, when the command</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">sudo dmesg
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">sudo dmesg
 </code></pre></div><p>can be executed to see the kernel logs. The new linux module should have logged a greeting. To see it happening in realtime, the <code>-w</code> option can de added to the dmesg command.</p>
 <p>To remove the kernel module from the linux kernel, the command</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">sudo rmmod mymodule
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">sudo rmmod mymodule
 </code></pre></div><p>can be used.</p>
 <h2 id="a-kernel-module-that-alters-memory">A kernel module that alters memory</h2>
 <p>To alter the MMIO registers of the PinePhone, a <code>character device</code> kernel module will be written. It will take an array of 3 characters and turn the right bits on and off using the values of the array. It will also be able to read the current state of the memory and return it in the form of a 3 character long array. All communication will happen through <code>/dev/mymodule</code>, a virtual device.</p>
 <p>All the used memory locations and structures will be put in a separate file called <code>mmio.h</code>. The new kernel module looks like this:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;linux/module.h&gt;</span><span style="color:#75715e">
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;linux/module.h&gt;</span><span style="color:#75715e">
 </span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;linux/kernel.h&gt;</span><span style="color:#75715e">
 </span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;linux/fs.h&gt;</span><span style="color:#75715e">
 </span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;linux/cdev.h&gt;</span><span style="color:#75715e">
@@ -2069,11 +2411,11 @@ dev_t dev_num;
 module_init(mymodule_init);
 module_exit(mymodule_exit);
 </code></pre></div><p>When this module is loaded in using</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">sudo insmod mymodule.ko
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">sudo insmod mymodule.ko
 </code></pre></div><p>it will log how to make a virtual device. After executing that command as superuser, a virtual device called <code>/dev/mymodule</code> will have been created.</p>
 <h1 id="communicating-with-the-kernel-module">Communicating with the kernel module</h1>
 <p>Communication can be done using a C or C++ program that runs in userland (as superuser):</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#75715e">// main.c
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#75715e">// main.c
 </span><span style="color:#75715e"></span>
 <span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;stdio.h&gt;</span><span style="color:#75715e">
 </span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;fcntl.h&gt;</span><span style="color:#75715e">

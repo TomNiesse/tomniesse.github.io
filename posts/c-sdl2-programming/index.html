@@ -22,7 +22,7 @@
 
 
 
-<link rel="stylesheet" href="/main.5b3e37caf5f369f54ba730903dd9043b99e0b3792e27db9a87f21a3634934b96.css" integrity="sha256-Wz43yvXzafVLpzCQPdkEO5ngs3kuJ9uah/IaNjSTS5Y=">
+<link rel="stylesheet" href="/main.d0bc80ef7c45f171405c3801554202d2e5fe4f2d84ab897a14ccf3b9ea92cca6.css" integrity="sha256-0LyA73xF8XFAXDgBVUIC0uX&#43;Ty2Eq4l6FMzzueqSzKY=">
 
 
 
@@ -36,10 +36,16 @@
 
 
 <meta itemprop="name" content="C and SDL2 programming">
-<meta itemprop="description" content="Working with SDL2 and C This post will show snippets of code that can be used to make an SDL2 application. This post serves mostly as a personal reminder of how the basics of SDL2 work. Much more advanced things can be done using SDL2, especially if it&rsquo;s combined with a language like C&#43;&#43;. C&#43;&#43; has classes, which make it much easier to create more advanced programs (like a basic game)."><meta itemprop="datePublished" content="2021-11-04T13:28:55+02:00" />
+<meta itemprop="description" content="Working with SDL2 and C This post will show snippets of code that can be used to make an SDL2 application. This post serves mostly as a personal reminder of how the basics of SDL2 work. Much more advanced things can be done using SDL2, especially if it&rsquo;s combined with a language like C&#43;&#43;. C&#43;&#43; has classes, which make it much easier to create more advanced programs (like a basic game).">
+<meta itemprop="datePublished" content="2021-11-04T13:28:55+02:00" />
 <meta itemprop="dateModified" content="2021-11-04T13:28:55+02:00" />
-<meta itemprop="wordCount" content="1376"><meta itemprop="image" content="https://tomniesse.github.io/"/>
+<meta itemprop="wordCount" content="1376">
+<meta itemprop="image" content="https://tomniesse.github.io/"/>
+
+
+
 <meta itemprop="keywords" content="untagged," />
+
 <meta name="twitter:card" content="summary_large_image"/>
 <meta name="twitter:image" content="https://tomniesse.github.io/"/>
 
@@ -51,10 +57,10 @@
     <meta property="og:title" content="C and SDL2 programming" />
 <meta property="og:description" content="Working with SDL2 and C This post will show snippets of code that can be used to make an SDL2 application. This post serves mostly as a personal reminder of how the basics of SDL2 work. Much more advanced things can be done using SDL2, especially if it&rsquo;s combined with a language like C&#43;&#43;. C&#43;&#43; has classes, which make it much easier to create more advanced programs (like a basic game)." />
 <meta property="og:type" content="article" />
-<meta property="og:url" content="https://tomniesse.github.io/posts/c-sdl2-programming/" /><meta property="og:image" content="https://tomniesse.github.io/"/><meta property="article:section" content="posts" />
+<meta property="og:url" content="https://tomniesse.github.io/posts/c-sdl2-programming/" />
+<meta property="og:image" content="https://tomniesse.github.io/"/>
 <meta property="article:published_time" content="2021-11-04T13:28:55+02:00" />
 <meta property="article:modified_time" content="2021-11-04T13:28:55+02:00" /><meta property="og:site_name" content="Tom&#39;s blog" />
-
 
 
 
@@ -157,7 +163,7 @@ audio, keyboard, mouse, joystick, and graphics hardware via OpenGL and Direct3D.
 <h2 id="creating-a-window-that-opens-and-closes">Creating a window that opens and closes</h2>
 <p>Before any drawing can begin, a window and renderer have to be created. After the program window opens and closes without errors, other elements can be created.</p>
 <p>Code:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;stddef.h&gt;</span><span style="color:#75715e">
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;stddef.h&gt;</span><span style="color:#75715e">
 </span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;stdlib.h&gt;</span><span style="color:#75715e">
 </span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;stdio.h&gt;</span><span style="color:#75715e">
 </span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;stdbool.h&gt;</span><span style="color:#75715e">
@@ -228,7 +234,7 @@ audio, keyboard, mouse, joystick, and graphics hardware via OpenGL and Direct3D.
     <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">0</span>;
 }
 </code></pre></div><p>Makefile to create the binary:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-Makefile" data-lang="Makefile">CC <span style="color:#f92672">=</span> gcc
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-Makefile" data-lang="Makefile">CC <span style="color:#f92672">=</span> gcc
 CFLAGS <span style="color:#f92672">=</span> -std<span style="color:#f92672">=</span>c99 -Wall -Wextra -Wconversion -Ofast -Wpedantic -Werror <span style="color:#ae81ff">\
 </span><span style="color:#ae81ff"></span>         <span style="color:#e6db74">`</span>sdl2-config --cflags<span style="color:#e6db74">`</span> -lSDL2 -lSDL2_ttf -lSDL2_image -lSDL2_mixer -lm
 
@@ -240,7 +246,7 @@ CFLAGS <span style="color:#f92672">=</span> -std<span style="color:#f92672">=</s
 <h2 id="small-code-examples">Small code examples</h2>
 <h3 id="drawing-a-line">Drawing a line</h3>
 <p>To draw a line over the whole window, the following code can be used:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#75715e">// Get begin and end values for the line
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#75715e">// Get begin and end values for the line
 </span><span style="color:#75715e"></span><span style="color:#66d9ef">int</span> x_start <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
 <span style="color:#66d9ef">int</span> y_start <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
 <span style="color:#66d9ef">int</span> x_end, y_end;
@@ -256,7 +262,7 @@ CFLAGS <span style="color:#f92672">=</span> -std<span style="color:#f92672">=</s
 <p><a href="images/sdl2_line_wide.png"><img src="images/sdl2_line_wide.png" alt="SDL2 wide line"></a></p>
 <h2 id="drawing-a-rectangle">Drawing a rectangle</h2>
 <p>Drawing a rectangle is something SDL2 can do by itself. It can either draw only the outline or fill it in with a color.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-C" data-lang="C"><span style="color:#75715e">// Set draw color
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-C" data-lang="C"><span style="color:#75715e">// Set draw color
 </span><span style="color:#75715e"></span>SDL_SetRenderDrawColor(renderer, <span style="color:#ae81ff">255</span>, <span style="color:#ae81ff">255</span>, <span style="color:#ae81ff">255</span>, SDL_ALPHA_OPAQUE);
 
 <span style="color:#75715e">// Create a rectangle
@@ -273,7 +279,7 @@ example_rectangle.x <span style="color:#f92672">=</span> <span style="color:#ae8
 </span></code></pre></div><p><a href="images/sdl2_rectangle.png"><img src="images/sdl2_rectangle.png" alt="SDL2 rectangle"></a></p>
 <h2 id="drawing-a-circle">Drawing a circle</h2>
 <p>Drawing a circle is not something SDL2 can do by itself, but it can be done using a function and a custom datatype:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#75715e">// Create a datatype called &#34;SDL_Circle&#34;
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#75715e">// Create a datatype called &#34;SDL_Circle&#34;
 </span><span style="color:#75715e"></span><span style="color:#66d9ef">typedef</span> <span style="color:#66d9ef">struct</span> {
 	<span style="color:#66d9ef">int</span> x, y, r;	<span style="color:#75715e">// point x, point y, radius
 </span><span style="color:#75715e"></span>} SDL_Circle;
@@ -309,7 +315,7 @@ circle.r <span style="color:#f92672">=</span> <span style="color:#ae81ff">240</s
 <p><a href="images/sdl2_circle.png"><img src="images/sdl2_circle.png" alt="SDL2 circle"></a></p>
 <h2 id="drawing-an-image">Drawing an image</h2>
 <p>SDL2 can draw images as sprites:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#75715e">// Enable support for JPG, PNG and/or TIF before creating the window
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#75715e">// Enable support for JPG, PNG and/or TIF before creating the window
 </span><span style="color:#75715e"></span>IMG_Init(IMG_INIT_JPG<span style="color:#f92672">|</span>IMG_INIT_PNG<span style="color:#f92672">|</span>IMG_INIT_TIF);
 
 <span style="color:#75715e">// Import image files before running the main loop
@@ -329,7 +335,7 @@ SDL_RenderCopyEx(renderer, example_texture, NULL, <span style="color:#f92672">&a
 <p><a href="images/sdl2_image_rendering.png"><img src="images/sdl2_image_rendering.png" alt="SDL2 image rendering"></a></p>
 <h2 id="playing-audio">Playing audio</h2>
 <p>To play audio, the following code can be used:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#75715e">// Initialize audio before the main loop
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#75715e">// Initialize audio before the main loop
 </span><span style="color:#75715e"></span><span style="color:#66d9ef">int</span> number_of_channels <span style="color:#f92672">=</span> <span style="color:#ae81ff">50</span>;    <span style="color:#75715e">// SDL2 will play max 50 audio clips at the same time
 </span><span style="color:#75715e"></span>
 <span style="color:#66d9ef">if</span>(Mix_OpenAudio(<span style="color:#ae81ff">44100</span>, AUDIO_S16SYS, <span style="color:#ae81ff">2</span>, <span style="color:#ae81ff">512</span>) <span style="color:#f92672">&lt;</span> <span style="color:#ae81ff">0</span>) {
@@ -352,11 +358,11 @@ SDL_RenderCopyEx(renderer, example_texture, NULL, <span style="color:#f92672">&a
 </code></pre></div><h2 id="rendering-text">Rendering text</h2>
 <p>To render text in SDL2, a font file with the extension <em>.ttf</em> is needed. It is to be placed in the same directory as the binary, or in a subdirectory within the project.</p>
 <p>First, enable font support and load a font by running the code below:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c">TTF_Init();
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c">TTF_Init();
 <span style="color:#66d9ef">int</span> font_size <span style="color:#f92672">=</span> <span style="color:#ae81ff">16</span>;
 TTF_Font<span style="color:#f92672">*</span> font <span style="color:#f92672">=</span> TTF_OpenFont(<span style="color:#e6db74">&#34;path/to/font-file.ttf&#34;</span>, font_size);
 </code></pre></div><p>Then, to render text on the screen using this font, the following function can be used:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#66d9ef">void</span> <span style="color:#a6e22e">text_render</span>(SDL_Renderer<span style="color:#f92672">*</span> renderer, TTF_Font<span style="color:#f92672">*</span> font, <span style="color:#66d9ef">char</span><span style="color:#f92672">*</span> message, <span style="color:#66d9ef">int</span> position_x, <span style="color:#66d9ef">int</span> position_y, <span style="color:#66d9ef">int</span> rotation_angle, <span style="color:#66d9ef">bool</span> center, SDL_Color<span style="color:#f92672">*</span> text_color) {
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#66d9ef">void</span> <span style="color:#a6e22e">text_render</span>(SDL_Renderer<span style="color:#f92672">*</span> renderer, TTF_Font<span style="color:#f92672">*</span> font, <span style="color:#66d9ef">char</span><span style="color:#f92672">*</span> message, <span style="color:#66d9ef">int</span> position_x, <span style="color:#66d9ef">int</span> position_y, <span style="color:#66d9ef">int</span> rotation_angle, <span style="color:#66d9ef">bool</span> center, SDL_Color<span style="color:#f92672">*</span> text_color) {
     <span style="color:#75715e">// Declare variables that will contain text size values generated by TTF_SizeText()
 </span><span style="color:#75715e"></span>    <span style="color:#66d9ef">int</span> text_width;
     <span style="color:#66d9ef">int</span> text_height;
@@ -387,7 +393,7 @@ TTF_Font<span style="color:#f92672">*</span> font <span style="color:#f92672">=<
     SDL_DestroyTexture(message_texture);
 }
 </code></pre></div><p>The function can now be called somewhere in <code>main()</code>:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#75715e">// Define a text color
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#75715e">// Define a text color
 </span><span style="color:#75715e"></span>SDL_Color color;
 color.r <span style="color:#f92672">=</span> <span style="color:#ae81ff">255</span>;               <span style="color:#75715e">// red
 </span><span style="color:#75715e"></span>color.g <span style="color:#f92672">=</span> <span style="color:#ae81ff">100</span>;               <span style="color:#75715e">// green
@@ -603,7 +609,7 @@ text_render(renderer, font, message, x_end <span style="color:#f92672">/</span> 
 
 
 
-<script type="text/javascript" src="/bundle.min.644292943ae47eef02fcd64b11757aeb8caeeaebf473a823b62099edccac808e8d82689359f285e5d95994e5ad5ae3b9c1ccc281eb1828e67d0ba6630f95b832.js" integrity="sha512-ZEKSlDrkfu8C/NZLEXV664yu6uv0c6gjtiCZ7cysgI6NgmiTWfKF5dlZlOWtWuO5wczCgesYKOZ9C6ZjD5W4Mg=="></script>
+<script type="text/javascript" src="/bundle.min.250eccec8a234ae0b0194ed3fed44baa4f5d4267332956cb0f92e363624a714666b7322e1a3da21cb389124adf349c467b46f9b7aab3351e3aa84dcaf55fe33a.js" integrity="sha512-JQ7M7IojSuCwGU7T/tRLqk9dQmczKVbLD5LjY2JKcUZmtzIuGj2iHLOJEkrfNJxGe0b5t6qzNR46qE3K9V/jOg=="></script>
 
 
 
