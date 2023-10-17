@@ -354,7 +354,8 @@ boot.vfat  sdcard.img
 <h3 id="creating-bootscr">Creating boot.scr</h3>
 <p>To create a boot script for U-boot, a text file with some script text needs to be converted.</p>
 <p>For this project, a file called <code>boot.txt</code> is created, with the following contents:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">setenv bootargs root<span style="color:#f92672">=</span>/dev/mmcblk0p2 rootwait panic<span style="color:#f92672">=</span><span style="color:#ae81ff">10</span> console<span style="color:#f92672">=</span>/dev/ttyS0,11520 console<span style="color:#f92672">=</span>tty0
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">setenv bootargs root<span style="color:#f92672">=</span>/dev/mmcblk0p2 rootwait panic<span style="color:#f92672">=</span><span style="color:#ae81ff">10</span> console<span style="color:#f92672">=</span>/dev/ttyS0,115200
+console<span style="color:#f92672">=</span>tty0
 load mmc 0:1 $kernel_addr_r zImage
 load mmc 0:1 $fdt_addr_r sun5i-a13-q8-tablet.dtb
 bootz $kernel_addr_r - $fdt_addr_r
